@@ -120,65 +120,6 @@ public static final class SampleConstants{
 
     }
 
-    public static final class PixelHandlerConstants {
-        public static final double DROP_OPEN_POSITION = 0;
-        public static final double DROP_CLOSED_POSITION = .7;
-
-        public enum LeftGripperSet {
-            WIDE_OPEN(.6),
-            OPEN(.5),//open position
-            MID(.7),//mid
-            CLOSED(.2);//closed
-
-            public final double position;
-
-            LeftGripperSet(double position) {
-                this.position = position;
-            }
-        }
-
-
-        public enum RightGripperSet {
-            WIDE_OPEN(.35),
-            OPEN(.4),
-            MID(.5),
-            CLOSED(.65);
-
-            public final double position;
-
-            RightGripperSet(double position) {
-                this.position = position;
-            }
-        }
-
-
-        public enum TurnGripperSet {
-            PICKUP(.2),
-            MID(.65),
-            DELIVER(0);
-
-            public final double position;
-
-            TurnGripperSet(double position) {
-                this.position = position;
-            }
-        }
-
-        public enum FlipGripperSet {
-            PICKUP(0.195),
-            LEFT_DOWN(.33),
-            DELIVER(.427),
-
-            RIGHT_DOWN(0.06);
-
-            public final double position;
-
-            FlipGripperSet(double position) {
-                this.position = position;
-            }
-        }
-    }
-
     public enum TurnGripperJogSet {
         LO(.001),
 
@@ -228,53 +169,38 @@ public static final class SampleConstants{
 
     }
 
-    public static final class ClimberConstants {
+    public static final class ElevatorConstants {
 
-        public static final double MAX_MOTOR_RPM = 312;
+        public static final double MAX_MOTOR_RPM = 435;
 
-        public static final double MAX_MOTOR_RPSEC = 312 / 60;
+        public static final double MAX_MOTOR_RPSEC = 435 / 60;
 
 
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 537.7;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 384.5;
 
-        public static final double GEARING_RATIO = 225 / 16;// motor revs per inch
+        public static final double GEARING_RATIO = 4.72;// motor inches per rev
 
-        public static final double ENCODER_COUNTS_PER_INCH = 6.67 * ENCODER_COUNTS_PER_MOTOR_REV / GEARING_RATIO;
-
-        public static final double MOTOR_REVS_PER_INCH = GEARING_RATIO;
-        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC / GEARING_RATIO;
-        public static final double POSITION_TOLERANCE_INCHES = .25;
-        public static final double UPPER_POSITION_LIMIT = 18.00;
-        public static final int LOWER_POSITION_LIMIT = 0;
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / GEARING_RATIO;
+        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
+        public static final double POSITION_TOLERANCE_INCHES = .5;
+        public static final double UPPER_POSITION_LIMIT = 27.00;
+        public static final int LOWER_POSITION_LIMIT = -1;
 
         public static final double JOG_UP_POWER = +.5;
-
         public static final double JOG_DOWN_POWER = -.4;
         public static final double AUTO_DELIVER_POSITION = 7.5;
         public static final double HOME_POSITION = 1;
-        public static final double MAX_VEL = 4;
-        public static final double MAX_ACCEL = 2;
+        public static final double MAX_VEL = 30;
+        public static final double MAX_ACCEL = 30;
+        public static double[] armPositionInches = {0,0.5, 5.8, 9, 13.6, 14.3, 16.8, 19};
 
-        public static double kP = .5;
+
+        public static double kP = 1.5;
         public static double kI = 0;
         public static double kD = 0;
 
         public static double POSITION_Kg = 0;
 
-        public static double CLEAR_BAR_HEIGHT = 16;
-
-        public static double RAISe_ROBOT_HEIGHT = 10;
-
-
-    }
-
-    public static final class CatapultConstants {
-
-        public static final double CATAPULT_LOCK_POSITION = .0;
-        public static final double CATAPULT_RELEASE_POSITION = .10;
-
-        public static final double CATAPULT_MOTOR_POWER = .5;
-        public static final long MOTOR_RUN_MILLISECONDS = 1000 ;
     }
 
 

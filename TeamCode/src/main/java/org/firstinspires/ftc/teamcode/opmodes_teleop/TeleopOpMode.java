@@ -16,6 +16,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.commands.drive.AlignToNote;
 import org.firstinspires.ftc.teamcode.commands.drive.JogDrive;
+import org.firstinspires.ftc.teamcode.commands.elevator.JogElevator;
+import org.firstinspires.ftc.teamcode.commands.elevator.PositionElevator;
+import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeRollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -27,6 +31,8 @@ public class TeleopOpMode extends CommandOpMode {
     protected MecanumDriveSubsystem drive;
     protected LimelightSubsystem limelight;
     protected IntakeRollerSubsystem intakeRoller;
+    protected ElevatorSubsystem elevator;
+    protected ExtendArmSubsystem arm;
     FtcDashboard dashboard;
     GamepadEx driver;
     GamepadEx coDriver;
@@ -40,6 +46,21 @@ public class TeleopOpMode extends CommandOpMode {
     private Button runRollerOut;
     private Button stopRoller;
 
+    private Button jogElevator;
+    private Button positionElevatorTenInches;
+    private Button positionElevatorTwentyInches;
+    private Button positionElevatorZeroInches;
+
+
+    private Button jogArm;
+    private Button positionArmTenInches;
+    private Button positionArmTwentyInches;
+    private Button positionArmZeroInches;
+
+
+    private Button stepTelemetryUp;
+    private Button stepTelemetryDown;
+
     @Override
     public void initialize() {
 
@@ -52,6 +73,20 @@ public class TeleopOpMode extends CommandOpMode {
         limelight = new LimelightSubsystem(this);
 
         intakeRoller = new IntakeRollerSubsystem(this);
+
+        elevator = new ElevatorSubsystem(this);
+
+        arm = new ExtendArmSubsystem(this);
+
+
+        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
+
+        positionElevatorZeroInches = new GamepadButton(coDriver, GamepadKeys.Button.A);
+
+        positionElevatorTenInches = new GamepadButton(coDriver, GamepadKeys.Button.B);
+
+        positionElevatorTwentyInches = new GamepadButton(coDriver, GamepadKeys.Button.X);
+
 
         m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
 
@@ -68,7 +103,7 @@ public class TeleopOpMode extends CommandOpMode {
         stopRoller = new GamepadButton(driver, GamepadKeys.Button.X);
 
 
-        register(drive, limelight);
+        register(drive, elevator, arm, limelight);
 
         drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
@@ -90,7 +125,7 @@ public class TeleopOpMode extends CommandOpMode {
         while (!isStopRequested() && opModeIsActive()) {
             CommandScheduler.getInstance().run();
             checkTriggers();
-           showField();
+            showField();
         }
         reset();
 //        TelemetryPacket packet = new TelemetryPacket();
@@ -123,8 +158,15 @@ public class TeleopOpMode extends CommandOpMode {
         stopRoller.whenPressed(new InstantCommand(() -> intakeRoller.stopRoller()));
 
 
-    }
+        jogElevator.whenHeld(new JogElevator(elevator, coDriver));
 
+        positionElevatorZeroInches.whenPressed(new PositionElevator(elevator, 0));
+
+        positionElevatorTenInches.whenPressed(new PositionElevator(elevator, 10));
+
+        positionElevatorTwentyInches.whenPressed(new PositionElevator(elevator, 20));
+
+    }
 
 
     void showField() {
@@ -135,7 +177,7 @@ public class TeleopOpMode extends CommandOpMode {
         telemetry.addData("x", drive.pose.position.x);
         telemetry.addData("y", drive.pose.position.y);
         telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
-       // telemetry.addData("BP3d",limelight.getBotPose2d().toString());
+        // telemetry.addData("BP3d",limelight.getBotPose2d().toString());
 
         telemetry.update();
 
