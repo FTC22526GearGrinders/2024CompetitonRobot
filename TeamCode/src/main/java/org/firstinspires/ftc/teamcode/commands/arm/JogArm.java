@@ -27,15 +27,15 @@ public class JogArm extends CommandBase {
 
         arm.power = gamepad.getRightX() / 2;
 
-        if (arm.power > 0 && arm.getPositionInches() < 50
-
-                || arm.power < 0 && arm.getPositionInches() >2) {
+//        if (arm.power > 0 && arm.getPositionInches() < 50
+//
+//                || arm.power < 0 && arm.getPositionInches() >2) {
         arm.armMotor.set(arm.power);
-        } else
-            arm.power = 0;
+//        } else
+//            arm.power = 0;
 
 
-        arm.armController.setGoal(arm.getPositionInches());
+        // arm.armController.setGoal(arm.getPositionInches());
     }
 
     @Override

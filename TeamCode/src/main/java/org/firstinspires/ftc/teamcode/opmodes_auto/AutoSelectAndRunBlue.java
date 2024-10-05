@@ -33,24 +33,29 @@ package org.firstinspires.ftc.teamcode.opmodes_auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.commands.auto.AutoFactory;
+import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 
 
-@Autonomous(name = "Auto: Select-BLUE NON BB Start", group = "Auto")
+@Autonomous(name = "Auto: Select-START", group = "Auto")
 //@Disabled
 public class AutoSelectAndRunBlue extends CommandOpMode {
 
-    private MecanumDriveSubsystem drive;
-
-
     FtcDashboard dashboard;
-
     boolean buttonLocked = false;
-    boolean useStageDoor = false;
-    boolean secondPixel = true;
+    boolean sample = false;
+    boolean basket = true;
+    private MecanumDriveSubsystem drive;
+    private ElevatorSubsystem elevator;
+    private ExtendArmSubsystem arm;
+    private AutoFactory af;
 
     @Override
     public void initialize() {
@@ -76,13 +81,8 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
 
             if (buttonLocked) {
 
-
-                if (currentB) {
-                    useStageDoor = !useStageDoor;
-                }
-
                 if (currentA) {
-                    secondPixel = !secondPixel;
+                    basket = !basket;
                 }
             }
 
@@ -98,11 +98,9 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
 
             buttonLocked = xReleased && yReleased && aReleased && bReleased && lbReleased && rbReleased && startReleased;
 
-            telemetry.addData("You Have Chosen BLUE Alliance  NON BB Start", "");
+            telemetry.addData("You Have Chosen BLUE Alliance  ", "");
             telemetry.addLine();
-            telemetry.addData("Second Pixel Selected A to Change", secondPixel);
-            telemetry.addLine();
-            telemetry.addData("Stage Door Selected B to Change", useStageDoor);
+            telemetry.addData("Basket Selected A to Change", basket);
             telemetry.addLine();
 
 
@@ -114,23 +112,19 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
 
         }
 
-        telemetry.addData("You Have Chosen BLUE Alliance  NON BB Start", "");
+        telemetry.addData("You Have Chosen BLUE Alliance ", "");
         telemetry.addLine();
 
 
-        if (useStageDoor)
+        if (basket)
 
-            telemetry.addData("You Have Chosen Stage Door", "");
+            telemetry.addData("You Have Chosen Basket", "");
         else
-            telemetry.addData("You Have Chosen Near Truss", "");
+            telemetry.addData("You Have Chosen Samples", "");
 
         telemetry.addLine();
 
-        if (secondPixel)
-            telemetry.addData("You Have Chosen Second Pixel", "");
-        else
-            telemetry.addData("You Did Not Choose Second Pixel", "");
-        telemetry.addLine();
+
         telemetry.addData("Reselect Opmode to Change", "");
         telemetry.addLine();
 
@@ -139,24 +133,16 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
         telemetry.update();
 
 
-//        ActiveMotionValues.setRedAlliance(false);
-//        ActiveMotionValues.setBBStart(false);
-//        ActiveMotionValues.setCenterPark(false);
-//        ActiveMotionValues.setNearPark(false);
-//
-//        ActiveMotionValues.setUseStageDoor(useStageDoor);
-//        ActiveMotionValues.setSecondPixel(secondPixel);
-//
-//
-//        drive = new Drive_Subsystem(this);
-//
-//        phss = new PixelHandlerSubsystem(this);
-//
-//        arm = new ArmSubsystem(this);
-//
+        drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
+
+
+        arm = new ExtendArmSubsystem(this);
+
+        elevator = new ElevatorSubsystem(this);
+
 //        vss = new Vision_Subsystem(this);
 //
-//        af = new AutoFactory(this, drive, phss, arm, vss);
+        af = new AutoFactory(this, drive, elevator, arm);
 
         dashboard = FtcDashboard.getInstance();
 
@@ -173,6 +159,11 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
 
 
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+
+        if (basket)
+            CommandScheduler.getInstance().schedule(af.getBasketSequences());
+        else
+            CommandScheduler.getInstance().schedule(af.getBasketSequences());
 
 
         while (!isStopRequested() && opModeIsActive()) {

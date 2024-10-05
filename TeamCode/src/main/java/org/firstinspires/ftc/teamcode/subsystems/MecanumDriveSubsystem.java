@@ -59,7 +59,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.Localizer;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
@@ -180,13 +179,13 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (show1) {
-            showTelemetry1();
-        }
-
-        if (show2) {
-            showTelemetry2();
-        }
+//        if (show1) {
+//            showTelemetry1();
+//        }
+//
+//        if (show2) {
+//            showTelemetry2();
+//        }
 
     }
 
@@ -494,16 +493,16 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
             leftBack.setPower(leftBackPower);
             rightBack.setPower(rightBackPower);
             rightFront.setPower(rightFrontPower);
-
-            p.put("x", pose.position.x);
-            p.put("y", pose.position.y);
-            p.put("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
-
-            Pose2d error = txWorldTarget.value().minusExp(pose);
-            p.put("xError", error.position.x);
-            p.put("yError", error.position.y);
-            p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
-
+//
+//            p.put("x", pose.position.x);
+//            p.put("y", pose.position.y);
+//            p.put("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+//
+//            Pose2d error = txWorldTarget.value().minusExp(pose);
+//            p.put("xError", error.position.x);
+//            p.put("yError", error.position.y);
+//            p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
+//
             // only draw when active; only one drive action should be active at a time
             Canvas c = p.fieldOverlay();
             drawPoseHistory(c);

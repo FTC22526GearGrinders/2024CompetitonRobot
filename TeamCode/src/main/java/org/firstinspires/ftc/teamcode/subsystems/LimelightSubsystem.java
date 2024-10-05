@@ -45,9 +45,9 @@ public class LimelightSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if (show) {
-            showTelemetry();
-        }
+//        if (show) {
+//            showTelemetry();
+//        }
 
     }
 

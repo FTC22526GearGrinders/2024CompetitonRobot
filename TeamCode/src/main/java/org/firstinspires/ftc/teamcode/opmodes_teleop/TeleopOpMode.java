@@ -14,11 +14,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Drawing;
+import org.firstinspires.ftc.teamcode.commands.arm.JogArm;
 import org.firstinspires.ftc.teamcode.commands.drive.AlignToNote;
 import org.firstinspires.ftc.teamcode.commands.drive.JogDrive;
-import org.firstinspires.ftc.teamcode.commands.elevator.JogElevator;
-import org.firstinspires.ftc.teamcode.commands.elevator.PositionElevator;
-import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeRollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
@@ -31,7 +29,7 @@ public class TeleopOpMode extends CommandOpMode {
     protected MecanumDriveSubsystem drive;
     protected LimelightSubsystem limelight;
     protected IntakeRollerSubsystem intakeRoller;
-    protected ElevatorSubsystem elevator;
+    // protected ElevatorSubsystem elevator;
     protected ExtendArmSubsystem arm;
     FtcDashboard dashboard;
     GamepadEx driver;
@@ -45,6 +43,11 @@ public class TeleopOpMode extends CommandOpMode {
     private Button runRollerIn;
     private Button runRollerOut;
     private Button stopRoller;
+
+    private Button tiltServoDown;
+    private Button tiltServoUp;
+    private Button jogTiltDown;
+    private Button jogTiltUp;
 
     private Button jogElevator;
     private Button positionElevatorTenInches;
@@ -74,18 +77,26 @@ public class TeleopOpMode extends CommandOpMode {
 
         intakeRoller = new IntakeRollerSubsystem(this);
 
-        elevator = new ElevatorSubsystem(this);
+        //  elevator = new ElevatorSubsystem(this);
 
         arm = new ExtendArmSubsystem(this);
 
+        intakeRoller.setTiltServoAngle(intakeRoller.tiltCurrent);
 
-        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
+        jogArm = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
 
-        positionElevatorZeroInches = new GamepadButton(coDriver, GamepadKeys.Button.A);
+//        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
+//
+//        positionElevatorZeroInches = new GamepadButton(coDriver, GamepadKeys.Button.A);
+//
+//        positionElevatorTenInches = new GamepadButton(coDriver, GamepadKeys.Button.B);
+//
+//        positionElevatorTwentyInches = new GamepadButton(coDriver, GamepadKeys.Button.X);
 
-        positionElevatorTenInches = new GamepadButton(coDriver, GamepadKeys.Button.B);
-
-        positionElevatorTwentyInches = new GamepadButton(coDriver, GamepadKeys.Button.X);
+        tiltServoUp = new GamepadButton(coDriver, GamepadKeys.Button.A);
+        tiltServoDown = new GamepadButton(coDriver, GamepadKeys.Button.B);
+        jogTiltUp = new GamepadButton(coDriver, GamepadKeys.Button.DPAD_UP);
+        jogTiltDown = new GamepadButton(coDriver, GamepadKeys.Button.DPAD_DOWN);
 
 
         m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
@@ -103,7 +114,7 @@ public class TeleopOpMode extends CommandOpMode {
         stopRoller = new GamepadButton(driver, GamepadKeys.Button.X);
 
 
-        register(drive, elevator, arm, limelight);
+        register(drive, arm, limelight);
 
         drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
@@ -157,14 +168,23 @@ public class TeleopOpMode extends CommandOpMode {
         runRollerOut.whenPressed(new InstantCommand(() -> intakeRoller.runRoller(-1)));
         stopRoller.whenPressed(new InstantCommand(() -> intakeRoller.stopRoller()));
 
+        tiltServoDown.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(0.25)));
+        tiltServoUp.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(.4)));
 
-        jogElevator.whenHeld(new JogElevator(elevator, coDriver));
+        jogTiltDown.whenPressed(new InstantCommand(() -> intakeRoller.incTilt(-0.005)));
 
-        positionElevatorZeroInches.whenPressed(new PositionElevator(elevator, 0));
+        jogTiltUp.whenPressed(new InstantCommand(() -> intakeRoller.incTilt(0.005)));
 
-        positionElevatorTenInches.whenPressed(new PositionElevator(elevator, 10));
+        jogArm.whenHeld(new JogArm(arm, coDriver));
 
-        positionElevatorTwentyInches.whenPressed(new PositionElevator(elevator, 20));
+
+//        jogElevator.whenHeld(new JogElevator(elevator, coDriver));
+//
+//        positionElevatorZeroInches.whenPressed(new PositionElevator(elevator, 0));
+//
+//        positionElevatorTenInches.whenPressed(new PositionElevator(elevator, 10));
+//
+//        positionElevatorTwentyInches.whenPressed(new PositionElevator(elevator, 20));
 
     }
 
