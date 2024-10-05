@@ -93,11 +93,17 @@ public class TeleopOpMode extends CommandOpMode {
 //
 //        positionElevatorTwentyInches = new GamepadButton(coDriver, GamepadKeys.Button.X);
 
-        tiltServoUp = new GamepadButton(coDriver, GamepadKeys.Button.A);
-        tiltServoDown = new GamepadButton(coDriver, GamepadKeys.Button.B);
-        jogTiltUp = new GamepadButton(coDriver, GamepadKeys.Button.DPAD_UP);
-        jogTiltDown = new GamepadButton(coDriver, GamepadKeys.Button.DPAD_DOWN);
+        tiltServoDown.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(0.25)));
 
+        tiltServoUp.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(.4)));
+
+
+        jogTiltDown.whenPressed(intakeRoller::incTilt)
+                .whenReleased(new InstantCommand(() -> intakeRoller.oneShot = false));
+
+
+        jogTiltUp.whenPressed(intakeRoller::decTilt)
+                .whenReleased(new InstantCommand(() -> intakeRoller.oneShot = false));
 
         m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
 
@@ -139,11 +145,6 @@ public class TeleopOpMode extends CommandOpMode {
             showField();
         }
         reset();
-//        TelemetryPacket packet = new TelemetryPacket();
-//        packet.fieldOverlay().setStroke("#3F51B5");
-//        Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
-        // Drawing.drawRobot(packet.fieldOverlay(),limelight.getBotPose2d());
-//        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 
     void checkTriggers() {
@@ -171,9 +172,7 @@ public class TeleopOpMode extends CommandOpMode {
         tiltServoDown.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(0.25)));
         tiltServoUp.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(.4)));
 
-        jogTiltDown.whenPressed(new InstantCommand(() -> intakeRoller.incTilt(-0.005)));
 
-        jogTiltUp.whenPressed(new InstantCommand(() -> intakeRoller.incTilt(0.005)));
 
         jogArm.whenHeld(new JogArm(arm, coDriver));
 

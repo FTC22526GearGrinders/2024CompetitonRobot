@@ -23,6 +23,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     private Telemetry telemetry;
     private double scanTime;
     private double val;
+    public boolean oneShot;
 
     public IntakeRollerSubsystem(CommandOpMode opMode) {
 
@@ -63,15 +64,24 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         tiltServo.setPosition(angle);
     }
 
-    public void incTilt(double val1) {
-        if (val == 0) {
-            tiltCurrent = tiltCurrent + val1;
-            val = 1;
+    public void incTilt() {
+        if (!oneShot) {
+            tiltCurrent = tiltCurrent + .01;
+            oneShot = true;
+            if (tiltCurrent > 1) tiltCurrent = 1;
+            if (tiltCurrent < 0) tiltCurrent = 0;
+            setTiltServoAngle(tiltCurrent);
         }
-        if (tiltCurrent > 1) tiltCurrent = 1;
-        if (tiltCurrent < 0) tiltCurrent = 0;
-        tiltServo.setPosition(tiltCurrent);
-        //val = 0;
+    }
+
+    public void decTilt() {
+        if (!oneShot) {
+            tiltCurrent = tiltCurrent - .01;
+            oneShot = true;
+            if (tiltCurrent > 1) tiltCurrent = 1;
+            if (tiltCurrent < 0) tiltCurrent = 0;
+            setTiltServoAngle(tiltCurrent);
+        }
     }
 
 
