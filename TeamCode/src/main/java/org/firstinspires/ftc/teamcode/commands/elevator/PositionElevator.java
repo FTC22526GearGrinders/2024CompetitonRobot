@@ -28,10 +28,13 @@ public class PositionElevator extends CommandBase {
     @Override
     public void initialize() {
         elevator.setNewFFValues();
-        elevator.setPositionKp();
+        elevator.setLeftPositionKp();
 
-        elevator.pidController.reset(elevator.getPositionInches());
-        elevator.pidController.setGoal(targetInches);
+        elevator.leftPidController.reset(elevator.getLeftPositionInches());
+        elevator.leftPidController.setGoal(targetInches);
+
+        elevator.rightPidController.reset(elevator.getRightPositionInches());
+        elevator.rightPidController.setGoal(targetInches);
 
 
         lpctr = 0;
@@ -46,12 +49,12 @@ public class PositionElevator extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        elevator.elevatorMotor.set(0);
-       // elevator.rightElevatorMotor.set(0);
+        elevator.leftElevatorMotor.set(0);
+        elevator.rightElevatorMotor.set(0);
     }
 
     @Override
     public boolean isFinished() {
-        return lpctr > 5 && elevator.pidController.atGoal()  ||lpctr>250;
+        return lpctr > 5 && elevator.leftPidController.atGoal()  && elevator.rightPidController.atGoal() ||lpctr>250;
     }
 }

@@ -26,76 +26,95 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double MAX_VEL = 30;
     public static double MAX_ACCEL = 30;
     //units used are per unit motor setting since motor setVolts isn't available
-    public static double ks = 0.;//1% motor power
-    public static double kg = 0;
-    public static double kv = .04;//per inch per second (max 17 ips )
-    public static double ka = 0;
-    public static double kp = 0.01;
-    public static double ki = 0;
-    public static double kd = 0;
+    public static double lks = 0.;//1% motor power
+    public static double lkg = 0;
+    public static double lkv = .04;//per inch per second (max 17 ips )
+    public static double lka = 0;
+    public static double lkp = 0.01;
+    public static double lki = 0;
+    public static double lkd = 0;
 
-
+    public static double rks = 0.;//1% motor power
+    public static double rkg = 0;
+    public static double rkv = .04;//per inch per second (max 17 ips )
+    public static double rka = 0;
+    public static double rkp = 0.01;
+    public static double rki = 0;
+    public static double rkd = 0;
 
 
     private final Telemetry telemetry;
-    public Motor elevatorMotor;
-    public Motor.Encoder elevatorEncoder;
 
     public double targetInches;
-    public double power;
-    public ProfiledPIDController pidController;
-    public TrapezoidProfile.State goal = new TrapezoidProfile.State();
-    public TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
-
-
-    public int holdCtr;
-    public int show = 0;
-    public ElevatorFeedforward FF;
-
-    public int posrng;
-    public TrapezoidProfile.Constraints constraints;
     ElapsedTime et;
     CommandOpMode myOpmode;
 
-    double setVel;
-    double setPos;
-    double ff;
+    public TrapezoidProfile.Constraints constraints;
 
-    double pidout;
+    public Motor leftElevatorMotor;
+    public Motor.Encoder leftElevatorEncoder;
+    public ProfiledPIDController leftPidController;
+    public TrapezoidProfile.State leftGoal = new TrapezoidProfile.State();
+    public TrapezoidProfile.State leftSetpoint = new TrapezoidProfile.State();
+    public ElevatorFeedforward leftFeedForward;
 
+    public Motor rightElevatorMotor;
+    public Motor.Encoder rightElevatorEncoder;
+    public ProfiledPIDController rightPidController;
+    public TrapezoidProfile.State rightGoal = new TrapezoidProfile.State();
+    public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
+    public ElevatorFeedforward rightFeedForward;
 
+    public int holdCtr;
+    public int show = 0;
+    public int posrng;
+
+    double leftSetVel;
+    double leftSetPos;
+    double leftFf;
+    double leftPidout;
+    public double leftPower;
+
+    double rightSetVel;
+    double rightSetPos;
+    double rightFf;
+    double rightPidout;
+    public double rightPower;
+
+    private double leftAccel;
+    private double leftLastVel;
+    private double rightAccel;
+    private double rightLastVel;
     private double scanTime;
-    private double accel;
-
-    private double lastVel;
-
 
     public ElevatorSubsystem(CommandOpMode opMode) {
 
         myOpmode = opMode;
-        elevatorMotor = new Motor(opMode.hardwareMap, "elevatorMotor", Motor.GoBILDA.RPM_312);
 
-        elevatorMotor.setInverted(true);
-        elevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevatorMotor", Motor.GoBILDA.RPM_312);
+        leftElevatorMotor.setInverted(true);
+        leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        leftElevatorEncoder = leftElevatorMotor.encoder;
+        leftElevatorEncoder.setDirection(Motor.Direction.FORWARD);
+        leftElevatorEncoder.setDistancePerPulse(1 / ENCODER_COUNTS_PER_INCH);
+        leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
+        leftPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
+        leftPidController.setTolerance(POSITION_TOLERANCE_INCHES);
+        leftPidController.reset();
 
-        elevatorEncoder = elevatorMotor.encoder;
 
-        elevatorEncoder.setDirection(Motor.Direction.FORWARD);
-
-        elevatorEncoder.setDistancePerPulse(1 / ENCODER_COUNTS_PER_INCH);
-
-
-        FF = new ElevatorFeedforward(ks, kg, kv,ka);
-
+        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevatorMotor", Motor.GoBILDA.RPM_312);
+        rightElevatorMotor.setInverted(true);
+        rightElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        rightElevatorEncoder = rightElevatorMotor.encoder;
+        rightElevatorEncoder.setDirection(Motor.Direction.FORWARD);
+        rightElevatorEncoder.setDistancePerPulse(1 / ENCODER_COUNTS_PER_INCH);
+        rightFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
+        rightPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
+        rightPidController.setTolerance(POSITION_TOLERANCE_INCHES);
+        rightPidController.reset();
 
         constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
-
-
-        pidController = new ProfiledPIDController(kp, ki, kd, constraints);
-
-        pidController.setTolerance(POSITION_TOLERANCE_INCHES);
-
-        pidController.reset();
 
 
         resetElevatorEncoders();
@@ -121,7 +140,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
 
         //    if (show == 0) {// Constants.TelemetryConstants.showRotateArm) {
-        showTelemetry();
+        showLeftTelemetry();
         //   }
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
@@ -130,134 +149,147 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
-    public double getVoltsPerIPS() {
-        return (power - .4) / getVelocityInPerSec();
+    public double getLeftVoltsPerIPS() {
+        return (leftPower - .4) / getLeftVelocityInPerSec();
     }
 
     public void position() {
-
         posrng++;
 
+        leftPidout = leftPidController.calculate(getLeftPositionInches());
+        leftSetpoint = leftPidController.getSetpoint();
+        leftSetVel = leftSetpoint.velocity;
+        leftSetPos = leftSetpoint.position;
+        leftAccel = (leftSetVel - leftLastVel) * 50;
+        leftFf = leftFeedForward.calculate(leftSetVel, leftAccel);
+        leftElevatorMotor.set(leftFf + leftPidout);
+        leftLastVel = leftSetVel;
 
-        // Retrieve the profiled setpoint for the next timestep. This setpoint moves
-
-        pidout = pidController.calculate(getPositionInches());
-
-        setpoint = pidController.getSetpoint();
-
-        setVel = setpoint.velocity;
-        setPos = setpoint.position;
-
-      accel   = (setVel - lastVel) * 50;
-
-        ff = FF.calculate(setVel,accel );
-
-
-        elevatorMotor.set(ff + pidout);
-
-
-        lastVel = setVel;
-
+        rightPidout = rightPidController.calculate(getRightPositionInches());
+        rightSetpoint = rightPidController.getSetpoint();
+        rightSetVel = rightSetpoint.velocity;
+        rightSetPos = rightSetpoint.position;
+        rightAccel = (rightSetVel - rightLastVel) * 50;
+        rightFf = rightFeedForward.calculate(rightSetVel, rightAccel);
+        rightElevatorMotor.set(rightFf + rightPidout);
+        rightLastVel = rightSetVel;
     }
 
     public void setTargetInches(double inches) {
         targetInches = inches;
     }
 
-//    public double getPositionKp() {
-//        return pidController.getP();
-//    }
-//
-    public void setPositionKp() {
-       pidController.setP(kp);
-    }
-//
-//    public double getPositionKi() {
-//        return pidController.getD();
-//    }
-//
-   public void setPositionKi() {
-        pidController.setI(ki);
-    }
-//
-//    public double getPositionKd() {
-//        return pidController.getD();
-//    }
-//
-    public void setPositionKd() {
-        pidController.setD(kd);
-    }
-//
-//    public double getFFKS() {
-//        return FF.ks;
-//    }
 
-//    public double getFFKg() {
-//        return FF.kg;
-//    }
-//
-//    public double getFFKV() {
-//        return FF.kv;
-//    }
-//
-//    public double getFFKa() {
-//        return FF.ka;
-//    }
+    public void setLeftPositionKp() {
+        leftPidController.setP(lkp);
+    }
+
+    public void setLefPositionKi() {
+        leftPidController.setI(lki);
+    }
+
+    public void setLeftPositionKd() {
+        leftPidController.setD(lkd);
+    }
+
+    public void setRightPositionKp() {
+        rightPidController.setP(rkp);
+    }
+
+    public void setRightPositionKi() {
+        rightPidController.setI(rki);
+    }
+
+    public void setRightPositionKd() {
+        rightPidController.setD(rkd);
+    }
 
     public void setNewFFValues() {
-        {
-            FF = new ElevatorFeedforward(ks, kg, kv, ka);
-        }
-
-
+        leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
+        rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
     }
 
     public void resetElevatorEncoders() {
-        elevatorEncoder.reset();
-
+        leftElevatorEncoder.reset();
+        rightElevatorEncoder.reset();
     }
 
-    public double getPositionInches() {
-        return round2dp(elevatorEncoder.getDistance(), 2);
+    public double getLeftPositionInches() {
+        return round2dp(leftElevatorEncoder.getDistance(), 2);
+    }
+
+    public double getLeftVelocityInPerSec() {
+        return round2dp(leftElevatorEncoder.getCorrectedVelocity() / 60, 2);
+    }
+
+    public double getRightPositionInches() {
+        return round2dp(leftElevatorEncoder.getDistance(), 2);
+    }
+
+    public double getRightVelocityInPerSec() {
+        return round2dp(rightElevatorEncoder.getCorrectedVelocity() / 60, 2);
     }
 
 
-    public double getVelocityInPerSec() {
-        return round2dp(elevatorEncoder.getCorrectedVelocity() / 60, 2);
+    public boolean leftInPosition() {
+        return leftPidController.atGoal();
+    }
+
+    public double getLeftPower() {
+        return leftElevatorMotor.get();
+    }
+
+    public void setLeftMotorPower(double leftPower) {
+        leftElevatorMotor.set(leftPower);
+    }
+
+    public boolean rightInPosition() {
+        return rightPidController.atGoal();
+    }
+
+    public double getRightPower() {
+        return rightElevatorMotor.get();
+    }
+
+    public void setRightMotorPower(double leftPower) {
+        rightElevatorMotor.set(leftPower);
     }
 
 
-    public boolean inPosition() {
-        return pidController.atGoal();
-    }
 
-    public double getPower() {
-        return elevatorMotor.get();
-    }
-
-    public void setPower(double power) {
-        elevatorMotor.set(power);
-        // rightElevatorMotor.set(power);
-    }
-
-    public void showTelemetry() {
-        telemetry.addData("Elevator", show);
+    public void showLeftTelemetry() {
+        telemetry.addData("ElevatorLeft", show);
 
         telemetry.addData("HoldRng", posrng);
 
-        telemetry.addData("VoltsPerIPS", getVoltsPerIPS());
+        telemetry.addData("LeftPositionInches", getLeftPositionInches());
+        telemetry.addData("RightPositionInches", getRightPositionInches());
+        telemetry.addData("ElevatorGoal", leftPidController.getGoal().position);
+        telemetry.addData("LeftPower", getLeftPower());
+        telemetry.addData("LeftPosErr", leftPidController.getPositionError());
+        telemetry.addData("LeftFF", leftFf);
+        telemetry.addData("LeftPIDout", leftPidout);
+        telemetry.addData("LeftSetVel", leftSetVel);
+        telemetry.addData("LeftSetPos", leftSetPos);
 
-        telemetry.addData("PositionInches", getPositionInches());
+        telemetry.update();
 
-        telemetry.addData("ElevatorGoal", pidController.getGoal().position);
+    }
 
+    public void showRightTelemetry() {
+        telemetry.addData("ElevatorRight", show);
 
-        telemetry.addData("Power", elevatorMotor.get());
-        telemetry.addData("PosErr", pidController.getPositionError());
-        telemetry.addData("FF", ff);
-        telemetry.addData("PIDout", pidout);
-        telemetry.addData("SetVel", setVel);
-        telemetry.addData("SetPos", setPos);
+        telemetry.addData("HoldRng", posrng);
+
+        telemetry.addData("RightPositionInches", getRightPositionInches());
+        telemetry.addData("RightPositionInches", getRightPositionInches());
+        telemetry.addData("ElevatorGoal", rightPidController.getGoal().position);
+        telemetry.addData("RightPower", getRightPower());
+        telemetry.addData("RightPosErr", rightPidController.getPositionError());
+        telemetry.addData("RightFF", rightFf);
+        telemetry.addData("RightPIDout", rightPidout);
+        telemetry.addData("RightSetVel", rightSetVel);
+        telemetry.addData("RightSetPos", rightSetPos);
 
         telemetry.update();
 

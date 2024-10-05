@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.commands.elevator;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 
 
@@ -25,22 +26,30 @@ public class JogElevator extends CommandBase {
     @Override
     public void execute() {
 
-        elevator.power = -gamepad.getRightY() / 2;
+        elevator.leftPower = -gamepad.getRightY() / 2;
+        elevator.rightPower = -gamepad.getRightY() / 2;
+        if (elevator.leftPower > 0 && elevator.getLeftPositionInches() < Constants.ElevatorConstants.UPPER_POSITION_LIMIT
+                || elevator.leftPower < 0 && elevator.getLeftPositionInches() > Constants.ArmConstants.LOWER_POSITION_LIMIT) {
+            elevator.setLeftMotorPower(elevator.leftPower);
+        } else
+            elevator.leftPower = 0;
+        elevator.setLeftMotorPower(elevator.leftPower);
 
-//        if (rotateArm.power > 0 && rotateArm.getPositionDegrees() < Constants.ArmConstants.UPPER_POSITION_LIMIT
-//                || rotateArm.power < 0 && rotateArm.getPositionDegrees() > Constants.ArmConstants.LOWER_POSITION_LIMIT) {
-//        elevator.setPower(elevator.power);
-//        } else
-//            rotateArm.power = 0;
+        if (elevator.rightPower > 0 && elevator.getRightPositionInches() < Constants.ElevatorConstants.UPPER_POSITION_LIMIT
+                || elevator.rightPower < 0 && elevator.getRightPositionInches() > Constants.ArmConstants.LOWER_POSITION_LIMIT) {
+            elevator.setRightMotorPower(elevator.rightPower);
+        } else
+            elevator.rightPower = 0;
+        elevator.setRightMotorPower(elevator.rightPower);
 
-        elevator.setPower(elevator.power);
 
-        elevator.setTargetInches(elevator.getPositionInches());
+
+        elevator.setTargetInches(elevator.getLeftPositionInches());
     }
 
     @Override
     public void end(boolean interrupted) {
-        elevator.elevatorMotor.set(0);
+        elevator.leftElevatorMotor.set(0);
 
     }
 
