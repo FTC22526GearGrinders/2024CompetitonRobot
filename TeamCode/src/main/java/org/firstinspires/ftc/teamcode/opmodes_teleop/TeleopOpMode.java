@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -17,8 +16,9 @@ import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.commands.arm.JogArm;
 import org.firstinspires.ftc.teamcode.commands.drive.AlignToNote;
 import org.firstinspires.ftc.teamcode.commands.drive.JogDrive;
+import org.firstinspires.ftc.teamcode.commands.elevator.JogElevator;
+import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeRollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 
@@ -28,8 +28,7 @@ public class TeleopOpMode extends CommandOpMode {
 
     protected MecanumDriveSubsystem drive;
     protected LimelightSubsystem limelight;
-    protected IntakeRollerSubsystem intakeRoller;
-    // protected ElevatorSubsystem elevator;
+    protected ElevatorSubsystem elevator;
     protected ExtendArmSubsystem arm;
     FtcDashboard dashboard;
     GamepadEx driver;
@@ -38,27 +37,9 @@ public class TeleopOpMode extends CommandOpMode {
 
     private Button alignbutton;
 
-    private Button jogRollerIn;
-    private Button jogRollerOut;
-    private Button runRollerIn;
-    private Button runRollerOut;
-    private Button stopRoller;
-
-    private Button tiltServoDown;
-    private Button tiltServoUp;
-    private Button jogTiltDown;
-    private Button jogTiltUp;
-
-    private Button jogElevator;
-    private Button positionElevatorTenInches;
-    private Button positionElevatorTwentyInches;
-    private Button positionElevatorZeroInches;
-
 
     private Button jogArm;
-    private Button positionArmTenInches;
-    private Button positionArmTwentyInches;
-    private Button positionArmZeroInches;
+    private Button jogElevator;
 
 
     private Button stepTelemetryUp;
@@ -75,49 +56,19 @@ public class TeleopOpMode extends CommandOpMode {
 
         limelight = new LimelightSubsystem(this);
 
-        intakeRoller = new IntakeRollerSubsystem(this);
 
-        //  elevator = new ElevatorSubsystem(this);
+        elevator = new ElevatorSubsystem(this);
 
         arm = new ExtendArmSubsystem(this);
 
-        intakeRoller.setTiltServoAngle(intakeRoller.tiltCurrent);
 
         jogArm = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
 
-//        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
-//
-//        positionElevatorZeroInches = new GamepadButton(coDriver, GamepadKeys.Button.A);
-//
-//        positionElevatorTenInches = new GamepadButton(coDriver, GamepadKeys.Button.B);
-//
-//        positionElevatorTwentyInches = new GamepadButton(coDriver, GamepadKeys.Button.X);
-
-        tiltServoDown.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(0.25)));
-
-        tiltServoUp.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(.4)));
-
-
-        jogTiltDown.whenPressed(intakeRoller::incTilt)
-                .whenReleased(new InstantCommand(() -> intakeRoller.oneShot = false));
-
-
-        jogTiltUp.whenPressed(intakeRoller::decTilt)
-                .whenReleased(new InstantCommand(() -> intakeRoller.oneShot = false));
+        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
 
         m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
 
         alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
-
-        jogRollerIn = new GamepadButton(coDriver, GamepadKeys.Button.X);
-
-        jogRollerOut = new GamepadButton(coDriver, GamepadKeys.Button.Y);
-
-        runRollerIn = new GamepadButton(driver, GamepadKeys.Button.A);
-
-        runRollerOut = new GamepadButton(driver, GamepadKeys.Button.B);
-
-        stopRoller = new GamepadButton(driver, GamepadKeys.Button.X);
 
 
         register(drive, arm, limelight);
@@ -125,12 +76,6 @@ public class TeleopOpMode extends CommandOpMode {
         drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
         limelight.setAprilTagPipeline();
-
-//        TelemetryPacket packet = new TelemetryPacket();
-//        packet.fieldOverlay().setStroke("#3F51B5");
-//       Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
-//       Drawing.drawRobot(packet.fieldOverlay(),limelight.getBotPose2d());
-//       FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
 
     }
@@ -160,21 +105,9 @@ public class TeleopOpMode extends CommandOpMode {
         }
         alignbutton.whenHeld(m_alignToNote);
 
-        jogRollerIn.whenPressed(new InstantCommand(() -> intakeRoller.runRoller(1)))
-                .whenReleased(new InstantCommand(() -> intakeRoller.stopRoller()));
-        jogRollerOut.whenPressed(new InstantCommand(() -> intakeRoller.runRoller(-1)))
-                .whenReleased(new InstantCommand(() -> intakeRoller.stopRoller()));
-
-        runRollerIn.whenPressed(new InstantCommand(() -> intakeRoller.runRoller(1)));
-        runRollerOut.whenPressed(new InstantCommand(() -> intakeRoller.runRoller(-1)));
-        stopRoller.whenPressed(new InstantCommand(() -> intakeRoller.stopRoller()));
-
-        tiltServoDown.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(0.25)));
-        tiltServoUp.whenPressed(new InstantCommand(() -> intakeRoller.setTiltServoAngle(.4)));
-
-
 
         jogArm.whenHeld(new JogArm(arm, coDriver));
+        jogElevator.whenHeld(new JogElevator(elevator, coDriver));
 
 
 //        jogElevator.whenHeld(new JogElevator(elevator, coDriver));

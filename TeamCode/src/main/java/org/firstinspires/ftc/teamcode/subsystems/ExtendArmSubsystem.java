@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,6 +25,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double kp = 0.01;
     public static double ki = 0;
     public static double kd = 0;
+    private final FtcDashboard dashboard;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
     public double targetInches;
@@ -36,6 +38,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public SimpleMotorFeedforward armFF;
     public int holdCtr;
     public int show = 0;
+    public Servo clawServo;
+    public Servo tiltServo;
+    public double currentTiltAngle = 0;
+    public double currentClawAngle = 0;
     ElapsedTime et;
     double setVel;
     double setPos;
@@ -47,10 +53,17 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double accel;
     private double lastVel;
 
-
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
         armMotor = new Motor(opMode.hardwareMap, "armMotor", Motor.GoBILDA.RPM_312);
+
+        clawServo = opMode.hardwareMap.get(Servo.class, "clawServo");
+
+        dashboard = FtcDashboard.getInstance();
+
+        telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
+
+        tiltServo = opMode.hardwareMap.get(Servo.class, "tiltServo");
 
         armMotor.setInverted(true);
 
@@ -62,7 +75,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         armEncoder.setDistancePerPulse(1 / 10);//ENCODER_COUNTS_PER_INCH);
 
-        armFF = new SimpleMotorFeedforward(ks,kv,ka);
+        armFF = new SimpleMotorFeedforward(ks, kv, ka);
 
 
         constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
@@ -113,10 +126,18 @@ public class ExtendArmSubsystem extends SubsystemBase {
         setVel = armSetpoint.velocity;
         setPos = armSetpoint.position;
         ff = armFF.calculate(setVel, accel);
-
-
         armMotor.set(ff + pidout);
+    }
 
+    public void setClawServoAngle(double angle) {
+        currentClawAngle = angle;
+        clawServo.setPosition(angle);
+    }
+
+
+    public void setTiltServoAngle(double angle) {
+        currentTiltAngle = angle;
+        tiltServo.setPosition(angle);
     }
 
 
@@ -172,10 +193,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
         armMotor.set(power);
     }
 
+
     public void showTelemetry() {
         telemetry.addData("Arm", show);
-//        telemetry.addData("EncCtsPerInch", Constants.ArmConstants.ENCODER_COUNTS_PER_INCH);
-        //  telemetry.addData("MaxIPS", Constants.ArmConstants.MAX_INCHES_PER_SECOND);
         telemetry.addData("HoldRng", holdCtr);
         telemetry.addData("Scantime", scanTime);
 

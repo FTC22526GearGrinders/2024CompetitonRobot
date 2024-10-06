@@ -3,15 +3,19 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
@@ -46,41 +50,39 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
 
     public double targetInches;
-    ElapsedTime et;
-    CommandOpMode myOpmode;
-
     public TrapezoidProfile.Constraints constraints;
-
     public Motor leftElevatorMotor;
     public Motor.Encoder leftElevatorEncoder;
     public ProfiledPIDController leftPidController;
     public TrapezoidProfile.State leftGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State leftSetpoint = new TrapezoidProfile.State();
     public ElevatorFeedforward leftFeedForward;
-
     public Motor rightElevatorMotor;
     public Motor.Encoder rightElevatorEncoder;
     public ProfiledPIDController rightPidController;
     public TrapezoidProfile.State rightGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
     public ElevatorFeedforward rightFeedForward;
-
+    public Servo bucketTiltServo;
+    public Servo sampleClawServo;
     public int holdCtr;
     public int show = 0;
-    public int posrng;
 
+    public double currentSampleClawAngle;
+    public int posrng;
+    public double leftPower;
+    public double rightPower;
+    ElapsedTime et;
+    CommandOpMode myOpmode;
     double leftSetVel;
     double leftSetPos;
     double leftFf;
     double leftPidout;
-    public double leftPower;
-
     double rightSetVel;
     double rightSetPos;
     double rightFf;
     double rightPidout;
-    public double rightPower;
-
+    private double currentBucketAngle;
     private double leftAccel;
     private double leftLastVel;
     private double rightAccel;
@@ -116,6 +118,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
 
+
+        bucketTiltServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
+
+        sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
 
         resetElevatorEncoders();
 
@@ -254,6 +260,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setRightMotorPower(double leftPower) {
         rightElevatorMotor.set(leftPower);
     }
+
+    public void setBucketServoAngle(double angle) {
+        currentBucketAngle = angle;
+        bucketTiltServo.setPosition(angle);
+    }
+
+    public void setSampleClawServoAngle(double angle) {
+        currentSampleClawAngle = angle;
+        sampleClawServo.setPosition(angle);
+    }
+
 
 
 

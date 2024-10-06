@@ -167,6 +167,13 @@ public static final class SampleConstants{
 
         public static double POSITION_Kg = 0;
 
+        public static double intakeClawOpenAngle;
+        public static double intakeClawClosedAngle;
+        public static double intakeTiltDownAngle;
+        public static double intakeTiltClearAngle;
+        public static double pickupDistance;
+        public static double intakeTiltBucketDeliverAngle;
+        public static double bucketDistance;
     }
 
     public static final class ElevatorConstants {
@@ -200,6 +207,20 @@ public static final class SampleConstants{
         public static double kD = 0;
 
         public static double POSITION_Kg = 0;
+
+        public static double bucketUprightAngle=0;
+        public static double bucketTippedAngle;
+
+        public static double elevatorDownHeight =0;
+        public static double elevatorLowerBasketHeight = 36;
+        public static double elevatorUpperBasketHeight = 36;
+        public static double elevatorSamplePickupHeight = 36;
+        public static double elevatorSampleAbovePlaceHeight = 36;
+        public static double elevatorSamplePlaceHeight = 36;
+
+
+        public static double sampleClawOpenAngle;
+        public static double sampleClawClosedAngle;
 
     }
 
