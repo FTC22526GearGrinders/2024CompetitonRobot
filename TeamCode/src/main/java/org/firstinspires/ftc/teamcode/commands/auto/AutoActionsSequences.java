@@ -19,6 +19,8 @@ public class AutoActionsSequences extends SequentialCommandGroup {
 
         boolean red = ActiveMotionValues.getRedAlliance();
 
+
+
         addCommands(
 
                 new SequentialCommandGroup(

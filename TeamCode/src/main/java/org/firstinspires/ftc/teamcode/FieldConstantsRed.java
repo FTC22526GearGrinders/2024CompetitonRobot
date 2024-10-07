@@ -2,54 +2,49 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.acmerobotics.roadrunner.Pose2d;
-
+import com.acmerobotics.roadrunner.Vector2d;
 
 public final class FieldConstantsRed {
 
-    /*
-     *
-     *
-     * */
+
+    //field values
 
 
-    public static final class FieldConstants {
+    public static final double basketSideStartAngle = Math.toRadians(45);
+    public static final double specimenSideStartAngle = Math.toRadians(-90);
+    public static final double observationSideStartAngle = Math.toRadians(0);
+    public static Pose2d innerYellowPickupPose = new Pose2d(-48.5,-36.1,Math.toRadians(90));
+    public static Pose2d midYellowPickupPose= new Pose2d(-57.7,-36.1,Math.toRadians(90));
+    public static Pose2d outerYellowPickupPose= new Pose2d(-60,-27.1,Math.toRadians(170));
 
-        static final double length = 144;
-        static final double width = 144;
-        static final double tileSize = 24;
-        static final double tileTeeth = .75;
-        static final double distanceBetwwenSpikeMarks = 10;
-    }
 
-    public static final class SampleConstants{
-        static final double length = 3.5;
-        static final double side = 1.5;
-    }
-    public static final double basketSideStartAngle = Math.toRadians(90);
-    public static final double observationSideStartAngle = Math.toRadians(90);
-
+    //specimen values
     public static final double observationZoneCenterPose = Math.toRadians(90);
-    public static final double spikeMarkYCenter = -24 - FieldConstants.tileTeeth - SampleConstants.length / 2;
+    static final double distanceBetweenSpikeMarks = 10;
+
+    static final double basketDeliverAngle = Math.toRadians(45);
+    static final double specimenPickupAngle = Math.toRadians(180);
+
+    static final double specimenLength = 3.5;
+    public static final double spikeMarkYCenter = -24 - Constants.FieldConstants.tileTeeth - specimenLength / 2;
+    public static Vector2d wallSideYellowSample = new Vector2d(-60, spikeMarkYCenter);
+    public static Vector2d centerYellowSample = new Vector2d(-50, spikeMarkYCenter);
+    public static Vector2d middleYellowSample = new Vector2d(-40, spikeMarkYCenter);
+    public static Vector2d alSideRedSample = new Vector2d(55, spikeMarkYCenter);
+    public static Vector2d centerRedSample = new Vector2d(55, spikeMarkYCenter);
+    public static Vector2d middleRedSample = new Vector2d(55, spikeMarkYCenter);
+    static final double specimenSide = 1.5;
+    public static Pose2d basketDeliverPose = new Pose2d(-55, -55, basketDeliverAngle);
+    public static Pose2d parkPose = new Pose2d(48, -50, basketDeliverAngle);
 
 
-    public static Pose2d basketSideStartPose = new Pose2d(55, 60, basketSideStartAngle);
-    public static Pose2d observationSideStartPose = new Pose2d(55, 60, observationSideStartAngle);
-
-    public static Pose2d basketPose = new Pose2d(-64, -64, Math.toRadians(-45));
+    public static Pose2d basketSideStartPose = new Pose2d(-45, -58, basketSideStartAngle);
 
 
-    public static Pose2d parkPose = new Pose2d(48, -50, Math.toRadians(45));
-    public static Pose2d specimenDropOffPose = new Pose2d(0, -24, Math.toRadians(0));
 
 
-    public static Pose2d wallSideYellowSample = new Pose2d(-60, spikeMarkYCenter, Math.toRadians(0));
-    public static Pose2d centerYellowSample = new Pose2d(-50,  spikeMarkYCenter, Math.toRadians(0));
-    public static Pose2d middleYellowSample = new Pose2d(-40,  spikeMarkYCenter, Math.toRadians(0));
 
 
-    public static Pose2d wallSideRedSample = new Pose2d(55,  spikeMarkYCenter, Math.toRadians(0));
-    public static Pose2d centerRedSample = new Pose2d(55,  spikeMarkYCenter, Math.toRadians(0));
-    public static Pose2d middleRedSample = new Pose2d(55,  spikeMarkYCenter, Math.toRadians(0));
 
 
 //

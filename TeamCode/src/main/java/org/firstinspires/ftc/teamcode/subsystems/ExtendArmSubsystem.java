@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
@@ -90,7 +91,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         resetEncoder();
 
-
         // setDefaultCommand(new PositionHoldArm(this));
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -134,12 +134,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
         clawServo.setPosition(angle);
     }
 
-
     public void setTiltServoAngle(double angle) {
         currentTiltAngle = angle;
         tiltServo.setPosition(angle);
     }
-
 
     public void resetEncoder() {
         armEncoder.reset();

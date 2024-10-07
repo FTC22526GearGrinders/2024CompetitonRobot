@@ -6,7 +6,6 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
-
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -19,8 +18,6 @@ public class AutoFactory extends CommandBase {
     CommandOpMode opMode;
 
 
-
-
     boolean doLogging = true;
 
 
@@ -28,12 +25,9 @@ public class AutoFactory extends CommandBase {
                        ElevatorSubsystem elevator, ExtendArmSubsystem arm) {
         this.opMode = opmode;
         this.drive = drive;
-        this.elevator=elevator;
+        this.elevator = elevator;
         this.arm = arm;
-
-
     }
-
 
 
     public Command getAllianceData(CommandOpMode opmode, boolean red) {
@@ -45,7 +39,7 @@ public class AutoFactory extends CommandBase {
 
 
     public Command getBasketSequences() {
-        return new WaitCommand(1);
+        return new WaitCommand(10);
     }
 
     public Command getSamplesSequences() {
@@ -59,8 +53,6 @@ public class AutoFactory extends CommandBase {
 //                new ShowTrajectoryInfo(drive, opMode),
 //                new RunTrajSequence(drive, opMode));
 //    }
-
-
 
 
 }

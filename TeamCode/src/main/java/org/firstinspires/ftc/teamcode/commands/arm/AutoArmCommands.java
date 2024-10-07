@@ -62,6 +62,12 @@ public class AutoArmCommands extends CommandBase {
                 tiltToClearPosition());
     }
 
+    public Command pickupAndDeliverToBucket(){
+        return new SequentialCommandGroup(
+                pickup(),
+                deliverToBucket());
+    }
+
 
 
 }

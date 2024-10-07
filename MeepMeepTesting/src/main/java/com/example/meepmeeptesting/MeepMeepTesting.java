@@ -20,27 +20,40 @@ public class MeepMeepTesting {
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
 
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(FieldConstantsRed.adjustPose(FieldConstantsRed.specimenStartPose, ix, iy, ih))
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.specimenDropPose, ix, iy, ih))
-                                .waitSeconds((2))//sample drop
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.specimenDropBackupPose, ix, iy, ih))
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.nearInnerSpecimenPose, ix, iy, ih))//near inner specimen pose
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.pickupInnerSpecimenPose, ix, iy, ih))//pickup inner specimer
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.basketPose, ix, iy, ih))
-                                .waitSeconds((2))//basket drop
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.nearMiddleSpecimenPose, ix, iy, ih))//near mid specimen
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.pickupMiddleSpecimenPose, ix, iy, ih))//pickup mid specimen
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.basketPose, ix, iy, ih))
-                                .waitSeconds((2))//basket drop
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.nearOuterSpecimenPose, ix, iy, ih))//near outer specimen
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.pickupOuterSpecimenPose, ix, iy, ih))//pickup outer specimen
-                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.basketPose, ix, iy, ih))
-                                .waitSeconds((2))//basket drop
-                                .build()
+                                drive.trajectorySequenceBuilder(FieldConstantsRed.basketSideStartPose)
+
+
+                                        .lineToSplineHeading(FieldConstantsRed.basketDeliverPose)
+                                               .waitSeconds((1))//sample
+                                        .lineToSplineHeading(FieldConstantsRed.innerYellowPickupPose)
+                                        .waitSeconds(1)
+                                        .lineToSplineHeading(FieldConstantsRed.basketDeliverPose)
+                                        .waitSeconds(1)
+                                        .lineToSplineHeading(FieldConstantsRed.midYellowPickupPose)
+                                        .waitSeconds(1)
+                                        .lineToSplineHeading(FieldConstantsRed.basketDeliverPose)
+                                        .waitSeconds(1)
+                                        .lineToSplineHeading(FieldConstantsRed.outerYellowPickupPose)
+
+
+                                        //sample drop
+                                        //    .lineToSplineHeading(FieldConstantsRed.innerYelloPickupPose)//near inner specimen pose
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.pickupInnerSpecimenPose, ix, iy, ih))//pickup inner specimer
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.basketPose, ix, iy, ih))
+//                                .waitSeconds((2))//basket drop
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.nearMiddleSpecimenPose, ix, iy, ih))//near mid specimen
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.pickupMiddleSpecimenPose, ix, iy, ih))//pickup mid specimen
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.basketPose, ix, iy, ih))
+//                                .waitSeconds((2))//basket drop
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.nearOuterSpecimenPose, ix, iy, ih))//near outer specimen
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.pickupOuterSpecimenPose, ix, iy, ih))//pickup outer specimen
+//                                .lineToSplineHeading(FieldConstantsRed.adjustPose(FieldConstantsRed.basketPose, ix, iy, ih))
+                                        .waitSeconds((2))//basket drop
+                                        .build()
                 );
 
         ShowField.showIt(meepMeep, myBot);
-        myBot.getDrive().setPoseEstimate(FieldConstantsRed.specimenStartPose);
+        myBot.getDrive().setPoseEstimate(FieldConstantsRed.basketSideStartPose);
 
     }
 }

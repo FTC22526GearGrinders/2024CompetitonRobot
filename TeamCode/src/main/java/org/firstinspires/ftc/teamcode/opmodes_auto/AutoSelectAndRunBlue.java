@@ -33,6 +33,7 @@ package org.firstinspires.ftc.teamcode.opmodes_auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -42,6 +43,7 @@ import org.firstinspires.ftc.teamcode.commands.auto.AutoFactory;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.trajectories.AllBasketAuto;
 
 
 @Autonomous(name = "Auto: Select-START", group = "Auto")
@@ -56,8 +58,7 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
     private ElevatorSubsystem elevator;
     private ExtendArmSubsystem arm;
     private AutoFactory af;
-
-    @Override
+private  AllBasketAuto aba;
     public void initialize() {
 
 
@@ -149,6 +150,8 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
 
     }
 
+
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -156,7 +159,6 @@ public class AutoSelectAndRunBlue extends CommandOpMode {
 
 
         waitForStart();
-
 
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
