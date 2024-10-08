@@ -3,14 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -39,10 +37,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public SimpleMotorFeedforward armFF;
     public int holdCtr;
     public int show = 0;
-    public Servo clawServo;
-    public Servo tiltServo;
-    public double currentTiltAngle = 0;
-    public double currentClawAngle = 0;
+
+
     ElapsedTime et;
     double setVel;
     double setPos;
@@ -58,13 +54,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         armMotor = new Motor(opMode.hardwareMap, "armMotor", Motor.GoBILDA.RPM_312);
 
-        clawServo = opMode.hardwareMap.get(Servo.class, "clawServo");
-
         dashboard = FtcDashboard.getInstance();
 
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
 
-        tiltServo = opMode.hardwareMap.get(Servo.class, "tiltServo");
 
         armMotor.setInverted(true);
 
@@ -115,8 +108,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
     public void position() {
-
-
         // Retrieve the profiled setpoint for the next timestep. This setpoint moves
 
         pidout = armController.calculate(getPositionInches());
@@ -127,16 +118,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         setPos = armSetpoint.position;
         ff = armFF.calculate(setVel, accel);
         armMotor.set(ff + pidout);
-    }
-
-    public void setClawServoAngle(double angle) {
-        currentClawAngle = angle;
-        clawServo.setPosition(angle);
-    }
-
-    public void setTiltServoAngle(double angle) {
-        currentTiltAngle = angle;
-        tiltServo.setPosition(angle);
     }
 
     public void resetEncoder() {
@@ -189,6 +170,19 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public void setPower(double power) {
         armMotor.set(power);
+    }
+
+    public void setTargetInches(double target){
+        targetInches=target;
+        armController.setGoal(targetInches);
+    }
+
+    public double getTargetInches(){
+        return targetInches;
+    }
+
+    public boolean atGoal(){
+        return armController.atGoal();
     }
 
 

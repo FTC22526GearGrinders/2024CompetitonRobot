@@ -3,19 +3,15 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Constants;
+
 
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
@@ -63,8 +59,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public TrapezoidProfile.State rightGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
     public ElevatorFeedforward rightFeedForward;
-    public Servo bucketTiltServo;
-    public Servo sampleClawServo;
+
     public int holdCtr;
     public int show = 0;
 
@@ -117,11 +112,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightPidController.reset();
 
         constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
-
-
-        bucketTiltServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
-
-        sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
 
         resetElevatorEncoders();
 
@@ -260,18 +250,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setRightMotorPower(double leftPower) {
         rightElevatorMotor.set(leftPower);
     }
-
-    public void setBucketServoAngle(double angle) {
-        currentBucketAngle = angle;
-        bucketTiltServo.setPosition(angle);
-    }
-
-    public void setSampleClawServoAngle(double angle) {
-        currentSampleClawAngle = angle;
-        sampleClawServo.setPosition(angle);
-    }
-
-
 
 
     public void showLeftTelemetry() {
