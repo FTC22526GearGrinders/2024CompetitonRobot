@@ -37,7 +37,6 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.commands.elevator.AutoElevatorCommands;
 import org.firstinspires.ftc.teamcode.commands.elevator.PositionElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -101,7 +100,6 @@ public class FTCWiresAutonomous extends CommandOpMode {
         double waitSecondsBeforeDrop = 0;
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(this, initPose);
         ElevatorSubsystem elevator = new ElevatorSubsystem(this);
-        AutoElevatorCommands aec = new AutoElevatorCommands(elevator);
         initPose = new Pose2d(0, 0, Math.toRadians(0)); //Starting pose
         moveBeyondTrussPose = new Pose2d(15, 0, 0);
 
@@ -285,6 +283,7 @@ public class FTCWiresAutonomous extends CommandOpMode {
                 startPosition = START_POSITION.RED_RIGHT;
                 break;
             }
+            telemetry.addData("StartPosition",startPosition);
             telemetry.update();
         }
         telemetry.clearAll();

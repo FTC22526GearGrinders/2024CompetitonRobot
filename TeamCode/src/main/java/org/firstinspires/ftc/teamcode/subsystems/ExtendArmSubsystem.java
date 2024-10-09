@@ -1,17 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class ExtendArmSubsystem extends SubsystemBase {
@@ -27,7 +33,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private final FtcDashboard dashboard;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
-    public double targetInches;
+    public static Servo intakeClawServo;
+    public  static Servo tiltServo;
+    public static double targetInches;
     public int armPositionIndex;
     public double power;
     public ProfiledPIDController armController = null;
@@ -53,6 +61,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
         armMotor = new Motor(opMode.hardwareMap, "armMotor", Motor.GoBILDA.RPM_312);
+
+        intakeClawServo = opMode.hardwareMap.get(Servo.class, "intakeClawServo");
+        tiltServo = opMode.hardwareMap.get(Servo.class, "tiltServo");
 
         dashboard = FtcDashboard.getInstance();
 
@@ -172,18 +183,92 @@ public class ExtendArmSubsystem extends SubsystemBase {
         armMotor.set(power);
     }
 
-    public void setTargetInches(double target){
+    public static void setTargetInches(double target){
         targetInches=target;
-        armController.setGoal(targetInches);
     }
 
-    public double getTargetInches(){
+
+    public static double getTargetInches(){
         return targetInches;
     }
 
     public boolean atGoal(){
         return armController.atGoal();
     }
+
+
+    public  Action tiltDown() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentTiltPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentTiltPosition = Constants.ArmConstants.intakeTiltDownAngle;
+                    tiltServo.setPosition(currentTiltPosition);
+                    initialized = true;
+                }
+                packet.put("position", currentTiltPosition);
+                return false;
+            }
+        };
+    }
+
+    public  Action tiltClear() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentTiltPosition = 0;
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentTiltPosition = Constants.ArmConstants.intakeTiltClearAngle;
+                    tiltServo.setPosition(currentTiltPosition);
+                    initialized = true;
+                }
+                packet.put("position", currentTiltPosition);
+                return false;
+            }
+        };
+    }
+
+    public  Action clawClose() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentTiltPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentTiltPosition = Constants.ArmConstants.intakeClawClosedAngle;
+                    intakeClawServo.setPosition(currentTiltPosition);
+                    initialized = true;
+                }
+                packet.put("position", currentTiltPosition);
+                return false;
+            }
+        };
+    }
+
+    public  Action clawOpen() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentTiltPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentTiltPosition = Constants.ArmConstants.intakeClawOpenAngle;
+                    intakeClawServo.setPosition(currentTiltPosition);
+                    initialized = true;
+                }
+
+                packet.put("position", currentTiltPosition);
+                return false;
+            }
+        };
+    }
+
 
 
     public void showTelemetry() {

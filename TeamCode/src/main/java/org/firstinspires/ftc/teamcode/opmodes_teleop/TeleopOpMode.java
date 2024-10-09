@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode.opmodes_teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -34,10 +33,13 @@ public class TeleopOpMode extends CommandOpMode {
     FtcDashboard dashboard;
     GamepadEx driver;
     GamepadEx coDriver;
+    TelemetryPacket packet;
+
     private AlignToNote m_alignToNote;
 
     private Button alignbutton;
-
+    private Button openIntakeClaw;
+    private Button closeIntakeClaw;
 
     private Button jogArm;
     private Button jogElevator;
@@ -62,6 +64,8 @@ public class TeleopOpMode extends CommandOpMode {
 
         arm = new ExtendArmSubsystem(this);
 
+        packet = new TelemetryPacket();
+
 
         jogArm = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
 
@@ -71,8 +75,11 @@ public class TeleopOpMode extends CommandOpMode {
 
         alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
 
+        openIntakeClaw = new GamepadButton(coDriver, GamepadKeys.Button.RIGHT_STICK_BUTTON);
+        closeIntakeClaw = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_STICK_BUTTON);
 
-        register(drive, arm, limelight);
+
+        register(drive, arm, elevator, limelight);
 
         drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
@@ -111,9 +118,12 @@ public class TeleopOpMode extends CommandOpMode {
         jogElevator.whenHeld(new JogElevator(elevator, coDriver));
 
 
+        if (openIntakeClaw.get())
+            arm.clawOpen().run(packet);
+        if (closeIntakeClaw.get())
+            arm.clawClose().run(packet);
 
 
-//        jogElevator.whenHeld(new JogElevator(elevator, coDriver));
 //
 //        positionElevatorZeroInches.whenPressed(new PositionElevator(elevator, 0));
 //

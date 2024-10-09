@@ -80,6 +80,7 @@ public class AutoOpmode extends CommandOpMode {
         arm = new ExtendArmSubsystem(this);
         tilt = new IntakeTiltServo(hardwareMap);
         packet = new TelemetryPacket();
+
     }
 
     @Override

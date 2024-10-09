@@ -1,16 +1,24 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Constants;
 
 
 @Config
@@ -41,11 +49,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double rkp = 0.01;
     public static double rki = 0;
     public static double rkd = 0;
-
-
+    public static double targetInches;
     private final Telemetry telemetry;
-
-    public double targetInches;
     public TrapezoidProfile.Constraints constraints;
     public Motor leftElevatorMotor;
     public Motor.Encoder leftElevatorEncoder;
@@ -59,6 +64,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public TrapezoidProfile.State rightGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
     public ElevatorFeedforward rightFeedForward;
+    public Servo bucketServo;
+    public Servo sampleClawServo;
 
     public int holdCtr;
     public int show = 0;
@@ -113,6 +120,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
 
+        bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
+        sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
+
         resetElevatorEncoders();
 
         setTargetInches(HOME_POSITION);
@@ -130,6 +140,119 @@ public class ElevatorSubsystem extends SubsystemBase {
         double temp1 = Math.round(number * temp);
         return temp1 / temp;
     }
+
+    public double getTargetInches() {
+        return targetInches;
+    }
+
+    public void setTargetInches(double inches) {
+        targetInches = inches;
+        leftPidController.setGoal(targetInches);
+        rightPidController.setGoal(targetInches);
+    }
+
+    public double getPositionInches() {
+        return leftElevatorEncoder.getPosition();
+    }
+
+    public boolean atGoal() {
+        return leftPidController.atGoal() && rightPidController.atGoal();
+    }
+
+    public Action setTarget(double targetInches) {
+        return new Action() {
+            private boolean initialized = false;
+
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    setTargetInches(targetInches);
+                    initialized = true;
+                }
+                packet.put("targetInches", getTargetInches());
+                packet.put("actualInches", getPositionInches());
+
+                return !atGoal();
+            }
+        };
+    }
+
+    public  Action tipBucket() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentBucketPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentBucketPosition = Constants.ElevatorConstants.bucketTippedAngle;
+                    bucketServo.setPosition(currentBucketPosition);
+                    initialized = true;
+                }
+                packet.put("bucketposition", currentBucketPosition);
+                return false;
+            }
+        };
+    }
+
+    public  Action levelBucket() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentTiltPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentTiltPosition = Constants.ElevatorConstants.bucketUprightAngle;
+                    bucketServo.setPosition(currentTiltPosition);
+                    initialized = true;                }
+
+                packet.put("bucketposition", currentTiltPosition);
+                return false;
+            }
+        };
+    }
+
+    public  Action sampleClawClose() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentClawPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentClawPosition = Constants.ElevatorConstants.sampleClawClosedAngle;
+                    sampleClawServo.setPosition(currentClawPosition);
+                    initialized = true;
+                }
+                packet.put("position", currentClawPosition);
+                return false;
+            }
+        };
+    }
+
+    public Action sampleClawOpen() {
+        return new Action() {
+            private boolean initialized = false;
+            private double currentClawPosition = 0;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    currentClawPosition = Constants.ElevatorConstants.sampleClawOpenAngle;
+                    sampleClawServo.setPosition(currentClawPosition);
+                    initialized = true;
+                }
+
+                packet.put("position", currentClawPosition);
+                return false;
+            }
+        };
+    }
+
+
+
 
     @Override
 
@@ -170,11 +293,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightElevatorMotor.set(rightFf + rightPidout);
         rightLastVel = rightSetVel;
     }
-
-    public void setTargetInches(double inches) {
-        targetInches = inches;
-    }
-
 
     public void setLeftPositionKp() {
         leftPidController.setP(lkp);
