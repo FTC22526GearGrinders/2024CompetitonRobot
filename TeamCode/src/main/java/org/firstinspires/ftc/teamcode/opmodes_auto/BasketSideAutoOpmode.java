@@ -37,48 +37,41 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsBlue;
 import org.firstinspires.ftc.teamcode.FieldConstantsRed;
-import org.firstinspires.ftc.teamcode.commands.servo_actions.IntakeTiltServo;
+import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 
 
 @Autonomous(name = "Auto:Test", group = "Auto")
 //@Disabled
-public class AutoOpmode extends CommandOpMode {
+public class BasketSideAutoOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
     public static Pose2d startPosition;
-    public Pose2d deliverMove;
-    public Pose2d secondMove;
-    public Pose2d thirdMove;
-    public Pose2d fourthMove;
-    public Pose2d fifthMove;
-    public Pose2d sixthMove;
-    MecanumDriveSubsystem drive;
-    ExtendArmSubsystem arm;
-    private IntakeTiltServo tilt;
-    private Action deliverAction;
-    private Action firstPickupAction;
-    private Action secondPickupAction;
-    private Action thirdPickupAction;
+    private MecanumDriveSubsystem drive;
+    private ExtendArmSubsystem arm;
+    private ElevatorSubsystem elevator;
+    private Action deliverMoveAction;
+    private Action firstPickupMoveAction;
+    private Action secondPickupMoveAction;
+    private Action thirdPickupMoveAction;
     private TelemetryPacket packet;
-    private HardwareMap hardwareMap;
 
     @Override
     public void initialize() {
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
         arm = new ExtendArmSubsystem(this);
-        tilt = new IntakeTiltServo(hardwareMap);
+        elevator = new ElevatorSubsystem(this);
         packet = new TelemetryPacket();
 
     }
@@ -96,9 +89,41 @@ public class AutoOpmode extends CommandOpMode {
 
             telemetry.update();
 
-            new ParallelAction(IntakeTiltServo.tiltClear()).run(packet);
 
-            Actions.runBlocking(deliverAction);
+            Actions.runBlocking(
+                    new SequentialAction(
+                            deliverMoveAction,
+                            elevator.deliverToTopBasket()));
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            firstPickupMoveAction,
+                            arm.goPickupSpecimen()));
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            deliverMoveAction,
+                            elevator.deliverToTopBasket()));
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            secondPickupMoveAction,
+                            arm.goPickupSpecimen()));
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            deliverMoveAction,
+                            elevator.deliverToTopBasket()));
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            thirdPickupMoveAction,
+                            arm.goPickupSpecimen()));
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            deliverMoveAction,
+                            elevator.deliverToTopBasket()));
 
 
             new SleepAction(2);
@@ -106,7 +131,6 @@ public class AutoOpmode extends CommandOpMode {
 
         }
         reset();
-
     }
 
     //Method to select starting position using X, Y, A, B buttons on gamepad
@@ -115,29 +139,29 @@ public class AutoOpmode extends CommandOpMode {
         telemetry.clearAll();
         //******select start pose*****
         while (!isStopRequested()) {
-            telemetry.addData("Initializing FTC Wires (ftcwires.org) Autonomous adopted for Team:",
+            telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
             telemetry.addData("Select Starting Position using XYAB on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
-            telemetry.addData("    Blue Left   ", "(X / ▢)");
-            telemetry.addData("    Blue Right ", "(Y / Δ)");
-            telemetry.addData("    Red Left    ", "(B / O)");
-            telemetry.addData("    Red Right  ", "(A / X)");
+            telemetry.addData("    Blue All Basket   ", "(X / ▢)");
+            telemetry.addData("    Blue Sample Then Basket ", "(Y / Δ)");
+            telemetry.addData("    Red All Basket    ", "(B / O)");
+            telemetry.addData("    Red Sample Then Basket  ", "(A / X)");
             if (gamepad1.x) {
                 startPosition = FieldConstantsBlue.basketSideStartPose;
-                deliverAction = drive.actionBuilder(drive.pose)
+                deliverMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position,
                                 FieldConstantsBlue.basketDeliverPose.heading)
                         .build();
-                firstPickupAction = drive.actionBuilder(drive.pose)
+                firstPickupMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsBlue.innerYellowPickupPose.position,
                                 FieldConstantsBlue.innerYellowPickupPose.heading)
                         .build();
-                secondPickupAction = drive.actionBuilder(drive.pose)
+                secondPickupMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position,
                                 FieldConstantsBlue.midYellowPickupPose.heading)
                         .build();
-                thirdPickupAction = drive.actionBuilder(drive.pose)
+                thirdPickupMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position,
                                 FieldConstantsBlue.midYellowPickupPose.heading)
                         .build();
@@ -145,19 +169,19 @@ public class AutoOpmode extends CommandOpMode {
             }
             if (gamepad1.y) {
                 startPosition = FieldConstantsRed.basketSideStartPose;
-                deliverAction = drive.actionBuilder(drive.pose)
+                deliverMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsRed.basketDeliverPose.position,
                                 FieldConstantsRed.basketDeliverPose.heading)
                         .build();
-                firstPickupAction = drive.actionBuilder(drive.pose)
+                firstPickupMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsRed.innerYellowPickupPose.position,
                                 FieldConstantsRed.innerYellowPickupPose.heading)
                         .build();
-                secondPickupAction = drive.actionBuilder(drive.pose)
+                secondPickupMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position,
                                 FieldConstantsRed.midYellowPickupPose.heading)
                         .build();
-                thirdPickupAction = drive.actionBuilder(drive.pose)
+                thirdPickupMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position,
                                 FieldConstantsRed.midYellowPickupPose.heading)
                         .build();

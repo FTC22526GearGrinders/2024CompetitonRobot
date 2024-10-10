@@ -7,10 +7,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
+import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -30,13 +33,15 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double kp = 0.01;
     public static double ki = 0;
     public static double kd = 0;
+    public static CRServo leftIntakeServo;
+    public static CRServo rightIntakeServo;
+
+    public static Servo leftTiltServo;
+    public static Servo rightTiltServo;
+    public static double targetInches;
     private final FtcDashboard dashboard;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
-    public static Servo intakeClawServo;
-    public  static Servo tiltServo;
-    public static double targetInches;
-    public int armPositionIndex;
     public double power;
     public ProfiledPIDController armController = null;
     public TrapezoidProfile.State armGoal = new TrapezoidProfile.State();
@@ -62,8 +67,17 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         armMotor = new Motor(opMode.hardwareMap, "armMotor", Motor.GoBILDA.RPM_312);
 
-        intakeClawServo = opMode.hardwareMap.get(Servo.class, "intakeClawServo");
-        tiltServo = opMode.hardwareMap.get(Servo.class, "tiltServo");
+        leftIntakeServo = opMode.hardwareMap.get(CRServo.class, "leftIntakeServo");
+        rightIntakeServo = opMode.hardwareMap.get(CRServo.class, "rightIntakeServo");
+
+        leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");
+        rightTiltServo = opMode.hardwareMap.get(Servo.class, "rightTiltServo");
+
+        leftIntakeServo.setInverted(false);
+        rightIntakeServo.setInverted(true);
+
+        leftTiltServo.setDirection(Servo.Direction.FORWARD);
+        rightTiltServo.setDirection(Servo.Direction.REVERSE);
 
         dashboard = FtcDashboard.getInstance();
 
@@ -105,6 +119,18 @@ public class ExtendArmSubsystem extends SubsystemBase {
         et = new ElapsedTime();
     }
 
+    public static double getTargetInches() {
+        return targetInches;
+    }
+
+    public void setTargetInches(double target) {
+        targetInches = target;
+        armController.setGoal(targetInches);
+    }
+
+//    public Action setTarget(double target) {
+//        return new InstantAction(() -> setTargetInches(target));
+//    }
 
     @Override
 
@@ -183,91 +209,66 @@ public class ExtendArmSubsystem extends SubsystemBase {
         armMotor.set(power);
     }
 
-    public static void setTargetInches(double target){
-        targetInches=target;
-    }
-
-
-    public static double getTargetInches(){
-        return targetInches;
-    }
-
-    public boolean atGoal(){
+    public boolean atGoal() {
         return armController.atGoal();
     }
 
 
-    public  Action tiltDown() {
+    public  Action setTarget(double targetInches) {
         return new Action() {
             private boolean initialized = false;
-            private double currentTiltPosition = 0;
-
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    currentTiltPosition = Constants.ArmConstants.intakeTiltDownAngle;
-                    tiltServo.setPosition(currentTiltPosition);
+                    setTargetInches(targetInches);
                     initialized = true;
                 }
-                packet.put("position", currentTiltPosition);
-                return false;
+                packet.put("targetInches", getTargetInches());
+                packet.put("actualInches", getPositionInches());
+                return atGoal();
             }
         };
     }
 
-    public  Action tiltClear() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentTiltPosition = 0;
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentTiltPosition = Constants.ArmConstants.intakeTiltClearAngle;
-                    tiltServo.setPosition(currentTiltPosition);
-                    initialized = true;
-                }
-                packet.put("position", currentTiltPosition);
-                return false;
-            }
-        };
+    public Action tiltBothDown() {
+        return new ParallelAction(
+                new InstantAction(() -> leftTiltServo.setPosition(Constants.ArmConstants.leftIntakeTiltDownAngle)),
+                new InstantAction(() -> rightTiltServo.setPosition(Constants.ArmConstants.rightIntakeTiltDownAngle)));
     }
 
-    public  Action clawClose() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentTiltPosition = 0;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentTiltPosition = Constants.ArmConstants.intakeClawClosedAngle;
-                    intakeClawServo.setPosition(currentTiltPosition);
-                    initialized = true;
-                }
-                packet.put("position", currentTiltPosition);
-                return false;
-            }
-        };
+    public Action tiltBothClear() {
+        return new ParallelAction(
+                new InstantAction(() -> leftTiltServo.setPosition(Constants.ArmConstants.leftIntakeTiltClearAngle)),
+                new InstantAction(() -> rightTiltServo.setPosition(Constants.ArmConstants.rightIntakeTiltClearAngle)));
     }
 
-    public  Action clawOpen() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentTiltPosition = 0;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentTiltPosition = Constants.ArmConstants.intakeClawOpenAngle;
-                    intakeClawServo.setPosition(currentTiltPosition);
-                    initialized = true;
-                }
-
-                packet.put("position", currentTiltPosition);
-                return false;
-            }
-        };
+    public Action runLeftIntake() {
+        return new InstantAction(() -> leftIntakeServo.set(1));
     }
+
+    public Action runRightIntake() {
+        return new InstantAction(() -> rightIntakeServo.set(1));
+    }
+
+    public Action runIntakeServos() {
+        return new ParallelAction(
+                runLeftIntake(),
+                runRightIntake());
+    }
+
+    public Action stopIntakeServos() {
+        return new ParallelAction(
+                new InstantAction(() -> leftIntakeServo.stop()),
+                new InstantAction(() -> rightIntakeServo.stop()));
+    }
+
+    public Action goPickupSpecimen() {
+        return new ParallelAction(
+                setTarget(Constants.ArmConstants.pickupDistance),
+                tiltBothDown(),
+                runIntakeServos());
+    }
+
 
 
 

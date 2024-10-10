@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.renderscript.Element;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -7,13 +9,15 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -84,7 +88,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     double rightSetPos;
     double rightFf;
     double rightPidout;
-    private double currentBucketAngle;
     private double leftAccel;
     private double leftLastVel;
     private double rightAccel;
@@ -108,7 +111,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
         rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevatorMotor", Motor.GoBILDA.RPM_312);
-        rightElevatorMotor.setInverted(true);
+        rightElevatorMotor.setInverted(false);
         rightElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
         rightElevatorEncoder = rightElevatorMotor.encoder;
         rightElevatorEncoder.setDirection(Motor.Direction.FORWARD);
@@ -122,6 +125,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
         sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
+
+        bucketServo.setDirection(Servo.Direction.FORWARD);
+        sampleClawServo.setDirection(Servo.Direction.FORWARD);
 
         resetElevatorEncoders();
 
@@ -159,7 +165,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         return leftPidController.atGoal() && rightPidController.atGoal();
     }
 
-    public Action setTarget(double targetInches) {
+//    public Action setTarget(double target) {
+//        return new InstantAction(() -> setTargetInches(target));
+//    }
+
+    public  Action setTarget(double targetInches) {
         return new Action() {
             private boolean initialized = false;
 
@@ -173,84 +183,33 @@ public class ElevatorSubsystem extends SubsystemBase {
                 packet.put("targetInches", getTargetInches());
                 packet.put("actualInches", getPositionInches());
 
-                return !atGoal();
+                return atGoal();
             }
         };
     }
 
-    public  Action tipBucket() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentBucketPosition = 0;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentBucketPosition = Constants.ElevatorConstants.bucketTippedAngle;
-                    bucketServo.setPosition(currentBucketPosition);
-                    initialized = true;
-                }
-                packet.put("bucketposition", currentBucketPosition);
-                return false;
-            }
-        };
+    public Action tipBucket() {
+        return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketTippedAngle));
     }
 
-    public  Action levelBucket() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentTiltPosition = 0;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentTiltPosition = Constants.ElevatorConstants.bucketUprightAngle;
-                    bucketServo.setPosition(currentTiltPosition);
-                    initialized = true;                }
-
-                packet.put("bucketposition", currentTiltPosition);
-                return false;
-            }
-        };
+    public Action levelBucket() {
+        return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
     }
 
-    public  Action sampleClawClose() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentClawPosition = 0;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentClawPosition = Constants.ElevatorConstants.sampleClawClosedAngle;
-                    sampleClawServo.setPosition(currentClawPosition);
-                    initialized = true;
-                }
-                packet.put("position", currentClawPosition);
-                return false;
-            }
-        };
+    public Action deliverToTopBasket(){
+        return new SequentialAction(
+                setTarget(Constants.ElevatorConstants.upperBasketDeliverPosition),
+                tipBucket(),
+                new SleepAction(1),
+                setTarget(Constants.ElevatorConstants.homePosition));
     }
-
-    public Action sampleClawOpen() {
-        return new Action() {
-            private boolean initialized = false;
-            private double currentClawPosition = 0;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    currentClawPosition = Constants.ElevatorConstants.sampleClawOpenAngle;
-                    sampleClawServo.setPosition(currentClawPosition);
-                    initialized = true;
-                }
-
-                packet.put("position", currentClawPosition);
-                return false;
-            }
-        };
+    public Action deliverToLowerBasket(){
+        return new SequentialAction(
+                setTarget(Constants.ElevatorConstants.lowerBasketDeliverPosition),
+                tipBucket(),
+                new SleepAction(1),
+                setTarget(Constants.ElevatorConstants.homePosition));
     }
-
 
 
 
@@ -343,7 +302,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double getRightVelocityInPerSec() {
         return round2dp(rightElevatorEncoder.getCorrectedVelocity() / 60, 2);
     }
-
 
     public boolean leftInPosition() {
         return leftPidController.atGoal();

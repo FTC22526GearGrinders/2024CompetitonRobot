@@ -69,11 +69,11 @@ public class TeleopOpMode extends CommandOpMode {
 
         jogArm = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
 
-        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_BUMPER);
+        jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.RIGHT_BUMPER);
 
         m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
 
-        alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
+     //   alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
 
         openIntakeClaw = new GamepadButton(coDriver, GamepadKeys.Button.RIGHT_STICK_BUTTON);
         closeIntakeClaw = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_STICK_BUTTON);
@@ -81,7 +81,7 @@ public class TeleopOpMode extends CommandOpMode {
 
         register(drive, arm, elevator, limelight);
 
-        drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
+        //   drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
         limelight.setAprilTagPipeline();
 
@@ -92,6 +92,7 @@ public class TeleopOpMode extends CommandOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
+        arm.tiltBothDown().run(packet);
         while (!isStopRequested() && opModeIsActive()) {
             CommandScheduler.getInstance().run();
             checkTriggers();
@@ -111,17 +112,11 @@ public class TeleopOpMode extends CommandOpMode {
         if (driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) == 1) {
             drive.resetEncoders();
         }
-        alignbutton.whenHeld(m_alignToNote);
+      //  alignbutton.whenHeld(m_alignToNote);
 
 
         jogArm.whenHeld(new JogArm(arm, coDriver));
         jogElevator.whenHeld(new JogElevator(elevator, coDriver));
-
-
-        if (openIntakeClaw.get())
-            arm.clawOpen().run(packet);
-        if (closeIntakeClaw.get())
-            arm.clawClose().run(packet);
 
 
 //

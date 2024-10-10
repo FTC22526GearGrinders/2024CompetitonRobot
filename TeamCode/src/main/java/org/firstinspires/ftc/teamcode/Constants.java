@@ -7,6 +7,20 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public final class Constants {
 
+    public enum TurnGripperJogSet {
+        LO(.001),
+
+        MED(.01),
+
+        HI(.1);
+
+        public final double increment;
+
+        TurnGripperJogSet(double increment) {
+            this.increment = increment;
+        }
+    }
+
     public static final class RobotConstants {
 
         public static final double length = 17.75;
@@ -25,11 +39,10 @@ public final class Constants {
         static final double distanceBetwwenSpikeMarks = 10;
     }
 
-public static final class SampleConstants{
+    public static final class SampleConstants {
         static final double length = 3.5;
         static final double side = 1.5;
-}
-
+    }
 
     public static final class DriveConstants {
 
@@ -51,13 +64,13 @@ public static final class SampleConstants{
         public static final double MAX_IPM = MAX_MOTOR_RPM * WHEEL_CIRCUMFERENCE_INCH;// 312 *12.57 = 3900 IPM
 
         public static final double MAX_IPS = MAX_IPM / 60;//65 IPS
+        public static double MAX_VEL = MAX_IPS * .9;
         public static final double POSITION_TOLERANCE_INCHES = .25;
         public static final double AT_BACKBOARD_ANGLE_DISTANCE = 6;
-        public static final double POSN_VEL = 4 ;
-        public static final double POSN_ACCEL = 4 ;
+        public static final double POSN_VEL = 4;
+        public static final double POSN_ACCEL = 4;
         public static final double FORWARD_GAIN = .032;
-
-        public static double MAX_VEL = MAX_IPS * .9;
+        public static final double BATTERY_VOLTS = 12;
         public static double MAX_ACCEL = 40;
         public static double MAX_ANG_VEL = Math.toRadians(75);
         public static double MAX_ANG_ACCEL = Math.toRadians(120);
@@ -65,38 +78,39 @@ public static final class SampleConstants{
         public static double TRAJ_ACCEL = 50;
         public static double TRAJ_ANG_VEL = Math.toRadians(50);
         public static double TRAJ_ANG_ACCEL = Math.toRadians(50);
-
         public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(.1, 0, 0, 0);
-
         public static double kP = .02;
         public static double kI = 0;
         public static double kD = 0;
-
-        public static double getMotorVelocityF(double ticksPerSecond) {
-            // see https://docs.google.com/document/d/1tyWrXDfMidwYyP_5H4mZyVgaEswhOC35gvdmP-V-5hA/edit#heading=h.61g9ixenznbx
-            return 32767 / ticksPerSecond;
-        }
-
         //     */
         public static double kV = .0195;//12 volts/60 ips = .02 max
         public static double kA = 0.003;// 0.0005;
         public static double kStatic = 0.0;//0.08;
 
 
-//        public static double kV =  0.0140;
+        //        public static double kV =  0.0140;
 //        public static double kA = 0.0022;
 //        public static double kStatic = 0.022;
-
-        public static final double BATTERY_VOLTS = 12;
-
-        //public static final double kV = BATTERY_VOLTS / MAX_IPM;//12/60 = .2 MAX THEORETICAL VALUE
-
-
         public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
+
+        //public static final double kV = BATTERY_VOLTS / MAX_IPM;//12/60 = .2 MAX THEORETICAL VALUE
         public static RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR =
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+        //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
+        //  applied to the drive motors to correct the error.
+        //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
+        public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
+        public static double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+        public static double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+        public static double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+        public static double BACKBOARD_DISTANCE_OFFSET = 6;
 
+        public static double getMotorVelocityF(double ticksPerSecond) {
+            // see https://docs.google.com/document/d/1tyWrXDfMidwYyP_5H4mZyVgaEswhOC35gvdmP-V-5hA/edit#heading=h.61g9ixenznbx
+            return 32767 / ticksPerSecond;
+        }
 
         public static double encoderTicksToInches(double ticks) {
             return 1.05 * WHEEL_DIAMETER_INCH * Math.PI * GEARBOX_RATIO * ticks / ENCODER_COUNTS_PER_WHEEL_REV;
@@ -107,33 +121,7 @@ public static final class SampleConstants{
             return rpm * GEARBOX_RATIO * 2 * Math.PI * WHEEL_DIAMETER_INCH / 2 / 60.0;
         }
 
-        public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
-        //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
-        //  applied to the drive motors to correct the error.
-        //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
-        public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-        public static double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
-        public static double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-        public static double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-
-        public static double BACKBOARD_DISTANCE_OFFSET = 6;
-
     }
-
-    public enum TurnGripperJogSet {
-        LO(.001),
-
-        MED(.01),
-
-        HI(.1);
-
-        public final double increment;
-
-        TurnGripperJogSet(double increment) {
-            this.increment = increment;
-        }
-    }
-
 
     public static final class ArmConstants {
 
@@ -158,7 +146,6 @@ public static final class SampleConstants{
         public static final double HOME_POSITION = 1;
         public static final double MAX_VEL = 30;
         public static final double MAX_ACCEL = 30;
-        public static double[] armPositionInches = {0,0.5, 5.8, 9, 13.6, 14.3, 16.8, 19};
 
 
         public static double kP = 1.5;
@@ -167,13 +154,16 @@ public static final class SampleConstants{
 
         public static double POSITION_Kg = 0;
 
-        public static double intakeClawOpenAngle;
-        public static double intakeClawClosedAngle;
-        public static double intakeTiltDownAngle;
-        public static double intakeTiltClearAngle;
-        public static double pickupDistance;
-        public static double intakeTiltBucketDeliverAngle;
-        public static double bucketDistance;
+        public static double intakeClawOpenAngle = 0;
+        public static double intakeClawClosedAngle = 1;
+        public static double leftIntakeTiltClearAngle = 0;
+        public static double leftIntakeTiltDownAngle = 1;
+        public static double rightIntakeTiltClearAngle = 0;
+        public static double rightIntakeTiltDownAngle = 1;
+
+        public static double homeDistance = 1;
+        public static double pickupDistance = 10;
+
     }
 
     public static final class ElevatorConstants {
@@ -199,8 +189,6 @@ public static final class SampleConstants{
         public static final double HOME_POSITION = 1;
         public static final double MAX_VEL = 30;
         public static final double MAX_ACCEL = 30;
-        public static double[] armPositionInches = {0,0.5, 5.8, 9, 13.6, 14.3, 16.8, 19};
-
 
         public static double kP = 1.5;
         public static double kI = 0;
@@ -208,10 +196,10 @@ public static final class SampleConstants{
 
         public static double POSITION_Kg = 0;
 
-        public static double bucketUprightAngle=0;
-        public static double bucketTippedAngle;
+        public static double bucketUprightAngle = 0;
+        public static double bucketTippedAngle = 1;
 
-        public static double elevatorDownHeight =0;
+        public static double elevatorDownHeight = 0;
         public static double elevatorLowerBasketHeight = 36;
         public static double elevatorUpperBasketHeight = 36;
         public static double elevatorSamplePickupHeight = 36;
@@ -219,8 +207,13 @@ public static final class SampleConstants{
         public static double elevatorSamplePlaceHeight = 36;
 
 
-        public static double sampleClawOpenAngle;
-        public static double sampleClawClosedAngle;
+        public static double sampleClawOpenAngle = 0;
+        public static double sampleClawClosedAngle = 1;
+
+        public static double homePosition = 1;
+        public static double lowerBasketDeliverPosition = 24;
+        public static double upperBasketDeliverPosition = 44;
+
 
     }
 
