@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.renderscript.Element;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -27,16 +25,6 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
-
-
-    public static final double MAX_INCHES_PER_SECOND = 50;// approx
-    public static final double UPPER_POSITION_LIMIT = 20;
-    public static final int LOWER_POSITION_LIMIT = 5;
-    private static final double ENCODER_COUNTS_PER_INCH = 113.8;
-    private static final double HOME_POSITION = 0;
-    private static final double POSITION_TOLERANCE_INCHES = .1;
-    public static double MAX_VEL = 30;
-    public static double MAX_ACCEL = 30;
     //units used are per unit motor setting since motor setVolts isn't available
     public static double lks = 0.;//1% motor power
     public static double lkg = 0;
@@ -53,6 +41,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double rkp = 0.01;
     public static double rki = 0;
     public static double rkd = 0;
+
+
+    public static double lkP = 1.5;
+    public static double lkI = 0;
+    public static double lkD = 0;
+
+    public static double rkP = 1.5;
+    public static double rkI = 0;
+    public static double rkD = 0;
+
+
     public static double targetInches;
     private final Telemetry telemetry;
     public TrapezoidProfile.Constraints constraints;
@@ -103,10 +102,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
         leftElevatorEncoder = leftElevatorMotor.encoder;
         leftElevatorEncoder.setDirection(Motor.Direction.FORWARD);
-        leftElevatorEncoder.setDistancePerPulse(1 / ENCODER_COUNTS_PER_INCH);
+        leftElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
         leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
         leftPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
-        leftPidController.setTolerance(POSITION_TOLERANCE_INCHES);
+        leftPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         leftPidController.reset();
 
 
@@ -115,13 +114,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
         rightElevatorEncoder = rightElevatorMotor.encoder;
         rightElevatorEncoder.setDirection(Motor.Direction.FORWARD);
-        rightElevatorEncoder.setDistancePerPulse(1 / ENCODER_COUNTS_PER_INCH);
-        rightFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
-        rightPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
-        rightPidController.setTolerance(POSITION_TOLERANCE_INCHES);
+        rightElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
+        rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
+        rightPidController = new ProfiledPIDController(rkp, rki, rkd, constraints);
+        rightPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         rightPidController.reset();
 
-        constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
+        constraints = new TrapezoidProfile.Constraints(Constants.ElevatorConstants.MAX_VEL, Constants.ElevatorConstants.MAX_ACCEL);
 
         bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
         sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
@@ -131,7 +130,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         resetElevatorEncoders();
 
-        setTargetInches(HOME_POSITION);
+        setTargetInches(Constants.ElevatorConstants.HOME_POSITION);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -165,11 +164,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return leftPidController.atGoal() && rightPidController.atGoal();
     }
 
-//    public Action setTarget(double target) {
-//        return new InstantAction(() -> setTargetInches(target));
-//    }
-
-    public  Action setTarget(double targetInches) {
+    public Action setTarget(double targetInches) {
         return new Action() {
             private boolean initialized = false;
 
@@ -196,21 +191,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
     }
 
-    public Action deliverToTopBasket(){
+    public Action deliverToTopBasket() {
         return new SequentialAction(
                 setTarget(Constants.ElevatorConstants.upperBasketDeliverPosition),
                 tipBucket(),
                 new SleepAction(1),
                 setTarget(Constants.ElevatorConstants.homePosition));
     }
-    public Action deliverToLowerBasket(){
+
+    public Action deliverToLowerBasket() {
         return new SequentialAction(
                 setTarget(Constants.ElevatorConstants.lowerBasketDeliverPosition),
                 tipBucket(),
                 new SleepAction(1),
                 setTarget(Constants.ElevatorConstants.homePosition));
     }
-
 
 
     @Override

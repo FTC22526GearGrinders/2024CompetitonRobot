@@ -16,49 +16,43 @@ public final class FieldConstantsRed {
     public static Pose2d basketDeliverPose = new Pose2d(-55, -55, basketDeliverAngle);
     public static Pose2d innerYellowPickupPose = new Pose2d(-48.5, -36.1, Math.toRadians(90));
     public static Pose2d midYellowPickupPose = new Pose2d(-57.7, -36.1, Math.toRadians(90));
-    public static Pose2d outerYellowPickupPose = new Pose2d(-60, -27.1, Math.toRadians(170));
+    public static Pose2d outerYellowApproachPose = new Pose2d(-50, -25.5, Math.toRadians(180));
+    public static Pose2d outerYellowPickupPose = new Pose2d(-60, -25.5, Math.toRadians(180));
 
-    //specimen values
-    public static final double observationZoneCenterPose = Math.toRadians(90);
-    public static final double specimenSideStartAngle = Math.toRadians(-90);
-    public static final double observationSideStartAngle = Math.toRadians(0);
-    static final double distanceBetweenSpikeMarks = 10;
-    static final double specimenPickupAngle = Math.toRadians(180);
-    static final double specimenLength = 3.5;
-    public static final double spikeMarkYCenter = -24 - Constants.FieldConstants.tileTeeth - specimenLength / 2;
-    public static Vector2d wallSideYellowSample = new Vector2d(-60, spikeMarkYCenter);
-    public static Vector2d centerYellowSample = new Vector2d(-50, spikeMarkYCenter);
-    public static Vector2d middleYellowSample = new Vector2d(-40, spikeMarkYCenter);
-    public static Vector2d alSideRedSample = new Vector2d(55, spikeMarkYCenter);
-    public static Vector2d centerRedSample = new Vector2d(55, spikeMarkYCenter);
-    public static Vector2d middleRedSample = new Vector2d(55, spikeMarkYCenter);
-    static final double specimenSide = 1.5;
 
-    public static Pose2d parkPose = new Pose2d(48, -50, basketDeliverAngle);
+    //Specimen poses
 
-    public static Pose2d flipPoseBlue(Pose2d pose) {
-        Pose2d temp = new Pose2d();
+
+    public static Pose2d sampleSideStartPose =new Pose2d(0, -64, Math.toRadians(90));
+    public static Pose2d specimenDeliverPose1 =new Pose2d(0, -32,Math.toRadians(90));
+    public static Pose2d specimenDeliverPose2 =new Pose2d(3, -32,Math.toRadians(90));
+    public static Pose2d specimenDeliverPose3 =new Pose2d(6, -32,Math.toRadians(90));
+    public static Pose2d specimenDeliverPose4 =new Pose2d(9, -32,Math.toRadians(90));
+
+
+    public static Pose2d sampleDeliverPose =new Pose2d(48.5, -54,Math.toRadians(90));
+    public static Pose2d samplePickupPose =new Pose2d(57.7, -62,Math.toRadians(90));
+    public static Vector2d innerRedPrePose = new Vector2d(48.5, -40);
+    public static Pose2d innerRedPickupPose =flipToSamplePose(innerYellowPickupPose);
+    public static Vector2d midRedPrePose =new Vector2d(57.7 ,-40);
+    public static Pose2d outerRedApproachPose =flipToSamplePoseIncHeading(outerYellowApproachPose);
+    public static Pose2d outerRedPickupPose =flipToSamplePoseIncHeading(outerYellowPickupPose);
+
+
+
+    public static Pose2d flipToSamplePose(Pose2d pose) {
         double x = -pose.getX();
-        double y = -pose.getY();
-        double heading = pose.getHeading() + 180;
-        heading = heading % 360;
-        if (heading > 180) {
-            heading -= 360;
-        } else if (heading < -180) {
-            heading += 360;
-        }
+        double y = pose.getY();
+        double heading = pose.getHeading();
         return new Pose2d(x, y, heading);
-
     }
 
+    public static Pose2d flipToSamplePoseIncHeading(Pose2d pose) {
+        double x = -pose.getX();
+        double y = pose.getY();
+        double heading = pose.getHeading()+Math.PI;
+        return new Pose2d(x, y, heading);
+    }
+
+
 }
-
-
-
-
-
-
-
-
-
-

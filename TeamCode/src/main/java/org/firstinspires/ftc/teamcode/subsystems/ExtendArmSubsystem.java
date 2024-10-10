@@ -25,20 +25,21 @@ import org.firstinspires.ftc.teamcode.Constants;
 @Config
 public class ExtendArmSubsystem extends SubsystemBase {
 
-    public static double MAX_VEL = 17;
-    public static double MAX_ACCEL = 30;
-    public static double ks = 0;//1% motor power
-    public static double kv = .015;//per inch per second (max 17 ips )
-    public static double ka = 0;
-    public static double kp = 0.01;
-    public static double ki = 0;
-    public static double kd = 0;
     public static CRServo leftIntakeServo;
     public static CRServo rightIntakeServo;
 
     public static Servo leftTiltServo;
     public static Servo rightTiltServo;
     public static double targetInches;
+    public static double ks = 0;//1% motor power
+    public static double kv = .015;//per inch per second (max 17 ips )
+    public static double ka = 0;
+    public static double kp = 0.01;
+    public static double ki = 0;
+    public static double kd = 0;
+    public static double kP = 1.5;
+    public static double kI = 0;
+    public static double kD = 0;
     private final FtcDashboard dashboard;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
@@ -50,8 +51,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public SimpleMotorFeedforward armFF;
     public int holdCtr;
     public int show = 0;
-
-
     ElapsedTime et;
     double setVel;
     double setPos;
@@ -62,6 +61,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double scanTime;
     private double accel;
     private double lastVel;
+
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
@@ -83,7 +83,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
 
-
         armMotor.setInverted(true);
 
         armMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -92,12 +91,12 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         armEncoder.setDirection(Motor.Direction.FORWARD);
 
-        armEncoder.setDistancePerPulse(1 / 10);//ENCODER_COUNTS_PER_INCH);
+        armEncoder.setDistancePerPulse(1/Constants.ArmConstants.ENCODER_COUNTS_PER_INCH);//ENCODER_COUNTS_PER_INCH);
 
         armFF = new SimpleMotorFeedforward(ks, kv, ka);
 
 
-        constraints = new TrapezoidProfile.Constraints(MAX_VEL, MAX_ACCEL);
+        constraints = new TrapezoidProfile.Constraints(Constants.ArmConstants.TRAJ_VEL, Constants.ArmConstants.TRAJ_ACCEL);
 
 
         armController = new ProfiledPIDController(kp, ki, kd, constraints);
@@ -135,8 +134,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     @Override
 
     public void periodic() {
-
-
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
             holdCtr = 0;
@@ -214,9 +211,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
 
-    public  Action setTarget(double targetInches) {
+    public Action setTarget(double targetInches) {
         return new Action() {
             private boolean initialized = false;
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
@@ -268,8 +266,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
                 tiltBothDown(),
                 runIntakeServos());
     }
-
-
 
 
     public void showTelemetry() {

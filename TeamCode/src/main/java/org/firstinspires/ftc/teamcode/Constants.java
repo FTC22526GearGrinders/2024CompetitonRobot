@@ -7,26 +7,13 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public final class Constants {
 
-    public enum TurnGripperJogSet {
-        LO(.001),
-
-        MED(.01),
-
-        HI(.1);
-
-        public final double increment;
-
-        TurnGripperJogSet(double increment) {
-            this.increment = increment;
-        }
-    }
 
     public static final class RobotConstants {
 
         public static final double length = 17.75;
-        static final double height = 13;
-        static final double width = 17.75;
-        static final Vector2d manipulatorToRobotCenter = new Vector2d(12, 0);
+        public static final double height = 13;
+        public static final double width = 17.75;
+        public static final Vector2d manipulatorToRobotCenter = new Vector2d(12, 0);
 
     }
 
@@ -146,11 +133,9 @@ public final class Constants {
         public static final double HOME_POSITION = 1;
         public static final double MAX_VEL = 30;
         public static final double MAX_ACCEL = 30;
+        public static final double TRAJ_VEL = 30;
+        public static final double TRAJ_ACCEL = 30;
 
-
-        public static double kP = 1.5;
-        public static double kI = 0;
-        public static double kD = 0;
 
         public static double POSITION_Kg = 0;
 
@@ -179,20 +164,15 @@ public final class Constants {
 
         public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / GEARING_RATIO;
         public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
-        public static final double POSITION_TOLERANCE_INCHES = .5;
-        public static final double UPPER_POSITION_LIMIT = 27.00;
-        public static final int LOWER_POSITION_LIMIT = -1;
 
-        public static final double JOG_UP_POWER = +.5;
-        public static final double JOG_DOWN_POWER = -.4;
-        public static final double AUTO_DELIVER_POSITION = 7.5;
-        public static final double HOME_POSITION = 1;
-        public static final double MAX_VEL = 30;
-        public static final double MAX_ACCEL = 30;
+        public static final double UPPER_POSITION_LIMIT = 20;
+        public static final int LOWER_POSITION_LIMIT = 5;
+        public static final double HOME_POSITION = 0;
+        public static final double POSITION_TOLERANCE_INCHES = .1;
 
-        public static double kP = 1.5;
-        public static double kI = 0;
-        public static double kD = 0;
+
+        public static double MAX_VEL = 30;
+        public static double MAX_ACCEL = 30;
 
         public static double POSITION_Kg = 0;
 
@@ -213,6 +193,9 @@ public final class Constants {
         public static double homePosition = 1;
         public static double lowerBasketDeliverPosition = 24;
         public static double upperBasketDeliverPosition = 44;
+
+        public static double sampleApproachPosition = 30;
+        public static double sampleDeliverPosition = 30;
 
 
     }

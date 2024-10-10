@@ -17,7 +17,9 @@ public final class FieldConstantsBlue {
 
     public static Pose2d innerYellowPickupPose = flipPoseBlue(FieldConstantsRed.innerYellowPickupPose);
     public static Pose2d midYellowPickupPose = flipPoseBlue(FieldConstantsRed.midYellowPickupPose);
-    public static Pose2d outerYellowPickupPose =flipPoseBlue(FieldConstantsRed.outerYellowPickupPose);
+    public static Pose2d outerYellowApproachPose = flipPoseBlue(FieldConstantsRed.outerYellowApproachPose);
+    public static Pose2d outerYellowPickupPose = flipPoseBlue(FieldConstantsRed.outerYellowPickupPose);
+
 
 
     public static Pose2d flipPoseBlue(Pose2d pose) {

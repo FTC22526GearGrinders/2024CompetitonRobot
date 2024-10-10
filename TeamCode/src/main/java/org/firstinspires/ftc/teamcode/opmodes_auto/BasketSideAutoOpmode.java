@@ -65,6 +65,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     private Action firstPickupMoveAction;
     private Action secondPickupMoveAction;
     private Action thirdPickupMoveAction;
+    private Action fourthPickupMoveAction;
+
     private TelemetryPacket packet;
 
     @Override
@@ -142,11 +144,11 @@ public class BasketSideAutoOpmode extends CommandOpMode {
             telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Select Starting Position using XYAB on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
+            telemetry.addData("Select Starting Position using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
             telemetry.addData("    Blue All Basket   ", "(X / ▢)");
-            telemetry.addData("    Blue Sample Then Basket ", "(Y / Δ)");
-            telemetry.addData("    Red All Basket    ", "(B / O)");
-            telemetry.addData("    Red Sample Then Basket  ", "(A / X)");
+
+            telemetry.addData("    Red All Basket    ", "(A / O)");
+
             if (gamepad1.x) {
                 startPosition = FieldConstantsBlue.basketSideStartPose;
                 deliverMoveAction = drive.actionBuilder(drive.pose)
@@ -167,7 +169,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         .build();
                 break;
             }
-            if (gamepad1.y) {
+            if (gamepad1.a) {
                 startPosition = FieldConstantsRed.basketSideStartPose;
                 deliverMoveAction = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(FieldConstantsRed.basketDeliverPose.position,
@@ -187,14 +189,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         .build();
                 break;
             }
-            if (gamepad1.b) {
-                startPosition = FieldConstantsRed.basketSideStartPose;
-                break;
-            }
-            if (gamepad1.a) {
-                startPosition = FieldConstantsRed.basketSideStartPose;
-                break;
-            }
+
             telemetry.update();
         }
         telemetry.clearAll();
