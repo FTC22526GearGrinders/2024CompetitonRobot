@@ -16,9 +16,7 @@ public class PositionHoldArm extends CommandBase {
 
     @Override
     public void initialize() {
-
         arm.armController.setGoal(arm.getPositionInches());
-
     }
 
     @Override

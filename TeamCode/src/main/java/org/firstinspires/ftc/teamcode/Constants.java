@@ -8,6 +8,10 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public final class Constants {
 
 
+    private double mmToInch(double mm) {
+        return mm * .03937;
+    }
+
     public static final class RobotConstants {
 
         public static final double length = 17.75;
@@ -113,16 +117,17 @@ public final class Constants {
     public static final class ArmConstants {
 
         public static final double MAX_MOTOR_RPM = 435;
-
-        public static final double MAX_MOTOR_RPSEC = 435 / 60;
-
+        public static final double GEARING_RATIO = 1;
+        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
+        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
 
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 384.5;
 
-        public static final double GEARING_RATIO = 4.72;// motor inches per rev
+        public static final double PULLEY_TEETH = 60;
+        public static final double BELT_PITCH = 2 * .03937; //.07874
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//4.5"approx
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//9 approx
 
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / GEARING_RATIO;
-        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
         public static final double POSITION_TOLERANCE_INCHES = .5;
         public static final double UPPER_POSITION_LIMIT = 27.00;
         public static final int LOWER_POSITION_LIMIT = -1;
@@ -154,16 +159,17 @@ public final class Constants {
     public static final class ElevatorConstants {
 
         public static final double MAX_MOTOR_RPM = 435;
-
-        public static final double MAX_MOTOR_RPSEC = 435 / 60;
-
+        public static final double GEARING_RATIO = 1;
+        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
+        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
 
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 384.5;
 
-        public static final double GEARING_RATIO = 4.72;// motor inches per rev
+        public static final double PULLEY_TEETH = 60;
+        public static final double BELT_PITCH = 2 * .03937; //.07874
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//4.5"approx
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//9 approx
 
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / GEARING_RATIO;
-        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
 
         public static final double UPPER_POSITION_LIMIT = 20;
         public static final int LOWER_POSITION_LIMIT = 5;
@@ -173,7 +179,8 @@ public final class Constants {
 
         public static double MAX_VEL = 30;
         public static double MAX_ACCEL = 30;
-
+        public static double TRAJ_VEL = 20;
+        public static double TRAJ_ACCEL = 20;
         public static double POSITION_Kg = 0;
 
         public static double bucketUprightAngle = 0;

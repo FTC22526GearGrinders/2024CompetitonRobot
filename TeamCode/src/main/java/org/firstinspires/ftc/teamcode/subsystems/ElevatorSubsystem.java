@@ -97,6 +97,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         myOpmode = opMode;
 
+        constraints = new TrapezoidProfile.Constraints(Constants.ElevatorConstants.TRAJ_VEL, Constants.ElevatorConstants.TRAJ_ACCEL);
+
+
         leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevatorMotor", Motor.GoBILDA.RPM_312);
         leftElevatorMotor.setInverted(true);
         leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
@@ -120,7 +123,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         rightPidController.reset();
 
-        constraints = new TrapezoidProfile.Constraints(Constants.ElevatorConstants.MAX_VEL, Constants.ElevatorConstants.MAX_ACCEL);
 
         bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
         sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
@@ -189,6 +191,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Action levelBucket() {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
+    }
+
+    public Action closeSampleClaw() {
+        return new InstantAction(() -> sampleClawServo.setPosition(Constants.ElevatorConstants.sampleClawClosedAngle));
+    }
+
+    public Action openSampleClaw() {
+        return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.sampleClawOpenAngle));
     }
 
     public Action deliverToTopBasket() {

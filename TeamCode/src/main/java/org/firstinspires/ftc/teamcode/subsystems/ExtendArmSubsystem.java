@@ -37,9 +37,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double kp = 0.01;
     public static double ki = 0;
     public static double kd = 0;
-    public static double kP = 1.5;
-    public static double kI = 0;
-    public static double kD = 0;
+    public static boolean TUNING=false;
     private final FtcDashboard dashboard;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
@@ -102,7 +100,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
         armController = new ProfiledPIDController(kp, ki, kd, constraints);
 
 
-        armController.setTolerance(1);
+        armController.setTolerance(Constants.ArmConstants.POSITION_TOLERANCE_INCHES);
 
         armController.reset(0);
 
@@ -113,7 +111,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
-
 
         et = new ElapsedTime();
     }
@@ -127,19 +124,32 @@ public class ExtendArmSubsystem extends SubsystemBase {
         armController.setGoal(targetInches);
     }
 
-//    public Action setTarget(double target) {
-//        return new InstantAction(() -> setTargetInches(target));
-//    }
 
     @Override
-
     public void periodic() {
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
             holdCtr = 0;
             et.reset();
         }
+        if(TUNING)tuning();
     }
+
+    public void tuning() {
+        if (armFF.kv != kv || armFF.ks != ks || armFF.ka != ka)
+            setNewFFValues();
+        if(armController.getP()!=kp)
+            armController.setP(kp);
+        if(armController.getI()!=ki)
+            armController.setI(ki);
+        if(armController.getD()!=kd)
+            armController.setD(kd);
+    }
+
+    public void setNewFFValues() {
+        armFF = new SimpleMotorFeedforward(ks, kv, ka);
+    }
+
 
     public void position() {
         // Retrieve the profiled setpoint for the next timestep. This setpoint moves
