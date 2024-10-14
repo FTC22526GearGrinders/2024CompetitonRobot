@@ -158,6 +158,23 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightPidController.setGoal(targetInches);
     }
 
+    public Action setWaitAtTarget(double target) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    setTargetInches(target);
+                    initialized = true;
+                }
+                packet.put("target", target);
+                packet.put("actual", getPositionInches());
+                return atGoal();
+            }
+        };
+    }
+
     public double getPositionInches() {
         return leftElevatorEncoder.getPosition();
     }

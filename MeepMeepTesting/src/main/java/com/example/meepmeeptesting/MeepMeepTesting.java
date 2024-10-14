@@ -12,7 +12,7 @@ public class MeepMeepTesting {
 
 
         boolean blue = false;
-        boolean basket = true;
+        boolean basket = false;
 
 
         if (blue && basket) {
@@ -101,8 +101,6 @@ public class MeepMeepTesting {
                                     .waitSeconds(1)
                                     .lineToSplineHeading(FieldConstantsBlue.basketDeliverPose)
                                     .waitSeconds(1)
-                                    .lineToSplineHeading(FieldConstantsBlue.outerYellowApproachPose)
-                                    .waitSeconds(.2)
                                     .lineToSplineHeading(FieldConstantsBlue.outerYellowPickupPose)
                                     .waitSeconds((2))//basket drop
                                     .build()
@@ -120,36 +118,37 @@ public class MeepMeepTesting {
 
                     .followTrajectorySequence(drive ->
                                     drive.trajectorySequenceBuilder(
-                                                    FieldConstantsRed.sampleSideStartPose)
+                                                    FieldConstantsRed.specimenSideStartPose)
                                             .waitSeconds((1))//sample
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose1)
                                             .waitSeconds((1))//sample
-                                            //  .lineToSplineHeading(FieldConstantsRed.sampleSideStartPose)
+                                            .forward(FieldConstantsRed.specimenDeliverPullbackInches)
 
-//                                    .turn(Math.toRadians(-90))
+
                                             .setTangent(0)
-                                            .lineToConstantHeading(FieldConstantsRed.innerRedPrePose)
-                                            .forward(6)
+                                            .lineToSplineHeading(FieldConstantsRed.innerRedPickupPose)
+
 
 
                                             .lineToLinearHeading(FieldConstantsRed.samplePickupPose)
 //
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose2)
                                             .waitSeconds((1))//sample
-                                            .lineToConstantHeading(FieldConstantsRed.midRedPrePose)
-                                            .forward(6)
+                                            .forward(FieldConstantsRed.specimenDeliverPullbackInches)
+                                            .lineToSplineHeading(FieldConstantsRed.midRedPickupPose)
 
 
                                             .lineToLinearHeading(FieldConstantsRed.samplePickupPose)
+
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose3)
                                             .waitSeconds((1))//sample
-
-                                            .back(15)
+                                            .forward(FieldConstantsRed.specimenDeliverPullbackInches)
 //                                    .lineToSplineHeading(FieldConstantsRed.samplePickupApproachPose)
-                                            .lineToSplineHeading(FieldConstantsRed.outerRedApproachPose)
+                                            //                 .lineToSplineHeading(FieldConstantsRed.outerRedApproachPose)
 //                                    //.waitSeconds((.2))//s
                                             .lineToSplineHeading(FieldConstantsRed.outerRedPickupPose)
                                             .waitSeconds((1))//sample
+                                            .back(6)
                                             .lineToSplineHeading(FieldConstantsRed.samplePickupPose)
                                             .waitSeconds(1)
 //                                   // .lineToSplineHeading(FieldConstantsRed.sampleDeliverPose)
@@ -161,7 +160,7 @@ public class MeepMeepTesting {
                     );
 
             ShowField.showIt(meepMeep, myBot);
-            myBot.getDrive().setPoseEstimate(FieldConstantsRed.sampleSideStartPose);
+            myBot.getDrive().setPoseEstimate(FieldConstantsRed.specimenSideStartPose);
         }
     }
 

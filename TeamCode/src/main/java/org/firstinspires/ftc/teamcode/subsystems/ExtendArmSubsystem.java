@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
@@ -124,7 +125,22 @@ public class ExtendArmSubsystem extends SubsystemBase {
         armController.setGoal(targetInches);
     }
 
+    public Action setWaitAtTarget(double target) {
+        return new Action() {
+            private boolean initialized = false;
 
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    setTargetInches(target);
+                    initialized = true;
+                }
+                packet.put("target", target);
+                packet.put("actual", getPositionInches());
+                return atGoal();
+            }
+        };
+    }
     @Override
     public void periodic() {
         if (holdCtr >= 100) {
@@ -270,11 +286,17 @@ public class ExtendArmSubsystem extends SubsystemBase {
                 new InstantAction(() -> rightIntakeServo.stop()));
     }
 
-    public Action goPickupSpecimen() {
+    public Action goPickupSample() {
         return new ParallelAction(
                 setTarget(Constants.ArmConstants.pickupDistance),
                 tiltBothDown(),
                 runIntakeServos());
+    }
+
+    public Action deliverToBucket() {
+        return new SequentialAction(
+                tiltBothClear(),
+                setTarget(Constants.ArmConstants.bucketDistance));
     }
 
 
@@ -292,4 +314,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.update();
 
     }
+
+
 }

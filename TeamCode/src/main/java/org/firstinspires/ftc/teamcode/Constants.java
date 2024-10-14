@@ -154,6 +154,7 @@ public final class Constants {
         public static double homeDistance = 1;
         public static double pickupDistance = 10;
 
+        public static double bucketDistance = 2;
     }
 
     public static final class ElevatorConstants {
@@ -190,8 +191,10 @@ public final class Constants {
         public static double elevatorLowerBasketHeight = 36;
         public static double elevatorUpperBasketHeight = 36;
         public static double elevatorSamplePickupHeight = 36;
-        public static double elevatorSampleAbovePlaceHeight = 36;
-        public static double elevatorSamplePlaceHeight = 36;
+        public static double elevatorSampleAboveLowPlaceHeight = 36;
+        public static double elevatorSampleLowlaceHeight = 36;
+        public static double elevatorSampleAboveTopPlaceHeight = 36;
+        public static double elevatorSampleTopPlaceHeight = 36;
 
 
         public static double sampleClawOpenAngle = 0;

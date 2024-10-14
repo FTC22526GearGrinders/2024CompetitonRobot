@@ -35,7 +35,6 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -97,35 +96,35 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                             deliverMoveAction,
                             elevator.deliverToTopBasket()));
 
-            Actions.runBlocking(
-                    new ParallelAction(
-                            firstPickupMoveAction,
-                            arm.goPickupSpecimen()));
-
-            Actions.runBlocking(
-                    new SequentialAction(
-                            deliverMoveAction,
-                            elevator.deliverToTopBasket()));
-
-            Actions.runBlocking(
-                    new ParallelAction(
-                            secondPickupMoveAction,
-                            arm.goPickupSpecimen()));
-
-            Actions.runBlocking(
-                    new SequentialAction(
-                            deliverMoveAction,
-                            elevator.deliverToTopBasket()));
-
-            Actions.runBlocking(
-                    new ParallelAction(
-                            thirdPickupMoveAction,
-                            arm.goPickupSpecimen()));
-
-            Actions.runBlocking(
-                    new SequentialAction(
-                            deliverMoveAction,
-                            elevator.deliverToTopBasket()));
+//            Actions.runBlocking(
+//                    new ParallelAction(
+//                            firstPickupMoveAction,
+//                          //  arm.goPickupSpecimen()));
+//
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            deliverMoveAction,
+//                            elevator.deliverToTopBasket()));
+//
+//            Actions.runBlocking(
+//                    new ParallelAction(
+//                            secondPickupMoveAction,
+//                         //   arm.goPickupSpecimen()));
+//
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            deliverMoveAction,
+//                            elevator.deliverToTopBasket()));
+//
+//            Actions.runBlocking(
+//                    new ParallelAction(
+//                            thirdPickupMoveAction,
+//                          //  arm.goPickupSpecimen()));
+//
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            deliverMoveAction,
+//                            elevator.deliverToTopBasket()));
 
 
             new SleepAction(2);
@@ -144,7 +143,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
             telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Select Starting Position using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
+            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
             telemetry.addData("    Blue All Basket   ", "(X / ▢)");
 
             telemetry.addData("    Red All Basket    ", "(A / O)");

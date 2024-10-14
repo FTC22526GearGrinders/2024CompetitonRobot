@@ -20,9 +20,7 @@ public final class FieldConstantsBlue {
     public static Pose2d outerYellowPickupPose = flipXYH(FieldConstantsRed.outerYellowPickupPose);
 
 
-
-
-    public static Pose2d sampleSideStartPose =flipXH(FieldConstantsRed.sampleSideStartPose);
+    public static Pose2d sampleSideStartPose = flipXH(FieldConstantsRed.specimenSideStartPose);
     public static Pose2d specimenDeliverPose =new Pose2d(10, -32,Math.toRadians(90));
     public static Pose2d sampleDeliverPose =new Pose2d(60, -54,Math.toRadians(90));
     public static Pose2d samplePickupPose =new Pose2d(60, -62,Math.toRadians(90));
