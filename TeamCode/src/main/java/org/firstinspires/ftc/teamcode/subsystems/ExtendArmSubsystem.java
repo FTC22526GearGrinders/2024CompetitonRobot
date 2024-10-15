@@ -60,6 +60,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double scanTime;
     private double accel;
     private double lastVel;
+    private int targetSetCounter;
 
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
@@ -237,19 +238,21 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
 
-    public Action setTarget(double targetInches) {
+    public Action setAndWaitForAtTarget(double target) {
         return new Action() {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    setTargetInches(targetInches);
+                    targetSetCounter = 0;
+                    setTargetInches(target);
                     initialized = true;
                 }
-                packet.put("targetInches", getTargetInches());
-                packet.put("actualInches", getPositionInches());
-                return atGoal();
+                packet.put("target", target);
+                packet.put("actual", getPositionInches());
+                targetSetCounter++;
+                return targetSetCounter >= 5 && atGoal();
             }
         };
     }
@@ -266,18 +269,23 @@ public class ExtendArmSubsystem extends SubsystemBase {
                 new InstantAction(() -> rightTiltServo.setPosition(Constants.ArmConstants.rightIntakeTiltClearAngle)));
     }
 
-    public Action runLeftIntake() {
-        return new InstantAction(() -> leftIntakeServo.set(1));
+    public Action runLeftIntake(double speed) {
+        return new InstantAction(() -> leftIntakeServo.set(speed));
     }
 
-    public Action runRightIntake() {
-        return new InstantAction(() -> rightIntakeServo.set(1));
+    public Action runRightIntake(double speed) {
+        return new InstantAction(() -> rightIntakeServo.set(speed));
     }
 
-    public Action runIntakeServos() {
+    public Action runIntakeServos(double speed) {
         return new ParallelAction(
-                runLeftIntake(),
-                runRightIntake());
+                runLeftIntake(speed),
+                runRightIntake(speed));
+    }
+    public Action reverseIntakeServos(double speed) {
+        return new ParallelAction(
+                runLeftIntake(speed),
+                runRightIntake(speed));
     }
 
     public Action stopIntakeServos() {
@@ -288,15 +296,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public Action goPickupSample() {
         return new ParallelAction(
-                setTarget(Constants.ArmConstants.pickupDistance),
+                setTargetInches(Constants.ArmConstants.pickupDistance);,
                 tiltBothDown(),
-                runIntakeServos());
+                runIntakeServos(1));
     }
 
     public Action deliverToBucket() {
         return new SequentialAction(
                 tiltBothClear(),
-                setTarget(Constants.ArmConstants.bucketDistance));
+                setAndWaitForAtTarget(Constants.ArmConstants.bucketDistance),
+                runIntakeServos(-1));
     }
 
 

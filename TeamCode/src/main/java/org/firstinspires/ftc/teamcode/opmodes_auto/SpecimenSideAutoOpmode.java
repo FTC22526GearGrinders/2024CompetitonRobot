@@ -47,6 +47,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FieldConstantsRed;
+import org.firstinspires.ftc.teamcode.FieldConstantsBlue;
+
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -69,9 +71,13 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     private Action thirdDeliverMoveAction;
     private Action fourthDeliverMoveAction;
 
+
     private Action firstPickupMoveAction;
     private Action secondPickupMoveAction;
     private Action thirdPickupMoveAction;
+
+    private Action specimenPickupMoveAction;
+
 
     private Action firstDropCollectMoveAction;
     private Action secondDropCollectMoveAction;
@@ -86,6 +92,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         arm = new ExtendArmSubsystem(this);
         elevator = new ElevatorSubsystem(this);
         packet = new TelemetryPacket();
+
 
     }
 
@@ -107,10 +114,10 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                     new SequentialAction(
                             new ParallelAction(
                                     firstDeliverMoveAction,
-                                    new InstantAction(() -> elevator.setTargetInches(Constants.ElevatorConstants.elevatorSampleAboveTopPlaceHeight))),
-                            new InstantAction(() -> elevator.setTargetInches(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight))));
+                                    new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleAboveTopPlaceHeight))),
+                            new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight))));
 
-
+//
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
@@ -121,7 +128,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             Actions.runBlocking(
                     new SequentialAction(
                             elevator.openSampleClaw(),
-                            new InstantAction(() -> elevator.setTargetInches(Constants.ElevatorConstants.elevatorSamplePickupHeight)),
+                            new InstantAction(() -> elevator.setTarget(Constants.ElevatorConstants.elevatorSamplePickupHeight)),
                             firstDropCollectMoveAction,
                             elevator.closeSampleClaw()));
 
@@ -129,8 +136,10 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                     new SequentialAction(
                             new ParallelAction(
                                     secondDeliverMoveAction,
-                                    new InstantAction(() -> elevator.setTargetInches(Constants.ElevatorConstants.elevatorSampleAboveTopPlaceHeight))),
-                            new InstantAction(() -> elevator.setTargetInches(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight))));
+                                    new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleAboveTopPlaceHeight))),
+                            new SequentialAction(
+                                    new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight)),
+                                    elevator.openSampleClaw())));
 
             Actions.runBlocking(
                     new SequentialAction(
@@ -142,10 +151,9 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             Actions.runBlocking(
                     new SequentialAction(
                             elevator.openSampleClaw(),
-                            new InstantAction(() -> elevator.setTargetInches(Constants.ElevatorConstants.elevatorSamplePickupHeight)),
+                            new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSamplePickupHeight)),
                             firstDropCollectMoveAction,
                             elevator.closeSampleClaw()));
-
 
 
             Actions.runBlocking(
@@ -181,45 +189,44 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             telemetry.addData("    Red All Basket    ", "(A / O)");
 
             if (gamepad1.x) {
-//                startPosition = FieldConstantsBlue.basketSideStartPose;
-//                deliverMoveAction = drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position,
-//                                FieldConstantsBlue.basketDeliverPose.heading)
-//                        .build();
-//                firstPickupMoveAction = drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(FieldConstantsBlue.innerYellowPickupPose.position,
-//                                FieldConstantsBlue.innerYellowPickupPose.heading)
-//                        .build();
-//                secondPickupMoveAction = drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position,
-//                                FieldConstantsBlue.midYellowPickupPose.heading)
-//                        .build();
-//                thirdPickupMoveAction = drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position,
-//                                FieldConstantsBlue.midYellowPickupPose.heading)
-//                        .build();
-//                break;
-            }
-            if (gamepad1.a) {
-                startPosition = FieldConstantsRed.specimenSideStartPose;
-                firstDeliverMoveAction = drive.actionBuilder(drive.pose)
-                        .lineToY(FieldConstantsRed.specimenDeliverPose1.position.y)
-                        .build();
+                 startPosition = FieldConstantsBlue.specimenSideStartPose;
+
+                firstDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsBlue.specimenDeliverPose4, 0).build();
+                secondDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsBlue.specimenDeliverPose3, 0).build();
+                thirdDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsBlue.specimenDeliverPose2, 0).build();
+                fourthDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsBlue.specimenDeliverPose1, 0).build();
+
                 firstPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.innerYellowPickupPose.position,
-                                FieldConstantsRed.innerYellowPickupPose.heading)
-                        .build();
+                        .splineToLinearHeading(FieldConstantsBlue.innerBluePickupPose,Math.toRadians(45))  .build();
                 secondPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position,
-                                FieldConstantsRed.midYellowPickupPose.heading)
-                        .build();
+                        .splineToLinearHeading(FieldConstantsBlue.midBluePickupPose,Math.toRadians(45)).build();
                 thirdPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position,
-                                FieldConstantsRed.midYellowPickupPose.heading)
-                        .build();
+                        .splineToLinearHeading(FieldConstantsBlue.outerBluePickupPose,Math.toRadians(0)).build();
+
+                specimenPickupMoveAction=  drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(FieldConstantsBlue.samplePickupPose,Math.PI).build();
                 break;
             }
+            if (gamepad1.a) {
 
+                startPosition = FieldConstantsRed.specimenSideStartPose;
+
+                firstDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsRed.specimenDeliverPose4, 0).build();
+                secondDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsRed.specimenDeliverPose3, 0).build();
+                thirdDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsRed.specimenDeliverPose2, 0).build();
+                fourthDeliverMoveAction = drive.actionBuilder(drive.pose).splineToLinearHeading(FieldConstantsRed.specimenDeliverPose1, 0).build();
+
+                firstPickupMoveAction = drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(FieldConstantsRed.innerRedPickupPose,Math.toRadians(45))  .build();
+                secondPickupMoveAction = drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(FieldConstantsRed.midRedPickupPose,Math.toRadians(45)).build();
+                thirdPickupMoveAction = drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(FieldConstantsRed.outerRedPickupPose,Math.toRadians(0)).build();
+
+                specimenPickupMoveAction=  drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(FieldConstantsRed.samplePickupPose,Math.PI).build();
+                break;
+            }
             telemetry.update();
         }
         telemetry.clearAll();

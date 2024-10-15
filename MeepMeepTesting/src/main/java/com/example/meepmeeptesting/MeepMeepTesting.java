@@ -11,8 +11,8 @@ public class MeepMeepTesting {
     public static void main(String[] args) {
 
 
-        boolean blue = false;
-        boolean basket = false;
+        boolean blue = true;
+        boolean basket = true;
 
 
         if (blue && basket) {
@@ -39,6 +39,8 @@ public class MeepMeepTesting {
                                     .lineToSplineHeading(FieldConstantsBlue.outerYellowApproachPose)
                                     .waitSeconds(.2)
                                     .lineToSplineHeading(FieldConstantsBlue.outerYellowPickupPose)
+                                    .lineToSplineHeading(FieldConstantsBlue.outerYellowApproachPose)
+                                    .lineToSplineHeading(FieldConstantsBlue.basketDeliverPose)
                                     .waitSeconds((2))//basket drop
                                     .build()
                     );
@@ -72,6 +74,8 @@ public class MeepMeepTesting {
                                     .waitSeconds(.2)
                                     .lineToSplineHeading(FieldConstantsRed.outerYellowPickupPose)
                                     .waitSeconds((2))//basket drop
+                                    .lineToSplineHeading(FieldConstantsRed.outerYellowApproachPose)
+                                    .lineToSplineHeading(FieldConstantsRed.basketDeliverPose)
                                     .build()
                     );
 
@@ -88,22 +92,36 @@ public class MeepMeepTesting {
                     .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
 
                     .followTrajectorySequence(drive ->
-                            drive.trajectorySequenceBuilder(
-                                            FieldConstantsBlue.basketSideStartPose)
-                                    .waitSeconds((1))//sample
-                                    .lineToSplineHeading(FieldConstantsBlue.basketDeliverPose)
-                                    .waitSeconds((1))//sample
-                                    .lineToSplineHeading(FieldConstantsBlue.innerYellowPickupPose)
-                                    .waitSeconds(1)
-                                    .lineToSplineHeading(FieldConstantsBlue.basketDeliverPose)
-                                    .waitSeconds(1)
-                                    .lineToSplineHeading(FieldConstantsBlue.midYellowPickupPose)
-                                    .waitSeconds(1)
-                                    .lineToSplineHeading(FieldConstantsBlue.basketDeliverPose)
-                                    .waitSeconds(1)
-                                    .lineToSplineHeading(FieldConstantsBlue.outerYellowPickupPose)
-                                    .waitSeconds((2))//basket drop
-                                    .build()
+                                    drive.trajectorySequenceBuilder(
+                                                    FieldConstantsBlue.specimenSideStartPose)
+                                            .waitSeconds((1))//sample
+                                            .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose1)
+                                            .waitSeconds((1))//sample
+
+                                            .splineToLinearHeading(FieldConstantsBlue.innerBluePickupPose,180)
+
+                                            .waitSeconds(1)
+
+                                            .lineToLinearHeading(FieldConstantsBlue.samplePickupPose)
+//
+                                            .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose2)
+                                            .waitSeconds((1))//sample
+
+                                            .splineToLinearHeading(FieldConstantsBlue.midBluePickupPose,180)
+
+                                            .lineToLinearHeading(FieldConstantsBlue.samplePickupPose)
+
+                                            .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose3)
+                                            .waitSeconds((1))//sample
+                                            .splineToLinearHeading(FieldConstantsBlue.outerBluePickupPose,180)
+                                            .waitSeconds((1))//sample
+                                            .lineToSplineHeading(FieldConstantsBlue.samplePickupPose)
+                                            .waitSeconds(1)
+//
+                                            .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose4)
+                                            .waitSeconds(5)
+
+                                            .build()
                     );
 
             ShowField.showIt(meepMeep, myBot);
@@ -122,37 +140,28 @@ public class MeepMeepTesting {
                                             .waitSeconds((1))//sample
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose1)
                                             .waitSeconds((1))//sample
-                                            .forward(FieldConstantsRed.specimenDeliverPullbackInches)
 
+                                            .splineToLinearHeading(FieldConstantsRed.innerRedPickupPose,0)
 
-                                            .setTangent(0)
-                                            .lineToSplineHeading(FieldConstantsRed.innerRedPickupPose)
-
-
+                                            .waitSeconds(1)
 
                                             .lineToLinearHeading(FieldConstantsRed.samplePickupPose)
 //
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose2)
                                             .waitSeconds((1))//sample
-                                            .forward(FieldConstantsRed.specimenDeliverPullbackInches)
-                                            .lineToSplineHeading(FieldConstantsRed.midRedPickupPose)
 
+                                            .splineToLinearHeading(FieldConstantsRed.midRedPickupPose,0)
 
                                             .lineToLinearHeading(FieldConstantsRed.samplePickupPose)
 
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose3)
                                             .waitSeconds((1))//sample
-                                            .forward(FieldConstantsRed.specimenDeliverPullbackInches)
-//                                    .lineToSplineHeading(FieldConstantsRed.samplePickupApproachPose)
-                                            //                 .lineToSplineHeading(FieldConstantsRed.outerRedApproachPose)
-//                                    //.waitSeconds((.2))//s
-                                            .lineToSplineHeading(FieldConstantsRed.outerRedPickupPose)
+                                            .splineToLinearHeading(FieldConstantsRed.outerRedPickupPose,0)
                                             .waitSeconds((1))//sample
                                             .back(6)
                                             .lineToSplineHeading(FieldConstantsRed.samplePickupPose)
                                             .waitSeconds(1)
-//                                   // .lineToSplineHeading(FieldConstantsRed.sampleDeliverPose)
-//                                  //  .waitSeconds(.2)
+//
                                             .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose4)
                                             .waitSeconds(5)
 

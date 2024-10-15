@@ -205,8 +205,6 @@ public class FTCWiresAutonomous extends CommandOpMode {
         //TODO : Code to drop Purple Pixel on Spike Mark
         safeWaitSeconds(1);
 
-        new PositionElevator(elevator, 10).schedule();
-
         //Move robot to midwayPose1
       Actions.runBlocking(
                 drive.actionBuilder(drive.pose)

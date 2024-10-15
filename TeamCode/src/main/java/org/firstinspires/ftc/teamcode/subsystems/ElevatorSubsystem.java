@@ -92,6 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double rightAccel;
     private double rightLastVel;
     private double scanTime;
+    private int targetSetCounter;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
 
@@ -152,25 +153,27 @@ public class ElevatorSubsystem extends SubsystemBase {
         return targetInches;
     }
 
-    public void setTargetInches(double inches) {
+    private void setTargetInches(double inches) {
         targetInches = inches;
         leftPidController.setGoal(targetInches);
         rightPidController.setGoal(targetInches);
     }
 
-    public Action setWaitAtTarget(double target) {
+    public Action setAndWaitForAtTarget(double target) {
         return new Action() {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
+                    targetSetCounter = 0;
                     setTargetInches(target);
                     initialized = true;
                 }
                 packet.put("target", target);
                 packet.put("actual", getPositionInches());
-                return atGoal();
+                targetSetCounter++;
+                return targetSetCounter >= 5 && atGoal();
             }
         };
     }
