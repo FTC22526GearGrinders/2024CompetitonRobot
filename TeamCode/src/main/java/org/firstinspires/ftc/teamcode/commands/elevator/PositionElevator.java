@@ -12,12 +12,6 @@ public class PositionElevator extends CommandBase {
 
     int lpctr;
 
-    private double accelLeft;
-    private double accelRight;
-
-    private double lastLeftVel;
-    private double lastRightVel;
-
 
     public PositionElevator(ElevatorSubsystem elevator, double targetInches) {
         this.elevator = elevator;

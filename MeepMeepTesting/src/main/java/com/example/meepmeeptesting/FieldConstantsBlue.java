@@ -22,14 +22,14 @@ public final class FieldConstantsBlue {
 
     //specimen
 
-    public static Pose2d specimenSideStartPose = new Pose2d(12, -64, Math.toRadians(90));
-    public static Pose2d specimenDeliverPose1 = new Pose2d(12, -32, Math.toRadians(90));
-    public static Pose2d specimenDeliverPose2 = new Pose2d(9, -32, Math.toRadians(90));
-    public static Pose2d specimenDeliverPose3 = new Pose2d(3, -32, Math.toRadians(90));
-    public static Pose2d specimenDeliverPose4 = new Pose2d(0, -32, Math.toRadians(90));
+    public static Pose2d specimenSideStartPose = new Pose2d(-12, 64, Math.toRadians(90));
+    public static Pose2d specimenDeliverPose1 = new Pose2d(-12, 32, Math.toRadians(90));
+    public static Pose2d specimenDeliverPose2 = new Pose2d(-9, 32, Math.toRadians(90));
+    public static Pose2d specimenDeliverPose3 = new Pose2d(-3, 32, Math.toRadians(90));
+    public static Pose2d specimenDeliverPose4 = new Pose2d(0, 32, Math.toRadians(90));
 
 
-    public static Pose2d samplePickupPose = new Pose2d(-57.7, 62, Math.toRadians(270));
+    public static Pose2d samplePickupPose = new Pose2d(-36, 62, Math.toRadians(270));
 
     public static Pose2d innerBluePickupPose = new Pose2d(-45, 31, Math.toRadians(225));
     public static Pose2d midBluePickupPose = new Pose2d(-55, 31, Math.toRadians(225));

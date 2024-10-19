@@ -98,7 +98,7 @@ public class MeepMeepTesting {
                                             .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose1)
                                             .waitSeconds((1))//sample
 
-                                            .splineToLinearHeading(FieldConstantsBlue.innerBluePickupPose,180)
+                                            .splineToLinearHeading(FieldConstantsBlue.innerBluePickupPose, 180)
 
                                             .waitSeconds(1)
 
@@ -107,13 +107,13 @@ public class MeepMeepTesting {
                                             .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose2)
                                             .waitSeconds((1))//sample
 
-                                            .splineToLinearHeading(FieldConstantsBlue.midBluePickupPose,180)
+                                            .splineToLinearHeading(FieldConstantsBlue.midBluePickupPose, 180)
 
                                             .lineToLinearHeading(FieldConstantsBlue.samplePickupPose)
 
                                             .lineToSplineHeading(FieldConstantsBlue.specimenDeliverPose3)
                                             .waitSeconds((1))//sample
-                                            .splineToLinearHeading(FieldConstantsBlue.outerBluePickupPose,180)
+                                            .splineToLinearHeading(FieldConstantsBlue.outerBluePickupPose, 180)
                                             .waitSeconds((1))//sample
                                             .lineToSplineHeading(FieldConstantsBlue.samplePickupPose)
                                             .waitSeconds(1)
@@ -135,37 +135,43 @@ public class MeepMeepTesting {
                     .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
 
                     .followTrajectorySequence(drive ->
-                                    drive.trajectorySequenceBuilder(
-                                                    FieldConstantsRed.specimenSideStartPose)
-                                            .waitSeconds((1))//sample
-                                            .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose1)
-                                            .waitSeconds((1))//sample
+                            drive.trajectorySequenceBuilder(
+                                            FieldConstantsRed.specimenSideStartPose)
+                                    .waitSeconds((1))//sample
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose1)
+                                    .waitSeconds((1))//sample
 
-                                            .splineToLinearHeading(FieldConstantsRed.innerRedPickupPose,0)
+                                    .splineToLinearHeading(FieldConstantsRed.innerRedPickupPose, 0)
 
-                                            .waitSeconds(1)
+                                    .waitSeconds(1)
 
-                                            .lineToLinearHeading(FieldConstantsRed.samplePickupPose)
-//
-                                            .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose2)
-                                            .waitSeconds((1))//sample
+                                    .lineToLinearHeading(FieldConstantsRed.specimenPickupPose)
+                                    .waitSeconds((1))//sample
+                                    .lineToSplineHeading(FieldConstantsRed.sampleDropPose)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverApproachPose2)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose2)
+                                    .waitSeconds((1))//sample
 
-                                            .splineToLinearHeading(FieldConstantsRed.midRedPickupPose,0)
+                                    .splineToLinearHeading(FieldConstantsRed.midRedPickupPose, 0)
 
-                                            .lineToLinearHeading(FieldConstantsRed.samplePickupPose)
+                                    .lineToLinearHeading(FieldConstantsRed.specimenPickupPose)
+                                    .waitSeconds((1))//sample
+                                    .lineToSplineHeading(FieldConstantsRed.sampleDropPose)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverApproachPose3)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose3)
+                                    .waitSeconds((1))//sample
 
-                                            .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose3)
-                                            .waitSeconds((1))//sample
-                                            .splineToLinearHeading(FieldConstantsRed.outerRedPickupPose,0)
-                                            .waitSeconds((1))//sample
-                                            .back(6)
-                                            .lineToSplineHeading(FieldConstantsRed.samplePickupPose)
-                                            .waitSeconds(1)
-//
-                                            .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose4)
-                                            .waitSeconds(5)
+                                    .splineToLinearHeading(FieldConstantsRed.outerRedPickupPose, 0)
+                                    .waitSeconds((1))//sample
+                                    .back(6)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenPickupPose)
+                                    .waitSeconds(1)
+                                    .lineToSplineHeading(FieldConstantsRed.sampleDropPose)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverApproachPose4)
+                                    .lineToSplineHeading(FieldConstantsRed.specimenDeliverPose4)
+                                    .waitSeconds(5)
 
-                                            .build()
+                                    .build()
                     );
 
             ShowField.showIt(meepMeep, myBot);

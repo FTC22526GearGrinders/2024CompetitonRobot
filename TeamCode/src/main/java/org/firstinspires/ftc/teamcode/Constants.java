@@ -116,17 +116,18 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-        public static final double MAX_MOTOR_RPM = 435;
+        public static final double MAX_MOTOR_RPM = 223;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 751.8;
+
         public static final double GEARING_RATIO = 1;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
-        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
-
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 384.5;
-
         public static final double PULLEY_TEETH = 60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
         public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//4.5"approx
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//9 approx
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx
+
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC * GEARING_RATIO * .8;//13
+
 
         public static final double POSITION_TOLERANCE_INCHES = .5;
         public static final double UPPER_POSITION_LIMIT = 27.00;
@@ -136,16 +137,15 @@ public final class Constants {
         public static final double JOG_DOWN_POWER = -.4;
         public static final double AUTO_DELIVER_POSITION = 7.5;
         public static final double HOME_POSITION = 1;
-        public static final double MAX_VEL = 30;
-        public static final double MAX_ACCEL = 30;
-        public static final double TRAJ_VEL = 30;
-        public static final double TRAJ_ACCEL = 30;
 
 
-        public static double POSITION_Kg = 0;
+        public static final double MAX_VEL = 13;
+        public static final double MAX_ACCEL = 13;
 
-        public static double intakeClawOpenAngle = 0;
-        public static double intakeClawClosedAngle = 1;
+        public static final double TRAJ_VEL = 10;
+        public static final double TRAJ_ACCEL = 10;
+
+
         public static double leftIntakeTiltClearAngle = 0;
         public static double leftIntakeTiltDownAngle = 1;
         public static double rightIntakeTiltClearAngle = 0;
@@ -159,17 +159,18 @@ public final class Constants {
 
     public static final class ElevatorConstants {
 
-        public static final double MAX_MOTOR_RPM = 435;
-        public static final double GEARING_RATIO = 1;
+        public static final double MAX_MOTOR_RPM = 312;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 537.5;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
-        public static final double MAX_INCHES_PER_SECOND = MAX_MOTOR_RPSEC * GEARING_RATIO;
 
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 384.5;
-
+        public static final double GEARING_RATIO = 1;
         public static final double PULLEY_TEETH = 60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//4.5"approx
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//9 approx
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//approx 4.9"
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx
+
+
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC * GEARING_RATIO;
 
 
         public static final double UPPER_POSITION_LIMIT = 20;
@@ -197,8 +198,8 @@ public final class Constants {
         public static double elevatorSampleTopPlaceHeight = 36;
 
 
-        public static double sampleClawOpenAngle = 0;
-        public static double sampleClawClosedAngle = 1;
+        public static double sampleClawOpenAngle = 0.3;
+        public static double sampleClawClosedAngle = .5;
 
         public static double homePosition = 1;
         public static double lowerBasketDeliverPosition = 24;

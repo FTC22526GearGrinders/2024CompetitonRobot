@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.commands.arm.JogArm;
 import org.firstinspires.ftc.teamcode.commands.drive.AlignToNote;
 import org.firstinspires.ftc.teamcode.commands.drive.JogDrive;
 import org.firstinspires.ftc.teamcode.commands.elevator.JogElevator;
+import org.firstinspires.ftc.teamcode.commands.elevator.PositionHoldElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
@@ -38,11 +39,14 @@ public class TeleopOpMode extends CommandOpMode {
     private AlignToNote m_alignToNote;
 
     private Button alignbutton;
-    private Button openIntakeClaw;
-    private Button closeIntakeClaw;
+    private Button openSampleClaw;
+    private Button closeSampleClaw;
 
     private Button jogArm;
     private Button jogElevator;
+
+    private Button intakeServo;
+    private Button intakeServoStop;
 
 
     private Button stepTelemetryUp;
@@ -71,18 +75,23 @@ public class TeleopOpMode extends CommandOpMode {
 
         jogElevator = new GamepadButton(coDriver, GamepadKeys.Button.RIGHT_BUMPER);
 
+        intakeServo = new GamepadButton(driver, GamepadKeys.Button.A);
+        intakeServoStop= new GamepadButton(driver, GamepadKeys.Button.B);
+
         m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
 
-     //   alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
+        //   alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
 
-        openIntakeClaw = new GamepadButton(coDriver, GamepadKeys.Button.RIGHT_STICK_BUTTON);
-        closeIntakeClaw = new GamepadButton(coDriver, GamepadKeys.Button.LEFT_STICK_BUTTON);
+        openSampleClaw = new GamepadButton(coDriver, GamepadKeys.Button.A);
+        closeSampleClaw = new GamepadButton(coDriver, GamepadKeys.Button.B);
 
 
         register(drive, arm, elevator, limelight);
 
-        //   drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
+        drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
+        //  arm.setDefaultCommand(new PositionHoldArm(arm));
+        elevator.setDefaultCommand(new PositionHoldElevator(elevator));
         limelight.setAprilTagPipeline();
 
 
@@ -104,6 +113,7 @@ public class TeleopOpMode extends CommandOpMode {
     void checkTriggers() {
 
         driver.readButtons();
+        coDriver.readButtons();
 
         if (driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) == 1) {
             new JogDrive(drive, driver, true, this).execute();
@@ -112,11 +122,17 @@ public class TeleopOpMode extends CommandOpMode {
         if (driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) == 1) {
             drive.resetEncoders();
         }
-      //  alignbutton.whenHeld(m_alignToNote);
+        //  alignbutton.whenHeld(m_alignToNote);
 
 
         jogArm.whenHeld(new JogArm(arm, coDriver));
         jogElevator.whenHeld(new JogElevator(elevator, coDriver));
+
+        if(intakeServo.get()) arm.runLeftIntake().run(packet);
+        if(intakeServoStop.get()) arm.stopIntakeServos().run(packet);
+
+        if (openSampleClaw.get()) elevator.openSampleClaw().run(packet);
+        if (closeSampleClaw.get()) elevator.closeSampleClaw().run(packet);
 
 
 //

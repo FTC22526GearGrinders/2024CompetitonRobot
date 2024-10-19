@@ -118,12 +118,12 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                             new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight))));
 
 //
-            Actions.runBlocking(
-                    new SequentialAction(
-                            new ParallelAction(
-                                    firstPickupMoveAction,
-                                    arm.goPickupSample()),
-                            arm.deliverToBucket()));
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            new ParallelAction(
+//                                    firstPickupMoveAction,
+//                                    arm.goPickupSample()),
+//                            arm.deliverToBucket()));
 
             Actions.runBlocking(
                     new SequentialAction(
@@ -141,12 +141,12 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                                     new InstantAction(() -> elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight)),
                                     elevator.openSampleClaw())));
 
-            Actions.runBlocking(
-                    new SequentialAction(
-                            new ParallelAction(
-                                    secondPickupMoveAction,
-                                    arm.goPickupSample()),
-                            arm.deliverToBucket()));
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            new ParallelAction(
+//                                    secondPickupMoveAction,
+//                                    arm.goPickupSample()),
+//                            arm.deliverToBucket()));
 
             Actions.runBlocking(
                     new SequentialAction(
@@ -156,10 +156,10 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                             elevator.closeSampleClaw()));
 
 
-            Actions.runBlocking(
-                    new ParallelAction(
-                            thirdPickupMoveAction,
-                            arm.goPickupSample()));
+//            Actions.runBlocking(
+//                    new ParallelAction(
+//                            thirdPickupMoveAction,
+//                            arm.goPickupSample()));
 
             Actions.runBlocking(
                     new SequentialAction(

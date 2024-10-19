@@ -26,31 +26,24 @@ import org.firstinspires.ftc.teamcode.Constants;
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
-    public static double lks = 0.;//1% motor power
-    public static double lkg = 0;
-    public static double lkv = .04;//per inch per second (max 17 ips )
+    public static double lks = 0.08;//1% motor power
+    public static double lkg = 0.04;
+    public static double lkv = .05;//per inch per second (max 17 ips )
     public static double lka = 0;
-    public static double lkp = 0.01;
+    public static double lkp = 0.05;
     public static double lki = 0;
     public static double lkd = 0;
 
-    public static double rks = 0.;//1% motor power
-    public static double rkg = 0;
-    public static double rkv = .04;//per inch per second (max 17 ips )
+    public static double rks = 0.08;//1% motor power
+    public static double rkg = 0.04;
+    public static double rkv = .05;//per inch per second (max 17 ips )
     public static double rka = 0;
-    public static double rkp = 0.01;
+    public static double rkp = 0.05;
     public static double rki = 0;
     public static double rkd = 0;
 
 
-    public static double lkP = 1.5;
-    public static double lkI = 0;
-    public static double lkD = 0;
-
-    public static double rkP = 1.5;
-    public static double rkI = 0;
-    public static double rkD = 0;
-
+    public static boolean TUNING = false;
 
     public static double targetInches;
     private final Telemetry telemetry;
@@ -129,7 +122,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
 
         bucketServo.setDirection(Servo.Direction.FORWARD);
-        sampleClawServo.setDirection(Servo.Direction.FORWARD);
+        sampleClawServo.setDirection(Servo.Direction.REVERSE);
 
         resetElevatorEncoders();
 
@@ -214,11 +207,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Action closeSampleClaw() {
-        return new InstantAction(() -> sampleClawServo.setPosition(Constants.ElevatorConstants.sampleClawClosedAngle));
+        return new InstantAction(() -> sampleClawServo.setPosition(Constants.ElevatorConstants.sampleClawClosedAngle));//.5
     }
 
     public Action openSampleClaw() {
-        return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.sampleClawOpenAngle));
+        return new InstantAction(() -> sampleClawServo.setPosition(Constants.ElevatorConstants.sampleClawOpenAngle));//.3
     }
 
     public Action deliverToTopBasket() {
@@ -243,12 +236,18 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
 
         //    if (show == 0) {// Constants.TelemetryConstants.showRotateArm) {
-        showLeftTelemetry();
+          showLeftTelemetry();
         //   }
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
             holdCtr = 0;
             et.reset();
+        }
+
+        if (TUNING) {
+            setTargetInches(targetInches);
+            setNewFFValues();
+            setGains();
         }
     }
 
@@ -307,6 +306,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
     }
 
+    public void setGains() {
+        if (lkp != leftPidController.getP())
+            setLeftPositionKp();
+        if (lki != leftPidController.getI())
+            setLefPositionKi();
+        if (lkd != leftPidController.getD())
+            setLeftPositionKd();
+        if (rkp != rightPidController.getP())
+            setRightPositionKp();
+        if (rki != rightPidController.getI())
+            setRightPositionKi();
+        if (rkd != rightPidController.getD())
+            setRightPositionKd();
+    }
+
     public void resetElevatorEncoders() {
         leftElevatorEncoder.reset();
         rightElevatorEncoder.reset();
@@ -321,7 +335,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getRightPositionInches() {
-        return round2dp(leftElevatorEncoder.getDistance(), 2);
+        return round2dp(rightElevatorEncoder.getDistance(), 2);
     }
 
     public double getRightVelocityInPerSec() {
@@ -362,11 +376,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("RightPositionInches", getRightPositionInches());
         telemetry.addData("ElevatorGoal", leftPidController.getGoal().position);
         telemetry.addData("LeftPower", getLeftPower());
+        telemetry.addData("RightPower", getRightPower());
         telemetry.addData("LeftPosErr", leftPidController.getPositionError());
-        telemetry.addData("LeftFF", leftFf);
-        telemetry.addData("LeftPIDout", leftPidout);
-        telemetry.addData("LeftSetVel", leftSetVel);
-        telemetry.addData("LeftSetPos", leftSetPos);
+        telemetry.addData("RightPosErr", rightPidController.getPositionError());
+//        telemetry.addData("LeftFF", leftFf);
+//        telemetry.addData("LeftPIDout", leftPidout);
+//        telemetry.addData("LeftSetVel", leftSetVel);
+//        telemetry.addData("LeftSetPos", leftSetPos);
 
         telemetry.update();
 
@@ -378,7 +394,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("HoldRng", posrng);
 
         telemetry.addData("RightPositionInches", getRightPositionInches());
-        telemetry.addData("RightPositionInches", getRightPositionInches());
+        telemetry.addData("LeftPositionInches", getLeftPositionInches());
         telemetry.addData("ElevatorGoal", rightPidController.getGoal().position);
         telemetry.addData("RightPower", getRightPower());
         telemetry.addData("RightPosErr", rightPidController.getPositionError());

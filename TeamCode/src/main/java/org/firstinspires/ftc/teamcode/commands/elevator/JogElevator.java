@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.commands.elevator;
 
+import com.acmerobotics.roadrunner.InstantAction;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -45,7 +46,7 @@ public class JogElevator extends CommandBase {
 
 
 
-        elevator.setTargetInches(elevator.getLeftPositionInches());
+        elevator.setTarget(elevator.getLeftPositionInches());
     }
 
     @Override

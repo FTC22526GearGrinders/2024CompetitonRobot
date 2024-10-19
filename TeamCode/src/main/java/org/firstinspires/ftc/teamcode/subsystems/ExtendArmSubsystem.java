@@ -13,10 +13,10 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
-import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
-import com.arcrobotics.ftclib.hardware.motors.CRServo;
+import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -27,23 +27,23 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class ExtendArmSubsystem extends SubsystemBase {
 
     public static CRServo leftIntakeServo;
-    public static CRServo rightIntakeServo;
+  //  public static CRServo rightIntakeServo;
 
     public static Servo leftTiltServo;
     public static Servo rightTiltServo;
     public static double targetInches;
     public static double ks = 0;//1% motor power
-    public static double kv = .015;//per inch per second (max 17 ips )
+    public static double kv = .06;//per inch per second (max 17 ips )
     public static double ka = 0;
-    public static double kp = 0.01;
+    public static double kp = 0.05;
     public static double ki = 0;
     public static double kd = 0;
-    public static boolean TUNING=false;
+    public static boolean TUNING = false;
     private final FtcDashboard dashboard;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
     public double power;
-    public ProfiledPIDController armController = null;
+    public ProfiledPIDController armController;
     public TrapezoidProfile.State armGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State armSetpoint = new TrapezoidProfile.State();
     public TrapezoidProfile.Constraints constraints;
@@ -67,14 +67,17 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         armMotor = new Motor(opMode.hardwareMap, "armMotor", Motor.GoBILDA.RPM_312);
 
-        leftIntakeServo = opMode.hardwareMap.get(CRServo.class, "leftIntakeServo");
-        rightIntakeServo = opMode.hardwareMap.get(CRServo.class, "rightIntakeServo");
+        //
+        leftIntakeServo = opMode.hardwareMap.get(CRServo.class, "leftInServo");
+
+
+      //  rightIntakeServo = opMode.hardwareMap.get(CRServo.class, "rightInServo");
 
         leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");
         rightTiltServo = opMode.hardwareMap.get(Servo.class, "rightTiltServo");
 
-        leftIntakeServo.setInverted(false);
-        rightIntakeServo.setInverted(true);
+      //  leftIntakeServo.setInverted(false);
+     //   rightIntakeServo.setInverted(true);
 
         leftTiltServo.setDirection(Servo.Direction.FORWARD);
         rightTiltServo.setDirection(Servo.Direction.REVERSE);
@@ -91,7 +94,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         armEncoder.setDirection(Motor.Direction.FORWARD);
 
-        armEncoder.setDistancePerPulse(1/Constants.ArmConstants.ENCODER_COUNTS_PER_INCH);//ENCODER_COUNTS_PER_INCH);
+        armEncoder.setDistancePerPulse(1 / Constants.ArmConstants.ENCODER_COUNTS_PER_INCH);//ENCODER_COUNTS_PER_INCH);
 
         armFF = new SimpleMotorFeedforward(ks, kv, ka);
 
@@ -142,24 +145,27 @@ public class ExtendArmSubsystem extends SubsystemBase {
             }
         };
     }
+
     @Override
     public void periodic() {
+      //  showTelemetry();
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
             holdCtr = 0;
             et.reset();
         }
-        if(TUNING)tuning();
+        if (TUNING) tuning();
     }
 
     public void tuning() {
+        setTargetInches(targetInches);
         if (armFF.kv != kv || armFF.ks != ks || armFF.ka != ka)
             setNewFFValues();
-        if(armController.getP()!=kp)
+        if (armController.getP() != kp)
             armController.setP(kp);
-        if(armController.getI()!=ki)
+        if (armController.getI() != ki)
             armController.setI(ki);
-        if(armController.getD()!=kd)
+        if (armController.getD() != kd)
             armController.setD(kd);
     }
 
@@ -171,14 +177,21 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public void position() {
         // Retrieve the profiled setpoint for the next timestep. This setpoint moves
 
-        pidout = armController.calculate(getPositionInches());
 
         armSetpoint = armController.getSetpoint();
 
         setVel = armSetpoint.velocity;
         setPos = armSetpoint.position;
+
+        accel = (lastVel - setVel) * 50;
+
+        pidout = armController.calculate(getPositionInches());
+
         ff = armFF.calculate(setVel, accel);
+
         armMotor.set(ff + pidout);
+
+        lastVel = armSetpoint.velocity;
     }
 
     public void resetEncoder() {
@@ -269,44 +282,45 @@ public class ExtendArmSubsystem extends SubsystemBase {
                 new InstantAction(() -> rightTiltServo.setPosition(Constants.ArmConstants.rightIntakeTiltClearAngle)));
     }
 
-    public Action runLeftIntake(double speed) {
-        return new InstantAction(() -> leftIntakeServo.set(speed));
+    public Action runLeftIntake() {
+        return new InstantAction(() -> leftIntakeServo.setPower(1));
     }
 
-    public Action runRightIntake(double speed) {
-        return new InstantAction(() -> rightIntakeServo.set(speed));
-    }
+//    public Action runRightIntake(double speed) {
+//        return new InstantAction(() -> rightIntakeServo.set(speed));
+//    }
 
-    public Action runIntakeServos(double speed) {
-        return new ParallelAction(
-                runLeftIntake(speed),
-                runRightIntake(speed));
-    }
-    public Action reverseIntakeServos(double speed) {
-        return new ParallelAction(
-                runLeftIntake(speed),
-                runRightIntake(speed));
-    }
+//    public Action runIntakeServos(double speed) {
+//        return new ParallelAction(
+//                runLeftIntake(speed));
+//            //    runRightIntake(speed));
+//    }
+
+//    public Action reverseIntakeServos(double speed) {
+//        return new ParallelAction(
+//                runLeftIntake(speed));
+//             //   runRightIntake(speed));
+//    }
 
     public Action stopIntakeServos() {
         return new ParallelAction(
-                new InstantAction(() -> leftIntakeServo.stop()),
-                new InstantAction(() -> rightIntakeServo.stop()));
+                new InstantAction(() -> leftIntakeServo.setPower(0)));
+            //    new InstantAction(() -> rightIntakeServo.stop()));
     }
 
-    public Action goPickupSample() {
-        return new ParallelAction(
-                setTargetInches(Constants.ArmConstants.pickupDistance);,
-                tiltBothDown(),
-                runIntakeServos(1));
-    }
-
-    public Action deliverToBucket() {
-        return new SequentialAction(
-                tiltBothClear(),
-                setAndWaitForAtTarget(Constants.ArmConstants.bucketDistance),
-                runIntakeServos(-1));
-    }
+//    public Action goPickupSample() {
+//        return new ParallelAction(
+//                new InstantAction(() -> setTargetInches(Constants.ArmConstants.pickupDistance)),
+//                tiltBothDown(),
+//                runIntakeServos(1));
+//    }
+//
+//    public Action deliverToBucket() {
+//        return new SequentialAction(
+//                tiltBothClear(),
+//                setAndWaitForAtTarget(Constants.ArmConstants.bucketDistance),
+//                runIntakeServos(-1));
+//    }
 
 
     public void showTelemetry() {
