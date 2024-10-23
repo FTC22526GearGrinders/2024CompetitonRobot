@@ -1,17 +1,19 @@
-package org.firstinspires.ftc.teamcode.commands.auto;
+package org.firstinspires.ftc.teamcode.commandsandactions.auto;
 
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 
+import org.firstinspires.ftc.teamcode.utils.ActiveMotionValues;
 
-public class SelectMotionValuesBlue extends CommandBase {
+
+public class SelectMotionValuesRed extends CommandBase {
 
 
     private final CommandOpMode opMode;
 
-    public SelectMotionValuesBlue(CommandOpMode opMode) {
+    public SelectMotionValuesRed(CommandOpMode opMode) {
         this.opMode = opMode;
     }
 
@@ -25,10 +27,10 @@ public class SelectMotionValuesBlue extends CommandBase {
     @Override
     public void execute() {
 
-//        boolean bbstart = ActiveMotionValues.getBBStart();
-     //  int lcr = ActiveMotionValues.getLcrpos();
-//        ActiveMotionValues.setAdvancePose(new Pose2d());
-//        ActiveMotionValues.setRetractPose(new Pose2d());
+        boolean basket= ActiveMotionValues.getBasket();
+          int lcr = ActiveMotionValues.getLcrpos();
+        ActiveMotionValues.setSampleDropOffPose(new Pose2d());
+        ActiveMotionValues.setRetractPose(new Pose2d());
 //        ActiveMotionValues.setClearPose(new Pose2d());
 //        ActiveMotionValues.setClearToTurnPose(new Pose2d());
 //        ActiveMotionValues.setParkPose(new Pose2d());
@@ -43,7 +45,7 @@ public class SelectMotionValuesBlue extends CommandBase {
 //
         int motionSelected = 0;//lcr;
 
-      //  if (!bbstart) motionSelected += 10;
+        //  if (!bbstart) motionSelected += 10;
 
 
         switch (motionSelected) {
@@ -293,8 +295,8 @@ public class SelectMotionValuesBlue extends CommandBase {
 //                ActiveMotionValues.setTargetPose(FieldConstantsBlue.getActiveTagPose(ActiveMotionValues.getActTag())
 //                        .plus(FieldConstantsBlue.AprilTagConstants.tagStrafeOffsetPoseSD));
 //            }
-        }
     }
+}
 
 //   // @Override
 //    public void end(boolean interrupted) {

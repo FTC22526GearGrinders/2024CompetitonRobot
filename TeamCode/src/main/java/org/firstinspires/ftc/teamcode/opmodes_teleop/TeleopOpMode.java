@@ -13,11 +13,11 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Drawing;
-import org.firstinspires.ftc.teamcode.commands.arm.JogArm;
-import org.firstinspires.ftc.teamcode.commands.drive.AlignToNote;
-import org.firstinspires.ftc.teamcode.commands.drive.JogDrive;
-import org.firstinspires.ftc.teamcode.commands.elevator.JogElevator;
-import org.firstinspires.ftc.teamcode.commands.elevator.PositionHoldElevator;
+import org.firstinspires.ftc.teamcode.commandsandactions.arm.JogArm;
+import org.firstinspires.ftc.teamcode.commandsandactions.drive.AlignToNote;
+import org.firstinspires.ftc.teamcode.commandsandactions.drive.JogDrive;
+import org.firstinspires.ftc.teamcode.commandsandactions.elevator.JogElevator;
+import org.firstinspires.ftc.teamcode.commandsandactions.elevator.PositionHoldElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;

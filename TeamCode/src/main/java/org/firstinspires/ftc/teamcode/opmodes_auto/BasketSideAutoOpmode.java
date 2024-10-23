@@ -35,6 +35,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -60,11 +61,22 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     private MecanumDriveSubsystem drive;
     private ExtendArmSubsystem arm;
     private ElevatorSubsystem elevator;
-    private Action deliverMoveAction;
-    private Action firstPickupMoveAction;
-    private Action secondPickupMoveAction;
-    private Action thirdPickupMoveAction;
-    private Action fourthPickupMoveAction;
+    Action firstSampleDeliverMoveAction;
+    Action secondSampleDeliverMoveAction;
+    Action thirdSampleDeliverMoveAction;
+    Action fourthSampleDeliverMoveAction;
+
+    Action secondSamplePickupMoveAction;
+    Action thirdSamplePickupMoveAction;
+    Action fourthSamplePickupMoveAction;
+
+    Action placeSpecimenAction = new SleepAction(2);
+    Action pickupSampleAction = new SleepAction(2);
+    Action transferSampleToBucketAction = new SleepAction(2);
+    Action dropSampleAction = new SleepAction(2);
+
+
+    Action deliverFourSamples;
 
     private TelemetryPacket packet;
 
@@ -91,10 +103,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
             telemetry.update();
 
 
-            Actions.runBlocking(
-                    new SequentialAction(
-                            deliverMoveAction,
-                            elevator.deliverToTopBasket()));
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            deliverMoveAction,
+//                            elevator.deliverToTopBasket()));
 
 //            Actions.runBlocking(
 //                    new ParallelAction(
@@ -148,44 +160,120 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
             telemetry.addData("    Red All Basket    ", "(A / O)");
 
-            if (gamepad1.x) {
-                startPosition = FieldConstantsBlue.basketSideStartPose;
-                deliverMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position,
-                                FieldConstantsBlue.basketDeliverPose.heading)
+            if (gamepad1.a) {
+                firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.basketSideStartPose)
+                        .strafeTo(FieldConstantsRed.basketDeliverPose.position)
+                        .build();//move to place first specimen
+
+                secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsRed.innerYellowPickupPose.position, FieldConstantsRed.innerYellowPickupPose.heading)
                         .build();
-                firstPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsBlue.innerYellowPickupPose.position,
-                                FieldConstantsBlue.innerYellowPickupPose.heading)
+
+                secondSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.innerYellowPickupPose)
+                        .strafeToLinearHeading(FieldConstantsRed.basketDeliverPose.position, FieldConstantsRed.basketDeliverPose.heading)
+                        .build();//move to place first specimen
+
+                thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position, FieldConstantsRed.midYellowPickupPose.heading)
                         .build();
-                secondPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position,
-                                FieldConstantsBlue.midYellowPickupPose.heading)
+
+                thirdSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.midYellowPickupPose)
+                        .strafeToLinearHeading(FieldConstantsRed.basketDeliverPose.position, FieldConstantsRed.basketDeliverPose.heading)
+                        .build();//move to place first specimen
+
+                fourthSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsRed.outerYellowApproachPose.position, FieldConstantsRed.outerYellowApproachPose.heading)
+                        .waitSeconds(.1)
+                        .lineToX(FieldConstantsRed.outerYellowPickupPose.position.x)
+
                         .build();
-                thirdPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position,
-                                FieldConstantsBlue.midYellowPickupPose.heading)
-                        .build();
+
+                fourthSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.outerYellowPickupPose)
+                        .lineToX(FieldConstantsRed.outerYellowApproachPose.position.x)
+                        .strafeToLinearHeading(FieldConstantsRed.basketDeliverPose.position, FieldConstantsRed.basketDeliverPose.heading)
+                        .build();//move to place first specimen
+
+
+                deliverFourSamples = new SequentialAction(
+                        firstSampleDeliverMoveAction,
+                        dropSampleAction,
+                        new ParallelAction(
+                                secondSamplePickupMoveAction,
+                                pickupSampleAction),
+                        secondSampleDeliverMoveAction,
+                        dropSampleAction,
+                        new ParallelAction(
+                                thirdSamplePickupMoveAction,
+                                pickupSampleAction),
+                        thirdSampleDeliverMoveAction,
+                        dropSampleAction,
+                        new ParallelAction(
+                                fourthSamplePickupMoveAction,
+                                pickupSampleAction),
+                        fourthSampleDeliverMoveAction,
+                        dropSampleAction
+
+
+                );
                 break;
             }
-            if (gamepad1.a) {
-                startPosition = FieldConstantsRed.basketSideStartPose;
-                deliverMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.basketDeliverPose.position,
-                                FieldConstantsRed.basketDeliverPose.heading)
+            if (gamepad1.x) {
+                firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.basketSideStartPose)
+                        .strafeTo(FieldConstantsBlue.basketDeliverPose.position)
+                        .build();//move to place first specimen
+
+                secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.innerYellowPickupPose.position, FieldConstantsBlue.innerYellowPickupPose.heading)
                         .build();
-                firstPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.innerYellowPickupPose.position,
-                                FieldConstantsRed.innerYellowPickupPose.heading)
+
+                secondSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.innerYellowPickupPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position, FieldConstantsBlue.basketDeliverPose.heading)
+                        .build();//move to place first specimen
+
+                thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position, FieldConstantsBlue.midYellowPickupPose.heading)
                         .build();
-                secondPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position,
-                                FieldConstantsRed.midYellowPickupPose.heading)
+
+                thirdSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.midYellowPickupPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position, FieldConstantsBlue.basketDeliverPose.heading)
+                        .build();//move to place first specimen
+
+                fourthSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.outerYellowApproachPose.position, FieldConstantsBlue.outerYellowApproachPose.heading)
+                        .waitSeconds(.1)
+                        .lineToX(FieldConstantsBlue.outerYellowPickupPose.position.x)
+
                         .build();
-                thirdPickupMoveAction = drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(FieldConstantsRed.midYellowPickupPose.position,
-                                FieldConstantsRed.midYellowPickupPose.heading)
-                        .build();
+
+                fourthSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.outerYellowPickupPose)
+                        .lineToX(FieldConstantsBlue.outerYellowApproachPose.position.x)
+                        .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position, FieldConstantsBlue.basketDeliverPose.heading)
+                        .build();//move to place first specimen
+
+
+                deliverFourSamples = new SequentialAction(
+                        new SleepAction(3),
+                        firstSampleDeliverMoveAction,
+                        dropSampleAction,
+                        new ParallelAction(
+                                secondSamplePickupMoveAction,
+                                pickupSampleAction),
+                        secondSampleDeliverMoveAction,
+                        dropSampleAction,
+                        new ParallelAction(
+                                thirdSamplePickupMoveAction,
+                                pickupSampleAction),
+                        thirdSampleDeliverMoveAction,
+                        dropSampleAction,
+                        new ParallelAction(
+                                fourthSamplePickupMoveAction,
+                                pickupSampleAction),
+                        fourthSampleDeliverMoveAction,
+                        dropSampleAction
+
+
+                );
+
                 break;
             }
 
