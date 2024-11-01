@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.hardware.Sensor;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -62,7 +64,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorFeedforward rightFeedForward;
     public Servo bucketServo;
     public Servo sampleClawServo;
-
+    public Sensor sampleClawSwitch;
     public int holdCtr;
     public int show = 0;
 
@@ -123,6 +125,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         bucketServo.setDirection(Servo.Direction.FORWARD);
         sampleClawServo.setDirection(Servo.Direction.REVERSE);
+
+        // sampleClawSwitch = new Sensor()
 
         resetElevatorEncoders();
 
@@ -202,6 +206,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketTippedAngle));
     }
 
+    public Action tipBucketDelayed(double time) {
+        return new SequentialAction(
+                new SleepAction(time),
+                new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketTippedAngle)));
+    }
+
     public Action levelBucket() {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
     }
@@ -236,7 +246,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
 
         //    if (show == 0) {// Constants.TelemetryConstants.showRotateArm) {
-          showLeftTelemetry();
+        //  showLeftTelemetry();
         //   }
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
@@ -304,6 +314,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setNewFFValues() {
         leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
         rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
+    }
+
+    public boolean getSpecimenClawPressed() {
+        return true;
     }
 
     public void setGains() {

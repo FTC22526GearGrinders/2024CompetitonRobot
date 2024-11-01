@@ -87,8 +87,7 @@ public class BlueSpecimen {
                 .build();//move to drop second sample and pick up third specimen
 
         thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose3, FieldConstantsBlueMM.specimenDeliverApproachPose3.heading)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose3, FieldConstantsBlueMM.specimenDeliverApproachPose3.heading)
+                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose3, Math.toRadians(90))
                 .lineToY(FieldConstantsBlueMM.specimenDeliverPose3.position.y)
                 .build();//place thirdspecimen
 
@@ -105,7 +104,7 @@ public class BlueSpecimen {
                 .build();//move to drop third sample and pick up fourth specimen
 
         fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose4, FieldConstantsBlueMM.specimenDeliverApproachPose4.heading)
+                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose4, Math.toRadians(90))
                 .lineToY(FieldConstantsBlueMM.specimenDeliverPose4.position.y)
                 .build();//deliver fourth specimen
 

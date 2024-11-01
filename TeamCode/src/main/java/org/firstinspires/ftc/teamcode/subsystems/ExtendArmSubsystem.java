@@ -9,11 +9,10 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
-import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;;
+import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -22,6 +21,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
+
+;
 
 @Config
 public class ExtendArmSubsystem extends SubsystemBase {
@@ -290,17 +291,17 @@ public class ExtendArmSubsystem extends SubsystemBase {
 //        return new InstantAction(() -> rightIntakeServo.set(speed));
 //    }
 
-//    public Action runIntakeServos(double speed) {
-//        return new ParallelAction(
-//                runLeftIntake(speed));
-//            //    runRightIntake(speed));
-//    }
+    public Action runIntakeServo() {
+        return new ParallelAction(
+                runLeftIntake());
+        //    runRightIntake(speed));
+    }
 
-//    public Action reverseIntakeServos(double speed) {
-//        return new ParallelAction(
-//                runLeftIntake(speed));
-//             //   runRightIntake(speed));
-//    }
+    public Action reverseIntakeServo() {
+        return new InstantAction(() -> leftIntakeServo.setPower(-1));
+
+
+    }
 
     public Action stopIntakeServos() {
         return new ParallelAction(

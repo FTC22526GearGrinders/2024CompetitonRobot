@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.commandsandactions.elevator.JogElevator;
 import org.firstinspires.ftc.teamcode.commandsandactions.elevator.PositionHoldElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 
 
@@ -28,7 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 public class TeleopOpMode extends CommandOpMode {
 
     protected MecanumDriveSubsystem drive;
-    protected LimelightSubsystem limelight;
+    //  protected LimelightSubsystem limelight;
     protected ElevatorSubsystem elevator;
     protected ExtendArmSubsystem arm;
     FtcDashboard dashboard;
@@ -61,7 +60,7 @@ public class TeleopOpMode extends CommandOpMode {
 
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
 
-        limelight = new LimelightSubsystem(this);
+        //  limelight = new LimelightSubsystem(this);
 
 
         elevator = new ElevatorSubsystem(this);
@@ -78,7 +77,7 @@ public class TeleopOpMode extends CommandOpMode {
         intakeServo = new GamepadButton(driver, GamepadKeys.Button.A);
         intakeServoStop= new GamepadButton(driver, GamepadKeys.Button.B);
 
-        m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
+        // m_alignToNote = new AlignToNote(drive, limelight, driver, true, this);
 
         //   alignbutton = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
 
@@ -86,13 +85,13 @@ public class TeleopOpMode extends CommandOpMode {
         closeSampleClaw = new GamepadButton(coDriver, GamepadKeys.Button.B);
 
 
-        register(drive, arm, elevator, limelight);
+        register(drive, arm, elevator);
 
         drive.setDefaultCommand(new JogDrive(this.drive, driver, false, this));
 
         //  arm.setDefaultCommand(new PositionHoldArm(arm));
         elevator.setDefaultCommand(new PositionHoldElevator(elevator));
-        limelight.setAprilTagPipeline();
+        //   limelight.setAprilTagPipeline();
 
 
     }
@@ -149,11 +148,11 @@ public class TeleopOpMode extends CommandOpMode {
 
 
         drive.updatePoseEstimate();
-//
-        telemetry.addData("x", drive.pose.position.x);
-        telemetry.addData("y", drive.pose.position.y);
-        telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
-        // telemetry.addData("BP3d",limelight.getBotPose2d().toString());
+////
+//        telemetry.addData("x", drive.pose.position.x);
+//        telemetry.addData("y", drive.pose.position.y);
+//        telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+//         telemetry.addData("BP3d",limelight.getBotPose2d().toString());
 
         telemetry.update();
 

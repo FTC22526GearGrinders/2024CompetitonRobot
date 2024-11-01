@@ -32,7 +32,7 @@ public class JogDrive extends CommandBase {
     @Override
     public void initialize() {
         drive.tempy = 911;
-        double gyro_radians = startRadians - drive.getYaw();
+        double gyro_radians = startRadians - drive.getYawRads();
     }
 
 

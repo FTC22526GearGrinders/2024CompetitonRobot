@@ -38,17 +38,19 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.FieldConstantsRed;
 import org.firstinspires.ftc.teamcode.FieldConstantsBlue;
-
+import org.firstinspires.ftc.teamcode.FieldConstantsRed;
+import org.firstinspires.ftc.teamcode.commandsandactions.drive.FailoverAction;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -61,45 +63,49 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
     public static Pose2d startPosition;
-    private MecanumDriveSubsystem drive;
-    private ExtendArmSubsystem arm;
-    private ElevatorSubsystem elevator;
-
-
     Action firstSpecimenDeliverMoveAction;
     Action secondSpecimenDeliverMoveAction;
     Action thirdSpecimenDeliverMoveAction;
     Action fourthSpecimenDeliverMoveAction;
-
     Action firstSpecimenDeliverBackupAction;
     Action secondSpecimenDeliverBackupAction;
     Action thirdSpecimenDeliverBackupAction;
-
     Action secondSpecimenPickupMoveAction;
     Action thirdSpecimenPickupMoveAction;
     Action fourthSpecimenPickupMoveAction;
-
     Action firstSamplePickupMoveAction;
     Action secondSamplePickupMoveAction;
     Action thirdSamplePickupMoveAction;
 
     Action placeSpecimenAction = new SleepAction(2);
-    Action pickupSampleAction = new SleepAction(2);
+    Action pickupSampleAction;
+    Action raiseArmIntakeAction;
+
     Action transferSampleToBucketAction = new SleepAction(2);
     Action dropSampleAction = new SleepAction(2);
     Action collectSpecimenAction = new SleepAction(2);
 
-    Action deliverFourSpecimens;
+    Action samplePickupAction;
 
-
+    private MecanumDriveSubsystem drive;
+    private ExtendArmSubsystem arm;
+    private ElevatorSubsystem elevator;
     private TelemetryPacket packet;
 
     @Override
     public void initialize() {
-        drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
+        //  drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
         arm = new ExtendArmSubsystem(this);
         elevator = new ElevatorSubsystem(this);
         packet = new TelemetryPacket();
+
+        pickupSampleAction = new SequentialAction(
+                arm.tiltBothDown(),
+                arm.runLeftIntake());
+
+        raiseArmIntakeAction = new SequentialAction(
+                arm.stopIntakeServos(),
+                arm.stopIntakeServos());
 
 
     }
@@ -116,7 +122,42 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             run();
 
             telemetry.update();
+            drive = new MecanumDriveSubsystem(this, startPosition);
 
+            Actions.runBlocking(
+                    new SequentialAction(
+                            elevator.closeSampleClaw(),
+                            elevator.setTarget(Constants.ElevatorConstants.elevatorSampleAboveTopPlaceHeight),
+                            new FailoverAction(firstSpecimenDeliverMoveAction,
+                                    new InstantAction(() -> drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0))),
+                                    elevator.getSpecimenClawPressed()))
+            );
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight),
+                            elevator.openSampleClaw())
+            );
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            firstSamplePickupMoveAction,
+                            elevator.setTarget(Constants.ElevatorConstants.elevatorSamplePickupHeight),
+                            arm.runLeftIntake())
+            );
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    elevator.setTarget(Constants.ElevatorConstants.specimenPickupPosition),
+                                    secondSpecimenPickupMoveAction),
+                            new SequentialAction(
+                                    elevator.closeSampleClaw(),
+                                    new ParallelAction(
+                                            elevator.tipBucketDelayed(1),
+                                            secondSpecimenDeliverMoveAction)),
+                            elevator.levelBucket())
+            );
 
 
         }
@@ -133,9 +174,9 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
             telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
-            telemetry.addData("    Blue All Basket   ", "(X / ▢)");
+            telemetry.addData("    Red All Specimen   ", "(A / O)");
 
-            telemetry.addData("    Red All Basket    ", "(A / O)");
+            telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
 
             if (gamepad1.a) {
                 firstSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenSideStartPose)
@@ -194,49 +235,49 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                         .build();//deliver fourth specimen
 
 
-                deliverFourSpecimens = new SequentialAction(
-
-                        firstSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
-                        firstSpecimenDeliverBackupAction,
-                        new ParallelAction(
-                                firstSamplePickupMoveAction,
-                                pickupSampleAction),
-                        new ParallelAction(
-                                secondSpecimenPickupMoveAction,
-                                transferSampleToBucketAction),
-                        new ParallelAction(
-                                collectSpecimenAction,
-                                dropSampleAction),
-                        secondSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
-                        secondSpecimenDeliverBackupAction,
-                        new ParallelAction(
-                                secondSamplePickupMoveAction,
-                                pickupSampleAction),
-                        new ParallelAction(
-                                thirdSpecimenPickupMoveAction,
-                                transferSampleToBucketAction),
-                        new ParallelAction(
-                                collectSpecimenAction,
-                                dropSampleAction),
-                        thirdSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
-                        thirdSpecimenDeliverBackupAction,
-                        new ParallelAction(
-                                thirdSamplePickupMoveAction,
-                                pickupSampleAction),
-                        new ParallelAction(
-                                fourthSpecimenPickupMoveAction,
-                                transferSampleToBucketAction),
-                        new ParallelAction(
-                                collectSpecimenAction,
-                                dropSampleAction),
-                        fourthSpecimenDeliverMoveAction,
-                        placeSpecimenAction
-
-
-                );
+//                deliverFourSpecimens = new SequentialAction(
+//
+//                        firstSpecimenDeliverMoveAction,
+//                        placeSpecimenAction,
+//                        firstSpecimenDeliverBackupAction,
+//                        new ParallelAction(
+//                                firstSamplePickupMoveAction,
+//                                pickupSampleAction),
+//                        new ParallelAction(
+//                                secondSpecimenPickupMoveAction,
+//                                transferSampleToBucketAction),
+//                        new ParallelAction(
+//                                collectSpecimenAction,
+//                                dropSampleAction),
+//                        secondSpecimenDeliverMoveAction,
+//                        placeSpecimenAction,
+//                        secondSpecimenDeliverBackupAction,
+//                        new ParallelAction(
+//                                secondSamplePickupMoveAction,
+//                                pickupSampleAction),
+//                        new ParallelAction(
+//                                thirdSpecimenPickupMoveAction,
+//                                transferSampleToBucketAction),
+//                        new ParallelAction(
+//                                collectSpecimenAction,
+//                                dropSampleAction),
+//                        thirdSpecimenDeliverMoveAction,
+//                        placeSpecimenAction,
+//                        thirdSpecimenDeliverBackupAction,
+//                        new ParallelAction(
+//                                thirdSamplePickupMoveAction,
+//                                pickupSampleAction),
+//                        new ParallelAction(
+//                                fourthSpecimenPickupMoveAction,
+//                                transferSampleToBucketAction),
+//                        new ParallelAction(
+//                                collectSpecimenAction,
+//                                dropSampleAction),
+//                        fourthSpecimenDeliverMoveAction,
+//                        placeSpecimenAction
+//
+//
+//                );
                 break;
             }
             if (gamepad1.x) {
@@ -298,49 +339,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                         .build();//deliver fourth specimen
 
 
-                deliverFourSpecimens = new SequentialAction(
 
-                        firstSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
-                        firstSpecimenDeliverBackupAction,
-                        new ParallelAction(
-                                firstSamplePickupMoveAction,
-                                pickupSampleAction),
-                        new ParallelAction(
-                                secondSpecimenPickupMoveAction,
-                                transferSampleToBucketAction),
-                        new ParallelAction(
-                                collectSpecimenAction,
-                                dropSampleAction),
-                        secondSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
-                        secondSpecimenDeliverBackupAction,
-                        new ParallelAction(
-                                secondSamplePickupMoveAction,
-                                pickupSampleAction),
-                        new ParallelAction(
-                                thirdSpecimenPickupMoveAction,
-                                transferSampleToBucketAction),
-                        new ParallelAction(
-                                collectSpecimenAction,
-                                dropSampleAction),
-                        thirdSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
-                        thirdSpecimenDeliverBackupAction,
-                        new ParallelAction(
-                                thirdSamplePickupMoveAction,
-                                pickupSampleAction),
-                        new ParallelAction(
-                                fourthSpecimenPickupMoveAction,
-                                transferSampleToBucketAction),
-                        new ParallelAction(
-                                collectSpecimenAction,
-                                dropSampleAction),
-                        fourthSpecimenDeliverMoveAction,
-                        placeSpecimenAction
-
-
-                );
 
                 break;
             }

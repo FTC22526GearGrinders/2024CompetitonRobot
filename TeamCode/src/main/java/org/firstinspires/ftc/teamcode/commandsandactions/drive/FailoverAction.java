@@ -10,9 +10,10 @@ public class FailoverAction implements Action {
     private final Action failoverAction;
     private boolean failedOver = false;
 
-    public FailoverAction(Action mainAction, Action failoverAction) {
+    public FailoverAction(Action mainAction, Action failoverAction, boolean failedOver) {
         this.mainAction = mainAction;
         this.failoverAction = failoverAction;
+        this.failedOver = failedOver;
     }
 
     @Override
@@ -24,7 +25,7 @@ public class FailoverAction implements Action {
         return mainAction.run(telemetryPacket);
     }
 
-    public void failover() {
-        failedOver = true;
-    }
+//    public void failover() {
+//        failedOver = true;
+//    }
 }

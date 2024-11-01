@@ -52,6 +52,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.Localizer;
+import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
@@ -73,14 +74,15 @@ public final class MecanumDriveT {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = .023;// theoretical = pi * 5.5 /751.8 = .023 test = 5
-        public double lateralInPerTick = inPerTick;// test
-        public double trackWidthTicks = 38;//estimate theroetical 16.25 ^ .023 =.3735
+        public double inPerTick = .00197;// theoretical = pi * 5.5 /751.8 = .023 test = 5
+        public double lateralInPerTick = 0.0012150746393629322;// test
+        public double trackWidthTicks = 199.32943876445606;//estimate theoretical 16.25 ^ .023 =.3735
 
         // feedforward parameters (in tick units)
         public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
+        public double kV = 0.000396;
+        ;
+        public double kA = 0.99338;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -216,6 +218,7 @@ public final class MecanumDriveT {
                     twist.line,
                     DualNum.cons(headingDelta, twist.angle.drop(1))
             );
+
         }
     }
 
@@ -230,10 +233,10 @@ public final class MecanumDriveT {
 
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");//2
+        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");//3
+        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");//1
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");//0
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -253,7 +256,8 @@ public final class MecanumDriveT {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer();
+        //  localizer = new DriveLocalizer();
+        localizer = new ThreeDeadWheelLocalizer(hardwareMap, .001978);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }

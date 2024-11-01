@@ -68,7 +68,7 @@ public class RedSpecimen {
                 .build();//move to drop first sample and pick up second specimen
 
         secondSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose2, FieldConstantsRedMM.specimenDeliverApproachPose2.heading)
+                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose2, Math.toRadians(90))
                 .lineToY(FieldConstantsRedMM.specimenDeliverPose2.position.y)
                 .build();//place second specimen
 
@@ -85,7 +85,7 @@ public class RedSpecimen {
                 .build();//move to drop second sample and pick up third specimen
 
         thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose3, FieldConstantsRedMM.specimenDeliverApproachPose3.heading)
+                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose3, Math.toRadians(90))
                 .lineToY(FieldConstantsRedMM.specimenDeliverPose3.position.y)
                 .build();//place thirdspecimen
 
@@ -102,7 +102,7 @@ public class RedSpecimen {
                 .build();//move to drop third sample and pick up fourth specimen
 
         fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose4, FieldConstantsRedMM.specimenDeliverApproachPose4.heading)
+                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose4, Math.toRadians(90))
                 .lineToY(FieldConstantsRedMM.specimenDeliverPose4.position.y)
                 .build();//deliver fourth specimen
 

@@ -70,18 +70,7 @@ public final class Constants {
         public static double TRAJ_ANG_VEL = Math.toRadians(50);
         public static double TRAJ_ANG_ACCEL = Math.toRadians(50);
         public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(.1, 0, 0, 0);
-        public static double kP = .02;
-        public static double kI = 0;
-        public static double kD = 0;
-        //     */
-        public static double kV = .0195;//12 volts/60 ips = .02 max
-        public static double kA = 0.003;// 0.0005;
-        public static double kStatic = 0.0;//0.08;
 
-
-        //        public static double kV =  0.0140;
-//        public static double kA = 0.0022;
-//        public static double kStatic = 0.022;
         public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
 
@@ -193,7 +182,7 @@ public final class Constants {
         public static double elevatorUpperBasketHeight = 36;
         public static double elevatorSamplePickupHeight = 36;
         public static double elevatorSampleAboveLowPlaceHeight = 36;
-        public static double elevatorSampleLowlaceHeight = 36;
+        public static double elevatorSampleLowPlaceHeight = 36;
         public static double elevatorSampleAboveTopPlaceHeight = 36;
         public static double elevatorSampleTopPlaceHeight = 36;
 
@@ -206,9 +195,10 @@ public final class Constants {
         public static double upperBasketDeliverPosition = 44;
 
         public static double sampleApproachPosition = 30;
-        public static double sampleDeliverPosition = 30;
+        public static double specimenDeliverPosition = 30;
 
 
+        public static double specimenPickupPosition = 12;
     }
 
 

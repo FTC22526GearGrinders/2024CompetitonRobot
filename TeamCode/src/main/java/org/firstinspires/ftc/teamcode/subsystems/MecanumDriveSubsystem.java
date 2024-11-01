@@ -63,11 +63,13 @@ import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
-import org.firstinspires.ftc.teamcode.utils.ActiveMotionValues;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+
+//https://rr.brott.dev/docs/v1-0/tuning/
 
 @Config
 public final class MecanumDriveSubsystem extends SubsystemBase {
@@ -112,10 +114,11 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
         //TODO Step 1 Drive Classes : get basic hardware configured. Update motor names to what is used in robot configuration
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = opMode.hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = opMode.hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = opMode.hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = opMode.hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = opMode.hardwareMap.get(DcMotorEx.class, "leftFront");//port 0
+        rightFront = opMode.hardwareMap.get(DcMotorEx.class, "rightFront");//port 1
+        leftBack = opMode.hardwareMap.get(DcMotorEx.class, "leftBack");//port 2
+        rightBack = opMode.hardwareMap.get(DcMotorEx.class, "rightBack");//port3
+
         //TODO End Step 1
 
 
@@ -137,8 +140,8 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
         voltageSensor = opMode.hardwareMap.voltageSensor.iterator().next();
 
-       //localizer = new DriveLocalizer();
-       // localizer= new TwoDeadWheelLocalizer(opMode.hardwareMap,lazyImu.get(),.001978);
+        //localizer = new DriveLocalizer();
+        // localizer= new TwoDeadWheelLocalizer(opMode.hardwareMap,lazyImu.get(),.001978);
         localizer = new ThreeDeadWheelLocalizer(opMode.hardwareMap, .001978);
 
 
@@ -168,7 +171,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
     public void jog(double y, double x, double rx) {
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        telemetry.addData("fwd", y);
+        // telemetry.addData("fwd", y);
 //        telemetry.update();
         leftFront.setPower((y + x + rx) / denominator);
         rightFront.setPower((y - x - rx) / denominator);
@@ -180,7 +183,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 //        if (show1) {
-//            showTelemetry1();
+        showTelemetry1();
 //        }
 //
 //        if (show2) {
@@ -256,13 +259,14 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         return encoderTicksToInches(getAverageTicks());
     }
 
-    public double getYaw() {
-        return lazyImu.get().getRobotYawPitchRollAngles().getYaw();
+    public double getYawRads() {
+        return pose.heading.toDouble();
     }
 
-    public void resetIMUYaw() {
-        lazyImu.get().resetYaw();
+    public double getYawDegs() {
+        return Math.toDegrees(pose.heading.toDouble());
     }
+
 
     public void showTelemetry1() {
 
@@ -271,37 +275,17 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         telemetry.addData("MecanumDrive 1", show1);
 
         telemetry.addData("TMPY", tempy);
-        telemetry.addData("FrontLeftTicks", leftFront.getCurrentPosition());
-        telemetry.addData("FrontRightTicks", rightFront.getCurrentPosition());
-        telemetry.addData("BackLeftTicks", leftBack.getCurrentPosition());
-        telemetry.addData("BackRightTicks", rightBack.getCurrentPosition());
-        telemetry.addData("AverageTicks", getAverageTicks());
-        telemetry.update();
-    }
-
-    public void showTelemetry2() {
-        telemetry.addData("MecanumDrive 2", show2);
-        telemetry.addData("FWD", tempy);
-        telemetry.addData("FrontLeftPosn", round2dp(encoderTicksToInches(leftFront.getCurrentPosition()), 2));
-        telemetry.addData("FrontRightPosn", round2dp(encoderTicksToInches(rightFront.getCurrentPosition()), 2));
-        telemetry.addData("BackLeftPosn", round2dp(encoderTicksToInches(leftBack.getCurrentPosition()), 2));
-        telemetry.addData("BackRightPosn", round2dp(encoderTicksToInches(rightBack.getCurrentPosition()), 2));
-        telemetry.addData("Robot X Posn", round2dp(pose.position.x, 2));
-        telemetry.addData("Robot Y Posn", round2dp(pose.position.y, 2));
-        telemetry.addData("Robot Heading", round2dp(Math.toDegrees(pose.heading.toDouble()), 2));
-
-        telemetry.addData("FrontLeftVel", leftFront.getVelocity());
-
-        telemetry.addData("Gyro Heading", getYaw());
-//        telemetry.addData("BatteryVolts", getBatteryVolts());
+        // telemetry.addData("FrontLeftTicks", leftFront.getCurrentPosition());
+        telemetry.addData("FrontRightTicks P0", rightFront.getCurrentPosition());
+        telemetry.addData("BackLeftTicks P1", leftBack.getCurrentPosition());
+        telemetry.addData("BackRightTicks Perp", rightBack.getCurrentPosition());
+        telemetry.addData("X", pose.position.x);
+        telemetry.addData("Y", pose.position.y);
+        telemetry.addData("H", pose.heading);
         telemetry.addData("FieldCentric", fieldCentric);
-
-
-        telemetry.addData("RedAllience", ActiveMotionValues.getRedAlliance());
-
         telemetry.update();
-
     }
+
 
     public static class Params {
         // IMU orientation
@@ -313,14 +297,15 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = .023;// theoretical = pi * 5.5 /751.8 = .023 test = 50/2000 = .025
-        public double lateralInPerTick = inPerTick;// test
-        public double trackWidthTicks = 38;//estimate theroetical 16.25 ^ .023 =.3735
+        public double inPerTick = .00197;//
+        public double lateralInPerTick = 0.0012150746393629322;// test
+        public double trackWidthTicks = 199.32943876445606;//estimate theroetical 16.25 ^ .023 =.3735
 
         // feedforward parameters (in tick units)
+        // feedforward parameters (in tick units)
         public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
+        public double kV = 0.000396;
+        public double kA = 0.99338;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
