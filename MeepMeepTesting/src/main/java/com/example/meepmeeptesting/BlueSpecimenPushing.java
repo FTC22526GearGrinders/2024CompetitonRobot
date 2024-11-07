@@ -2,7 +2,7 @@ package com.example.meepmeeptesting;
 
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -12,7 +12,7 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class BlueSpecimen {
+public class BlueSpecimenPushing {
 
 
     public static void main(String[] args) {
@@ -47,7 +47,7 @@ public class BlueSpecimen {
         MeepMeep meepMeep = new MeepMeep(800);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(45, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
                 .setColorScheme(new ColorSchemeBlueLight())
                 .setStartPose(FieldConstantsBlueMM.specimenSideStartPose)
@@ -57,21 +57,26 @@ public class BlueSpecimen {
 
         firstSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenSideStartPose)
                 .lineToY(FieldConstantsBlueMM.specimenDeliverPose1.position.y)
-                .strafeToLinearHeading(FieldConstantsBlueMM.specimenDeliverPose1.position, Math.toRadians(90))
                 .build();//move to place first specimen
 
         firstSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverPose1)
-                .lineToY(FieldConstantsBlueMM.specimenDeliverApproachPose1.position.y)
+                .splineToSplineHeading(new Pose2d(-36, 42, Math.toRadians(-180)), Math.toRadians(-180))
+                .waitSeconds(0.5)
+                //.splineToConstantHeading(new Vector2d(-44, 12), Math.toRadians(270))
+                //.strafeTo(new Vector2d(-34, 12))
+                .strafeTo(new Vector2d(-36, 8))
+                .splineToConstantHeading(new Vector2d(-48, 56), Math.toRadians(80))
+                //  .strafeTo(new Vector2d(-44, 50))
                 .build();
 
         firstSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverApproachPose1)
-                //  .strafeToLinearHeading(FieldConstantsBlueMM.innerBluePickupPose.position, Math.toRadians(225))
-                .strafeToLinearHeading(new Vector2d(-48, 0), Math.toRadians(0))
-                .build();//move to pickup inner sample
+                .lineToY(36)
+                .build();
 
-//        firstSampleDropOffMoveAction = drive.actionBuilder(FieldConstantsBlueMM.innerBluePickupPose)
-//                .strafeToLinearHeading(FieldConstantsBlueMM.firstSampleDropOffPose.position, FieldConstantsBlueMM.firstSampleDropOffPose.heading)
-//                .build();
+
+        firstSampleDropOffMoveAction = drive.actionBuilder(FieldConstantsBlueMM.innerBluePickupPose)
+                .strafeToLinearHeading(FieldConstantsBlueMM.firstSampleDropOffPose.position, FieldConstantsBlueMM.firstSampleDropOffPose.heading)
+                .build();
 
         secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.innerBluePickupPose)
                 .strafeToLinearHeading(FieldConstantsBlueMM.specimenPickupPose.position, Math.toRadians(270))
@@ -121,43 +126,43 @@ public class BlueSpecimen {
 
                 firstSpecimenDeliverMoveAction,
                 placeSpecimenAction,
-                firstSpecimenDeliverBackupAction,
-                new ParallelAction(
-                        firstSamplePickupMoveAction,
-                        pickupSampleAction),
-                new ParallelAction(
-                        secondSpecimenPickupMoveAction,
-                        transferSampleToBucketAction),
-                new ParallelAction(
-                        collectSpecimenAction,
-                        dropSampleAction),
-                //  firstSampleDropOffMoveAction,
-                secondSpecimenDeliverMoveAction,
-                placeSpecimenAction,
-                secondSpecimenDeliverBackupAction,
-                new ParallelAction(
-                        secondSamplePickupMoveAction,
-                        pickupSampleAction),
-                new ParallelAction(
-                        thirdSpecimenPickupMoveAction,
-                        transferSampleToBucketAction),
-                new ParallelAction(
-                        collectSpecimenAction,
-                        dropSampleAction),
-                thirdSpecimenDeliverMoveAction,
-                placeSpecimenAction,
-                thirdSpecimenDeliverBackupAction,
-                new ParallelAction(
-                        thirdSamplePickupMoveAction,
-                        pickupSampleAction),
-                new ParallelAction(
-                        fourthSpecimenPickupMoveAction,
-                        transferSampleToBucketAction),
-                new ParallelAction(
-                        collectSpecimenAction,
-                        dropSampleAction),
-                fourthSpecimenDeliverMoveAction,
-                placeSpecimenAction
+                firstSpecimenDeliverBackupAction
+//                new ParallelAction(
+//                        firstSamplePickupMoveAction,
+//                        pickupSampleAction),
+//                new ParallelAction(
+//                        secondSpecimenPickupMoveAction,
+//                        transferSampleToBucketAction),
+//                new ParallelAction(
+//                        collectSpecimenAction,
+//                        dropSampleAction),
+//              //  firstSampleDropOffMoveAction,
+//                secondSpecimenDeliverMoveAction,
+//                placeSpecimenAction,
+//                secondSpecimenDeliverBackupAction,
+//                new ParallelAction(
+//                        secondSamplePickupMoveAction,
+//                        pickupSampleAction),
+//                new ParallelAction(
+//                        thirdSpecimenPickupMoveAction,
+//                        transferSampleToBucketAction),
+//                new ParallelAction(
+//                        collectSpecimenAction,
+//                        dropSampleAction),
+//                thirdSpecimenDeliverMoveAction,
+//                placeSpecimenAction,
+//                thirdSpecimenDeliverBackupAction,
+//                new ParallelAction(
+//                        thirdSamplePickupMoveAction,
+//                        pickupSampleAction),
+//                new ParallelAction(
+//                        fourthSpecimenPickupMoveAction,
+//                        transferSampleToBucketAction),
+//                new ParallelAction(
+//                        collectSpecimenAction,
+//                        dropSampleAction),
+//                fourthSpecimenDeliverMoveAction,
+//                placeSpecimenAction
 
 
         );

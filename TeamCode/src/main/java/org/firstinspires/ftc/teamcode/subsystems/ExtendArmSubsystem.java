@@ -41,6 +41,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double kd = 0;
     public static boolean TUNING = false;
     private final FtcDashboard dashboard;
+    private Telemetry telemetry;
     public Motor armMotor;
     public Motor.Encoder armEncoder;
     public double power;
@@ -57,7 +58,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     double ff;
     double pidout;
     private int armDeliverLevel;
-    private Telemetry telemetry;
     private double scanTime;
     private double accel;
     private double lastVel;
@@ -76,9 +76,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");
         rightTiltServo = opMode.hardwareMap.get(Servo.class, "rightTiltServo");
-
-      //  leftIntakeServo.setInverted(false);
-     //   rightIntakeServo.setInverted(true);
 
         leftTiltServo.setDirection(Servo.Direction.FORWARD);
         rightTiltServo.setDirection(Servo.Direction.REVERSE);

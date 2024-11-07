@@ -42,6 +42,7 @@ public final class FieldConstantsBlueMM {
     public static Pose2d outerBluePickupPose = new Pose2d(-60, 25.5, Math.toRadians(180));
 
 
+    public static Pose2d firstSampleDropOffPose = new Pose2d(-60, 48, Math.toRadians(0));
 }
 
 
