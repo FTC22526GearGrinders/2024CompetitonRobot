@@ -21,10 +21,14 @@ public class BlueSamples {
         Action secondSampleDeliverMoveAction;
         Action thirdSampleDeliverMoveAction;
         Action fourthSampleDeliverMoveAction;
+        Action fifthSampleDeliverMoveAction;
 
         Action secondSamplePickupMoveAction;
         Action thirdSamplePickupMoveAction;
         Action fourthSamplePickupMoveAction;
+        Action fifthSamplePickupMoveAction;
+
+        Action parkAction;
 
         Action placeSpecimenAction = new SleepAction(2);
         Action pickupSampleAction = new SleepAction(2);
@@ -46,18 +50,21 @@ public class BlueSamples {
         DriveShim drive = myBot.getDrive();
 
         firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketSideStartPose)
-                .strafeTo(FieldConstantsBlueMM.basketDeliverPose.position)
+                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
         secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsBlueMM.innerYellowPrePickupPose.position, FieldConstantsBlueMM.innerYellowPrePickupPose.heading)
                 .strafeToLinearHeading(FieldConstantsBlueMM.innerYellowPickupPose.position, FieldConstantsBlueMM.innerYellowPickupPose.heading)
                 .build();
+
 
         secondSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.innerYellowPickupPose)
                 .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
         thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsBlueMM.midYellowPrePickupPose.position, FieldConstantsBlueMM.midYellowPrePickupPose.heading)
                 .strafeToLinearHeading(FieldConstantsBlueMM.midYellowPickupPose.position, FieldConstantsBlueMM.midYellowPickupPose.heading)
                 .build();
 
@@ -75,11 +82,23 @@ public class BlueSamples {
         fourthSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.outerYellowPickupPose)
                 .lineToX(FieldConstantsBlueMM.outerYellowApproachPose.position.x)
                 .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
-                .build();//move to place first specimen
+                .build();//
 
+        fifthSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsBlueMM.ascentZonePickupPose.position, Math.toRadians(180))
+                .build();
+
+        fifthSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.ascentZonePickupPose)
+                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
+                .build();
+
+
+        parkAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsBlueMM.ascentZonePickupPose.position, Math.toRadians(180))
+                .build();
 
         deliverFourSamples = new SequentialAction(
-                new SleepAction(3),
+                new SleepAction(.3),
                 firstSampleDeliverMoveAction,
                 dropSampleAction,
                 new ParallelAction(
@@ -96,7 +115,11 @@ public class BlueSamples {
                         fourthSamplePickupMoveAction,
                         pickupSampleAction),
                 fourthSampleDeliverMoveAction,
-                dropSampleAction
+                dropSampleAction,
+                fifthSamplePickupMoveAction,
+                pickupSampleAction,
+                fifthSampleDeliverMoveAction,
+                parkAction
 
 
         );

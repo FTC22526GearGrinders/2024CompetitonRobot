@@ -63,12 +63,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
     public ElevatorFeedforward rightFeedForward;
     public Servo bucketServo;
-    public Servo sampleClawServo;
-    public Sensor sampleClawSwitch;
+    public Servo specimenClawServo;
+    public Sensor specimenClawSwitch;
     public int holdCtr;
     public int show = 0;
 
-    public double currentSampleClawAngle;
+    public double currentSpecimenClawAngle;
     public int posrng;
     public double leftPower;
     public double rightPower;
@@ -121,12 +121,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
         bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
-        sampleClawServo = opMode.hardwareMap.get(Servo.class, "sampleClawServo");
+        specimenClawServo = opMode.hardwareMap.get(Servo.class, "specimenClawServo");
 
         bucketServo.setDirection(Servo.Direction.FORWARD);
-        sampleClawServo.setDirection(Servo.Direction.REVERSE);
+        specimenClawServo.setDirection(Servo.Direction.REVERSE);
 
-        // sampleClawSwitch = new Sensor()
+        // specimenClawSwitch = new Sensor()
 
         resetElevatorEncoders();
 
@@ -216,12 +216,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
     }
 
-    public Action closeSampleClaw() {
-        return new InstantAction(() -> sampleClawServo.setPosition(Constants.ElevatorConstants.sampleClawClosedAngle));//.5
+    public Action closeSpecimenClaw() {
+        return new InstantAction(() -> specimenClawServo.setPosition(Constants.ElevatorConstants.specimenClawClosedAngle));//.5
     }
 
-    public Action openSampleClaw() {
-        return new InstantAction(() -> sampleClawServo.setPosition(Constants.ElevatorConstants.sampleClawOpenAngle));//.3
+    public Action openSpecimenClaw() {
+        return new InstantAction(() -> specimenClawServo.setPosition(Constants.ElevatorConstants.specimenClawOpenAngle));//.3
     }
 
     public Action deliverToTopBasket() {

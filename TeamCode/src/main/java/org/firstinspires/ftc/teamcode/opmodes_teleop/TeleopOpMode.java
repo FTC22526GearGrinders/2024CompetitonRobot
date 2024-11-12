@@ -130,8 +130,6 @@ public class TeleopOpMode extends CommandOpMode {
         if(intakeServo.get()) arm.runLeftIntake().run(packet);
         if(intakeServoStop.get()) arm.stopIntakeServos().run(packet);
 
-        if (openSampleClaw.get()) elevator.openSampleClaw().run(packet);
-        if (closeSampleClaw.get()) elevator.closeSampleClaw().run(packet);
 
 
 //

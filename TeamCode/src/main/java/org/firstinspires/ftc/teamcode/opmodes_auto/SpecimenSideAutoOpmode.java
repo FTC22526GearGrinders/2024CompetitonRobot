@@ -35,10 +35,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -47,35 +44,34 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FieldConstantsBlue;
 import org.firstinspires.ftc.teamcode.FieldConstantsRed;
-import org.firstinspires.ftc.teamcode.commandsandactions.drive.FailoverAction;
-import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Auto:Test", group = "Auto")
+@Autonomous(name = "Specimen", group = "Auto")
 //@Disabled
 public class SpecimenSideAutoOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
     public static Pose2d startPosition;
+
     Action firstSpecimenDeliverMoveAction;
     Action secondSpecimenDeliverMoveAction;
     Action thirdSpecimenDeliverMoveAction;
     Action fourthSpecimenDeliverMoveAction;
-    Action firstSpecimenDeliverBackupAction;
-    Action secondSpecimenDeliverBackupAction;
-    Action thirdSpecimenDeliverBackupAction;
+
     Action secondSpecimenPickupMoveAction;
     Action thirdSpecimenPickupMoveAction;
     Action fourthSpecimenPickupMoveAction;
-    Action firstSamplePickupMoveAction;
-    Action secondSamplePickupMoveAction;
-    Action thirdSamplePickupMoveAction;
+
+    Action firstSampleMoveToObservationZoneAction;
+    Action secondSampleMoveToObservationZoneAction;
+
+    Action deliverThreeSpecimens;
 
     Action placeSpecimenAction = new SleepAction(2);
     Action pickupSampleAction;
@@ -88,24 +84,18 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     Action samplePickupAction;
 
     private MecanumDriveSubsystem drive;
-    private ExtendArmSubsystem arm;
-    private ElevatorSubsystem elevator;
+
+
+    private LimelightSubsystem limelight;
+
     private TelemetryPacket packet;
 
     @Override
     public void initialize() {
-        //  drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
-        arm = new ExtendArmSubsystem(this);
-        elevator = new ElevatorSubsystem(this);
+        drive = new MecanumDriveSubsystem(this, FieldConstantsBlue.specimenSideStartPose);
+
+        limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
-
-        pickupSampleAction = new SequentialAction(
-                arm.tiltBothDown(),
-                arm.runLeftIntake());
-
-        raiseArmIntakeAction = new SequentialAction(
-                arm.stopIntakeServos(),
-                arm.stopIntakeServos());
 
 
     }
@@ -114,6 +104,8 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     public void runOpMode() throws InterruptedException {
 
         initialize();
+
+        selectStartingPosition();
 
         waitForStart();
 
@@ -124,43 +116,15 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             telemetry.update();
             drive = new MecanumDriveSubsystem(this, startPosition);
 
-            Actions.runBlocking(
-                    new SequentialAction(
-                            elevator.closeSampleClaw(),
-                            elevator.setTarget(Constants.ElevatorConstants.elevatorSampleAboveTopPlaceHeight),
-                            new FailoverAction(firstSpecimenDeliverMoveAction,
-                                    new InstantAction(() -> drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0))),
-                                    elevator.getSpecimenClawPressed()))
-            );
-
-            Actions.runBlocking(
-                    new SequentialAction(
-                            elevator.setAndWaitForAtTarget(Constants.ElevatorConstants.elevatorSampleTopPlaceHeight),
-                            elevator.openSampleClaw())
-            );
-
-            Actions.runBlocking(
-                    new ParallelAction(
-                            firstSamplePickupMoveAction,
-                            elevator.setTarget(Constants.ElevatorConstants.elevatorSamplePickupHeight),
-                            arm.runLeftIntake())
-            );
-
-            Actions.runBlocking(
-                    new SequentialAction(
-                            new ParallelAction(
-                                    elevator.setTarget(Constants.ElevatorConstants.specimenPickupPosition),
-                                    secondSpecimenPickupMoveAction),
-                            new SequentialAction(
-                                    elevator.closeSampleClaw(),
-                                    new ParallelAction(
-                                            elevator.tipBucketDelayed(1),
-                                            secondSpecimenDeliverMoveAction)),
-                            elevator.levelBucket())
-            );
+            Actions.runBlocking(deliverThreeSpecimens);
 
 
         }
+        PoseStorage.currentPose = drive.pose;
+        PoseStorage.poseUpdatedTime = System.currentTimeMillis();
+
+        PoseStorage.currentTeam = drive.currentteam;
+
         reset();
     }
 
@@ -179,60 +143,71 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
 
             if (gamepad1.a) {
-                firstSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenSideStartPose)
-                        .lineToY(FieldConstantsRed.specimenDeliverPose1.position.y)
-                        .build();//move to place first specimen
 
-                firstSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverPose1)
-                        .lineToY(FieldConstantsRed.specimenDeliverApproachPose1.position.y)
-                        .build();
+                telemetry.clearAll();
+                telemetry.addData("RED ", "Chosen");
+                telemetry.addData("Restart OpMode ", "to Change");
 
-                firstSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverApproachPose1)
-                        .strafeToLinearHeading(FieldConstantsRed.innerRedPickupPose.position, FieldConstantsRed.innerRedPickupPose.heading)
-                        .build();//move to pickup inner sample
 
-                secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRed.innerRedPickupPose)
-                        .strafeToLinearHeading(FieldConstantsRed.specimenPickupPose.position, FieldConstantsRed.specimenPickupPose.heading)
-                        .build();//move to drop first sample and pick up second specimen
+                drive.currentteam = PoseStorage.Team.RED;
 
-                secondSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenPickupPose)
-                        .splineToLinearHeading(FieldConstantsRed.specimenDeliverApproachPose2, FieldConstantsRed.specimenDeliverApproachPose2.heading)
-                        .lineToY(FieldConstantsRed.specimenDeliverPose2.position.y)
-                        .build();//place second specimen
+                drive.pose = FieldConstantsRed.basketSideStartPose;
 
-                secondSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverPose2)
-                        .lineToY(FieldConstantsRed.specimenDeliverApproachPose2.position.y)
-                        .build();//clear submersible
 
-                secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverApproachPose2)
-                        .strafeToLinearHeading(FieldConstantsRed.midRedPickupPose.position, FieldConstantsRed.midRedPickupPose.heading)
-                        .build();//move to pickup inner sample
-
-                thirdSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRed.midRedPickupPose)
-                        .strafeToLinearHeading(FieldConstantsRed.specimenPickupPose.position, FieldConstantsRed.specimenPickupPose.heading)
-                        .build();//move to drop second sample and pick up third specimen
-
-                thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenPickupPose)
-                        .splineToLinearHeading(FieldConstantsRed.specimenDeliverApproachPose3, FieldConstantsRed.specimenDeliverApproachPose3.heading)
-                        .lineToY(FieldConstantsRed.specimenDeliverPose3.position.y)
-                        .build();//place thirdspecimen
-
-                thirdSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverPose3)
-                        .lineToY(FieldConstantsRed.specimenDeliverApproachPose3.position.y)
-                        .build();
-
-                thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverApproachPose3)
-                        .strafeToLinearHeading(FieldConstantsRed.outerRedPickupPose.position, FieldConstantsRed.outerRedPickupPose.heading)
-                        .build();//move to pickup inner sample
-
-                fourthSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRed.outerRedPickupPose)
-                        .strafeToLinearHeading(FieldConstantsRed.specimenPickupPose.position, FieldConstantsRed.specimenPickupPose.heading)
-                        .build();//move to drop third sample and pick up fourth specimen
-
-                fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenPickupPose)
-                        .splineToLinearHeading(FieldConstantsRed.specimenDeliverApproachPose4, FieldConstantsRed.specimenDeliverApproachPose4.heading)
-                        .lineToY(FieldConstantsRed.specimenDeliverPose4.position.y)
-                        .build();//deliver fourth specimen
+//                firstSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenSideStartPose)
+//                        .lineToY(FieldConstantsRed.specimenDeliverPose1.position.y)
+//                        .build();//move to place first specimen
+//
+//                firstSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverPose1)
+//                        .lineToY(FieldConstantsRed.specimenDeliverApproachPose1.position.y)
+//                        .build();
+//
+//                firstSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverApproachPose1)
+//                        .strafeToLinearHeading(FieldConstantsRed.innerRedPickupPose.position, FieldConstantsRed.innerRedPickupPose.heading)
+//                        .build();//move to pickup inner sample
+//
+//                secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRed.innerRedPickupPose)
+//                        .strafeToLinearHeading(FieldConstantsRed.specimenPickupPose.position, FieldConstantsRed.specimenPickupPose.heading)
+//                        .build();//move to drop first sample and pick up second specimen
+//
+//                secondSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenPickupPose)
+//                        .splineToLinearHeading(FieldConstantsRed.specimenDeliverApproachPose2, FieldConstantsRed.specimenDeliverApproachPose2.heading)
+//                        .lineToY(FieldConstantsRed.specimenDeliverPose2.position.y)
+//                        .build();//place second specimen
+//
+//                secondSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverPose2)
+//                        .lineToY(FieldConstantsRed.specimenDeliverApproachPose2.position.y)
+//                        .build();//clear submersible
+//
+//                secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverApproachPose2)
+//                        .strafeToLinearHeading(FieldConstantsRed.midRedPickupPose.position, FieldConstantsRed.midRedPickupPose.heading)
+//                        .build();//move to pickup inner sample
+//
+//                thirdSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRed.midRedPickupPose)
+//                        .strafeToLinearHeading(FieldConstantsRed.specimenPickupPose.position, FieldConstantsRed.specimenPickupPose.heading)
+//                        .build();//move to drop second sample and pick up third specimen
+//
+//                thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenPickupPose)
+//                        .splineToLinearHeading(FieldConstantsRed.specimenDeliverApproachPose3, FieldConstantsRed.specimenDeliverApproachPose3.heading)
+//                        .lineToY(FieldConstantsRed.specimenDeliverPose3.position.y)
+//                        .build();//place thirdspecimen
+//
+//                thirdSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverPose3)
+//                        .lineToY(FieldConstantsRed.specimenDeliverApproachPose3.position.y)
+//                        .build();
+//
+//                thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRed.specimenDeliverApproachPose3)
+//                        .strafeToLinearHeading(FieldConstantsRed.outerRedPickupPose.position, FieldConstantsRed.outerRedPickupPose.heading)
+//                        .build();//move to pickup inner sample
+//
+//                fourthSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRed.outerRedPickupPose)
+//                        .strafeToLinearHeading(FieldConstantsRed.specimenPickupPose.position, FieldConstantsRed.specimenPickupPose.heading)
+//                        .build();//move to drop third sample and pick up fourth specimen
+//
+//                fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.specimenPickupPose)
+//                        .splineToLinearHeading(FieldConstantsRed.specimenDeliverApproachPose4, FieldConstantsRed.specimenDeliverApproachPose4.heading)
+//                        .lineToY(FieldConstantsRed.specimenDeliverPose4.position.y)
+//                        .build();//deliver fourth specimen
 
 
 //                deliverFourSpecimens = new SequentialAction(
@@ -281,64 +256,99 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 break;
             }
             if (gamepad1.x) {
+
+                telemetry.clearAll();
+                telemetry.addData("BLUE ", "Chosen");
+                telemetry.addData("Restart OpMode ", "to Change");
+
+
+                drive.currentteam = PoseStorage.Team.BLUE;
+
+                drive.pose = FieldConstantsBlue.basketSideStartPose;
+
+
                 firstSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenSideStartPose)
+                        .lineToY(FieldConstantsBlue.specimenDeliverApproachPose1.position.y)
                         .lineToY(FieldConstantsBlue.specimenDeliverPose1.position.y)
-                        .strafeToLinearHeading(FieldConstantsBlue.specimenDeliverPose1.position, Math.toRadians(90))
                         .build();//move to place first specimen
 
-                firstSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose1)
-                        .lineToY(FieldConstantsBlue.specimenDeliverApproachPose1.position.y)
+                firstSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose1)
+                        .splineToSplineHeading(new Pose2d(-36, 42, Math.toRadians(180)), Math.toRadians(180))
+                        .strafeTo(new Vector2d(-36, 10))
+                        .strafeTo(new Vector2d(-48, 10))
+                        .strafeTo(FieldConstantsBlue.sample1ObservationZoneDropPose.position)
+                        .strafeTo(new Vector2d(FieldConstantsBlue.sample1ObservationZoneDropPose.position.x, FieldConstantsBlue.sample1ObservationZoneDropPose.position.y - 10))
                         .build();
 
-                firstSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverApproachPose1)
-                        .strafeToLinearHeading(FieldConstantsBlue.innerBluePickupPose.position, Math.toRadians(225))
-                        .build();//move to pickup inner sample
-
-                secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlue.innerBluePickupPose)
-                        .strafeToLinearHeading(FieldConstantsBlue.specimenPickupPose.position, Math.toRadians(270))
-                        .build();//move to drop first sample and pick up second specimen
+                secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlue.sample1ObservationZoneDropPose)
+                        .lineToXSplineHeading(FieldConstantsBlue.specimenPrePickupPose.position.x, Math.toRadians(90))
+                        .strafeTo(FieldConstantsBlue.specimenPickupPose.position)
+                        .waitSeconds(1)
+                        .build();
 
                 secondSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenPickupPose)
-                        .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose2, Math.toRadians(90))
+                        .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose2, Math.toRadians(-90))
                         .lineToY(FieldConstantsBlue.specimenDeliverPose2.position.y)
                         .build();//place second specimen
 
-                secondSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose2)
-                        .lineToY(FieldConstantsBlue.specimenDeliverApproachPose2.position.y)
-                        .build();//clear submersible
-
-                secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverApproachPose2)
-                        .splineToLinearHeading(FieldConstantsBlue.midBluePickupPose, FieldConstantsBlue.midBluePickupPose.heading)
-                        .build();//move to pickup inner sample
-
-                thirdSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlue.midBluePickupPose)
-                        .strafeToLinearHeading(FieldConstantsBlue.specimenPickupPose.position, FieldConstantsBlue.specimenPickupPose.heading)
-                        .build();//move to drop second sample and pick up third specimen
-
-                thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenPickupPose)
-                        .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose3, FieldConstantsBlue.specimenDeliverApproachPose3.heading)
-                        .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose3, FieldConstantsBlue.specimenDeliverApproachPose3.heading)
-                        .lineToY(FieldConstantsBlue.specimenDeliverPose3.position.y)
-                        .build();//place thirdspecimen
-
-                thirdSpecimenDeliverBackupAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose3)
-                        .lineToY(FieldConstantsBlue.specimenDeliverApproachPose3.position.y)
+                thirdSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose2)
+                        //.lineToY(FieldConstantsBlue.specimenDeliverApproachPose2.position.y)
+                        .splineToLinearHeading(FieldConstantsBlue.specimenPrePickupPose, Math.toRadians(0))
+                        .waitSeconds(.2)
+                        .strafeTo(FieldConstantsBlue.specimenPickupPose.position)
+                        .waitSeconds(1)
                         .build();
 
-                thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverApproachPose3)
-                        .splineToLinearHeading(FieldConstantsBlue.outerBluePickupPose, FieldConstantsBlue.outerBluePickupPose.heading)
-                        .build();//move to pickup inner sample
+                thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenPickupPose)
+                        .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose3, Math.toRadians(-90))
+                        .lineToY(FieldConstantsBlue.specimenDeliverPose3.position.y)
+                        .build();//place second specimen
 
-                fourthSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlue.outerBluePickupPose)
-                        .strafeToLinearHeading(FieldConstantsBlue.specimenPickupPose.position, FieldConstantsBlue.specimenPickupPose.heading)
-                        .build();//move to drop third sample and pick up fourth specimen
+//        fourthSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose3)
+//                .lineToY(FieldConstantsBlue.specimenDeliverApproachPose3.position.y)
+//                .splineToLinearHeading(FieldConstantsBlue.specimenPrePickupPose, Math.toRadians(180))
+//                .strafeTo(FieldConstantsBlue.specimenPickupPose.position)
+//                .waitSeconds(1)
+//                .build();
+//
+//        fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenPickupPose)
+//                .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose4, Math.toRadians(-90))
+//                .lineToY(FieldConstantsBlue.specimenDeliverPose4.position.y)
+//                .build();//place second specimen
 
-                fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.specimenPickupPose)
-                        .splineToLinearHeading(FieldConstantsBlue.specimenDeliverApproachPose4, FieldConstantsBlue.specimenDeliverApproachPose4.heading)
-                        .lineToY(FieldConstantsBlue.specimenDeliverPose4.position.y)
-                        .build();//deliver fourth specimen
+                secondSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose3)
+                        .splineToSplineHeading(new Pose2d(-22, 48, Math.toRadians(180)), Math.toRadians(180))
+                        .strafeTo(new Vector2d(-56, 10))
+                        .strafeTo(FieldConstantsBlue.sample2ObservationZoneDropPose.position)
 
+//                .strafeTo(new Vector2d(-48, 10))
+//                .strafeTo(new Vector2d(-58, 10))
+                        //  .strafeTo(FieldConstantsBlue.sample2ObservationZoneDropPose.position)
+                        .build();
 
+//        parkAction = drive.actionBuilder(FieldConstantsBlue.specimenDeliverPose4)
+//                .splineToLinearHeading(FieldConstantsBlue.parkPose, Math.toRadians(180))
+//
+//                .waitSeconds(1)
+//                .build();
+
+                deliverThreeSpecimens =
+                        new SequentialAction(
+
+                                firstSpecimenDeliverMoveAction,
+                                placeSpecimenAction,
+                                firstSampleMoveToObservationZoneAction,
+                                //  secondSampleMoveToObservationZoneAction,
+                                secondSpecimenPickupMoveAction,
+                                secondSpecimenDeliverMoveAction,
+                                thirdSpecimenPickupMoveAction,
+                                thirdSpecimenDeliverMoveAction,
+
+                                //  fourthSpecimenDeliverMoveAction,
+                                //  parkAction
+                                secondSampleMoveToObservationZoneAction
+
+                        );
 
 
                 break;

@@ -46,45 +46,39 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsBlue;
 import org.firstinspires.ftc.teamcode.FieldConstantsRed;
-import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Auto:Test", group = "Auto")
+@Autonomous(name = "Basket", group = "Auto")
 //@Disabled
 public class BasketSideAutoOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
     public static Pose2d startPosition;
-    private MecanumDriveSubsystem drive;
-    private ExtendArmSubsystem arm;
-    private ElevatorSubsystem elevator;
     Action firstSampleDeliverMoveAction;
     Action secondSampleDeliverMoveAction;
     Action thirdSampleDeliverMoveAction;
     Action fourthSampleDeliverMoveAction;
-
     Action secondSamplePickupMoveAction;
     Action thirdSamplePickupMoveAction;
     Action fourthSamplePickupMoveAction;
-
+    Action samplePickUpActoin;
     Action placeSpecimenAction = new SleepAction(2);
     Action pickupSampleAction = new SleepAction(2);
     Action transferSampleToBucketAction = new SleepAction(2);
     Action dropSampleAction = new SleepAction(2);
-
-
     Action deliverFourSamples;
-
+    private MecanumDriveSubsystem drive;
+    private LimelightSubsystem limelight;
     private TelemetryPacket packet;
 
     @Override
     public void initialize() {
-        drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
-        arm = new ExtendArmSubsystem(this);
-        elevator = new ElevatorSubsystem(this);
+        drive = new MecanumDriveSubsystem(this, FieldConstantsBlue.basketSideStartPose);
+        //   limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
 
     }
@@ -93,6 +87,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     public void runOpMode() throws InterruptedException {
 
         initialize();
+        selectStartingPosition();
+
+        // limelight.setYellowSamplePipeline();
+
 
         waitForStart();
 
@@ -102,47 +100,17 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
             telemetry.update();
 
-
-//            Actions.runBlocking(
-//                    new SequentialAction(
-//                            deliverMoveAction,
-//                            elevator.deliverToTopBasket()));
-
-//            Actions.runBlocking(
-//                    new ParallelAction(
-//                            firstPickupMoveAction,
-//                          //  arm.goPickupSpecimen()));
-//
-//            Actions.runBlocking(
-//                    new SequentialAction(
-//                            deliverMoveAction,
-//                            elevator.deliverToTopBasket()));
-//
-//            Actions.runBlocking(
-//                    new ParallelAction(
-//                            secondPickupMoveAction,
-//                         //   arm.goPickupSpecimen()));
-//
-//            Actions.runBlocking(
-//                    new SequentialAction(
-//                            deliverMoveAction,
-//                            elevator.deliverToTopBasket()));
-//
-//            Actions.runBlocking(
-//                    new ParallelAction(
-//                            thirdPickupMoveAction,
-//                          //  arm.goPickupSpecimen()));
-//
-//            Actions.runBlocking(
-//                    new SequentialAction(
-//                            deliverMoveAction,
-//                            elevator.deliverToTopBasket()));
-
-
-            new SleepAction(2);
-
-
+            Actions.runBlocking(deliverFourSamples);
         }
+
+        PoseStorage.currentPose = drive.pose;
+        PoseStorage.poseUpdatedTime = System.currentTimeMillis();
+
+        PoseStorage.currentPose = drive.pose;
+        PoseStorage.poseUpdatedTime = System.currentTimeMillis();
+
+        PoseStorage.currentTeam = drive.currentteam;
+
         reset();
     }
 
@@ -161,6 +129,15 @@ public class BasketSideAutoOpmode extends CommandOpMode {
             telemetry.addData("    Red All Basket    ", "(A / O)");
 
             if (gamepad1.a) {
+
+                telemetry.clearAll();
+                telemetry.addData("RED ", "Chosen");
+                telemetry.addData("Restart OpMode ", "to Change");
+
+
+                drive.currentteam = PoseStorage.Team.RED;
+                drive.pose = FieldConstantsRed.basketSideStartPose;
+
                 firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRed.basketSideStartPose)
                         .strafeTo(FieldConstantsRed.basketDeliverPose.position)
                         .build();//move to place first specimen
@@ -218,19 +195,32 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 break;
             }
             if (gamepad1.x) {
+
+                telemetry.clearAll();
+                telemetry.addData("BLUE ", "Chosen");
+                telemetry.addData("Restart OpMode ", "to Change");
+
+
+                drive.currentteam = PoseStorage.Team.BLUE;
+
+                drive.pose = FieldConstantsBlue.basketSideStartPose;
+
                 firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.basketSideStartPose)
-                        .strafeTo(FieldConstantsBlue.basketDeliverPose.position)
+                        .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position, FieldConstantsBlue.basketDeliverPose.heading)
                         .build();//move to place first specimen
 
                 secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.innerYellowPrePickupPose.position, FieldConstantsBlue.innerYellowPrePickupPose.heading)
                         .strafeToLinearHeading(FieldConstantsBlue.innerYellowPickupPose.position, FieldConstantsBlue.innerYellowPickupPose.heading)
                         .build();
+
 
                 secondSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlue.innerYellowPickupPose)
                         .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position, FieldConstantsBlue.basketDeliverPose.heading)
                         .build();//move to place first specimen
 
                 thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlue.basketDeliverPose)
+                        .strafeToLinearHeading(FieldConstantsBlue.midYellowPrePickupPose.position, FieldConstantsBlue.midYellowPrePickupPose.heading)
                         .strafeToLinearHeading(FieldConstantsBlue.midYellowPickupPose.position, FieldConstantsBlue.midYellowPickupPose.heading)
                         .build();
 
@@ -250,26 +240,38 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         .strafeToLinearHeading(FieldConstantsBlue.basketDeliverPose.position, FieldConstantsBlue.basketDeliverPose.heading)
                         .build();//move to place first specimen
 
-
+//                Actions.runBlocking(drive.actionBuilder(drive.pose)
+//                        .strafeToLinearHeading(FieldConstantsBlue.innerYellowPickupPose.position, FieldConstantsRed.innerYellowPickupPose.heading)
+//                        .build());
                 deliverFourSamples = new SequentialAction(
-                        new SleepAction(3),
                         firstSampleDeliverMoveAction,
-                        dropSampleAction,
-                        new ParallelAction(
-                                secondSamplePickupMoveAction,
-                                pickupSampleAction),
+                        drive.actionBuilder(drive.pose)
+                                .strafeToLinearHeading(FieldConstantsRed.innerYellowPickupPose.position, FieldConstantsRed.innerYellowPickupPose.heading)
+                                .build(),
+                        // dropSampleAction,
+                        // new ParallelAction(
+                        new SleepAction(.2),
+//                        new FailoverAction(
+//                                secondSamplePickupMoveAction, dropSampleAction, Math.abs(limelight.getTX()) > 5),
+                        secondSamplePickupMoveAction,
+//                        //   pickupSampleAction),
+                        new SleepAction(.25),
                         secondSampleDeliverMoveAction,
-                        dropSampleAction,
-                        new ParallelAction(
-                                thirdSamplePickupMoveAction,
-                                pickupSampleAction),
+//                        //   dropSampleAction,
+//                        //  new ParallelAction(
+                        new SleepAction(.25),
+                        thirdSamplePickupMoveAction,
+//                        //     pickupSampleAction),
+                        new SleepAction(.25),
                         thirdSampleDeliverMoveAction,
-                        dropSampleAction,
-                        new ParallelAction(
-                                fourthSamplePickupMoveAction,
-                                pickupSampleAction),
-                        fourthSampleDeliverMoveAction,
-                        dropSampleAction
+//                        // dropSampleAction,
+//                        //  new ParallelAction(
+                        new SleepAction(.25),
+                        fourthSamplePickupMoveAction,
+//                        //  pickupSampleAction),
+                        new SleepAction(.25),
+                        fourthSampleDeliverMoveAction
+                        //  dropSampleAction
 
 
                 );

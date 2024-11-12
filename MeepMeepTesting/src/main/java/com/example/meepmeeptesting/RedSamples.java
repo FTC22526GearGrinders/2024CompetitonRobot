@@ -21,10 +21,11 @@ public class RedSamples {
         Action thirdSampleDeliverMoveAction;
         Action fourthSampleDeliverMoveAction;
 
-
         Action secondSamplePickupMoveAction;
         Action thirdSamplePickupMoveAction;
         Action fourthSamplePickupMoveAction;
+
+        Action parkAction;
 
         Action placeSpecimenAction = new SleepAction(2);
         Action pickupSampleAction = new SleepAction(2);
@@ -33,7 +34,6 @@ public class RedSamples {
 
 
         Action deliverFourSamples;
-
 
         MeepMeep meepMeep = new MeepMeep(800);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
@@ -47,18 +47,21 @@ public class RedSamples {
         DriveShim drive = myBot.getDrive();
 
         firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.basketSideStartPose)
-                .strafeTo(FieldConstantsRedMM.basketDeliverPose.position)
+                .strafeToLinearHeading(FieldConstantsRedMM.basketDeliverPose.position, FieldConstantsRedMM.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
         secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRedMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsRedMM.innerYellowPrePickupPose.position, FieldConstantsRedMM.innerYellowPrePickupPose.heading)
                 .strafeToLinearHeading(FieldConstantsRedMM.innerYellowPickupPose.position, FieldConstantsRedMM.innerYellowPickupPose.heading)
                 .build();
+
 
         secondSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.innerYellowPickupPose)
                 .strafeToLinearHeading(FieldConstantsRedMM.basketDeliverPose.position, FieldConstantsRedMM.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
         thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsRedMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsRedMM.midYellowPrePickupPose.position, FieldConstantsRedMM.midYellowPrePickupPose.heading)
                 .strafeToLinearHeading(FieldConstantsRedMM.midYellowPickupPose.position, FieldConstantsRedMM.midYellowPickupPose.heading)
                 .build();
 
@@ -78,9 +81,11 @@ public class RedSamples {
                 .strafeToLinearHeading(FieldConstantsRedMM.basketDeliverPose.position, FieldConstantsRedMM.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
+        parkAction = drive.actionBuilder(FieldConstantsRedMM.basketDeliverPose)
+                .strafeToLinearHeading(FieldConstantsRedMM.ascentZoneParkPose.position, FieldConstantsRedMM.ascentZoneParkPose.heading)
+                .build();
 
         deliverFourSamples = new SequentialAction(
-                new SleepAction(3),
                 firstSampleDeliverMoveAction,
                 dropSampleAction,
                 new ParallelAction(
@@ -97,7 +102,8 @@ public class RedSamples {
                         fourthSamplePickupMoveAction,
                         pickupSampleAction),
                 fourthSampleDeliverMoveAction,
-                dropSampleAction
+                dropSampleAction,
+                parkAction
 
 
         );

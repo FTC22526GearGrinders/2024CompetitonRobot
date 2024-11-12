@@ -63,6 +63,8 @@ import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.utils.PosePatcher;
+import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -97,6 +99,8 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     public Pose2d pose;
     public Telemetry telemetry;
     public boolean fieldCentric;
+    public PosePatcher posePatcher;
+    public PoseStorage.Team currentteam;
     public int slowMode;
     public boolean show1 = false;
     public boolean show2 = false;
@@ -104,6 +108,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
     public MecanumDriveSubsystem(CommandOpMode opMode, Pose2d pose) {
         this.pose = pose;
+        posePatcher = new PosePatcher(1000000000); // timeout of 1 second
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
         LynxFirmware.throwIfModulesAreOutdated(opMode.hardwareMap);
@@ -192,6 +197,16 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
     }
 
+    public void toggleFieldCentric() {
+        fieldCentric = !fieldCentric;
+    }
+
+
+    public void toggleAlliance() {
+        if (currentteam == PoseStorage.Team.RED)
+            currentteam = PoseStorage.Team.BLUE;
+        else currentteam = PoseStorage.Team.RED;
+    }
     public void resetEncoders() {
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -207,6 +222,9 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     public PoseVelocity2d updatePoseEstimate() {
         Twist2dDual<Time> twist = localizer.update();
         pose = pose.plus(twist.value());
+
+        posePatcher.add(pose);
+        posePatcher.removeOld();
 
         poseHistory.add(pose);
         while (poseHistory.size() > 100) {

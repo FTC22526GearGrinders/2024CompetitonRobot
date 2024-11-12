@@ -30,7 +30,7 @@ public final class Constants {
         static final double distanceBetwwenSpikeMarks = 10;
     }
 
-    public static final class SampleConstants {
+    public static final class SpecimenConstants {
         static final double length = 3.5;
         static final double side = 1.5;
     }
@@ -180,21 +180,21 @@ public final class Constants {
         public static double elevatorDownHeight = 0;
         public static double elevatorLowerBasketHeight = 36;
         public static double elevatorUpperBasketHeight = 36;
-        public static double elevatorSamplePickupHeight = 36;
-        public static double elevatorSampleAboveLowPlaceHeight = 36;
-        public static double elevatorSampleLowPlaceHeight = 36;
-        public static double elevatorSampleAboveTopPlaceHeight = 36;
-        public static double elevatorSampleTopPlaceHeight = 36;
+        public static double elevatorSpecimenPickupHeight = 36;
+        public static double elevatorSpecimenAboveLowPlaceHeight = 36;
+        public static double elevatorSpecimenLowPlaceHeight = 36;
+        public static double elevatorAbveHighChamber = 36;
+        public static double elevatorAtHighChamber = 36;
 
 
-        public static double sampleClawOpenAngle = 0.3;
-        public static double sampleClawClosedAngle = .5;
+        public static double specimenClawOpenAngle = 0.3;
+        public static double specimenClawClosedAngle = .5;
 
         public static double homePosition = 1;
         public static double lowerBasketDeliverPosition = 24;
         public static double upperBasketDeliverPosition = 44;
 
-        public static double sampleApproachPosition = 30;
+        public static double specimenApproachPosition = 30;
         public static double specimenDeliverPosition = 30;
 
 

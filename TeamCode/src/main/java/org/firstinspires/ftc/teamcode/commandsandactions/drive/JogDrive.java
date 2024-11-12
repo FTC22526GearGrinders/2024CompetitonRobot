@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
-import org.firstinspires.ftc.teamcode.utils.ActiveMotionValues;
+import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
 public class JogDrive extends CommandBase {
@@ -68,10 +68,19 @@ public class JogDrive extends CommandBase {
                 forward *= .2;
                 rcw *= .2;
             }
+            /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
+
+            double gyro_radians = startRadians - drive.getYawRads();
 
 
-            if (!ActiveMotionValues.getRedAlliance()) {
+            double temp = strafe * Math.sin(gyro_radians) + forward * (float) Math.cos(gyro_radians);
 
+            strafe = strafe * Math.cos(gyro_radians) - forward * Math.sin(gyro_radians);
+
+            forward = temp;
+
+
+            if (drive.currentteam == PoseStorage.Team.RED) {
                 forward = -this.gamepad.getLeftY();
                 strafe = this.gamepad.getLeftX(); /* Invert stick Y axis */
                 rcw = this.gamepad.getRightX();
@@ -81,15 +90,6 @@ public class JogDrive extends CommandBase {
 
 
             /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
-
-            double gyro_radians = startRadians;//- drive.drive.getRawExternalHeading();
-
-
-            double temp = strafe * Math.sin(gyro_radians) + forward * (float) Math.cos(gyro_radians);
-
-            strafe = strafe * Math.cos(gyro_radians) - forward * Math.sin(gyro_radians);
-
-            forward = temp;
 
             drive.jog(forward, strafe, rcw);
         }
