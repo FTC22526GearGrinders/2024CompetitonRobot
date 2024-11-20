@@ -40,10 +40,11 @@ public class TeleopOpMode extends CommandOpMode {
     TelemetryPacket packet;
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
+    public int showSelect;
+
 
     // @Override
     public void initialize() {
-
 
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
 
@@ -53,7 +54,7 @@ public class TeleopOpMode extends CommandOpMode {
 
         elevator = new ElevatorSubsystem(this);
 
-        eara = new Elevator_Arm_RotateArm_Actions(arm, rotateArm, this);
+        eara = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotateArm, this);
 
         packet = new TelemetryPacket();
 
@@ -140,10 +141,12 @@ public class TeleopOpMode extends CommandOpMode {
 
     }
 
-
     public void doCoDriveButtons() {
 
         if (gamepad2.a) runningActions.add(eara.getSampleAutoBasket());
+
+        if (gamepad2.dpad_up) incShowSelect();
+        if (gamepad2.dpad_down) decShowSelect();
 
     }
 
@@ -174,31 +177,46 @@ public class TeleopOpMode extends CommandOpMode {
         if (gamepad2.dpad_right)
             runningActions.add(arm.armToPickupAction());
 
+        if (gamepad2.right_bumper) runningActions.add(eara.deliverSpecimenToUpperSubmersible());
+
 
     }
 
 
     void doElevatorTestCoDriverButtons() {
 
+        if (gamepad2.a) runningActions.add(elevator.openSpecimenClaw());
+        if (gamepad2.b) runningActions.add(elevator.closeSpecimenClaw());
+        if (gamepad2.x) runningActions.add(elevator.tipBucket());
+        if (gamepad2.y) runningActions.add(elevator.levelBucket());
 
-
-
+        if (gamepad2.dpad_up) runningActions.add(elevator.elevatorToAboveUpperSubmersible());
+        if (gamepad2.dpad_down) runningActions.add(elevator.elevatorToUpperSubmersible());
+        if (gamepad2.dpad_left) runningActions.add(elevator.elevatorToHome());
+        if (gamepad2.dpad_right) runningActions.add(elevator.elevatorToUpperBasket());
 
 
     }
 
-
     void showField() {
-
-
         drive.updatePoseEstimate();
         TelemetryPacket packet = new TelemetryPacket();
         packet.fieldOverlay().setStroke("#3F51B5");
         Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
-
     }
 
+    void incShowSelect() {
+        showSelect++;
+        if (showSelect > Constants.MiscConstants.maxShowSelectCount)
+            showSelect = Constants.MiscConstants.minShowSelectCount;
+    }
+
+    void decShowSelect() {
+        showSelect--;
+        if (showSelect < Constants.MiscConstants.minShowSelectCount)
+            showSelect = Constants.MiscConstants.maxShowSelectCount;
+    }
 
 }
 

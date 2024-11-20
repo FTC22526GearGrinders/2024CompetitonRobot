@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.FailoverAction;
@@ -23,9 +24,11 @@ public class Elevator_Arm_RotateArm_Actions {
     public final Gamepad.RumbleEffect fiveStepRumbleEffect;
     private final ExtendArmSubsystem arm;
     private final RotateArmSubsystem rotateArm;
+    private final ElevatorSubsystem elevetor;
     private CommandOpMode opmode;
 
-    public Elevator_Arm_RotateArm_Actions(ExtendArmSubsystem arm, RotateArmSubsystem rotateArm, CommandOpMode opmode) {
+    public Elevator_Arm_RotateArm_Actions(ElevatorSubsystem elevetor, ExtendArmSubsystem arm, RotateArmSubsystem rotateArm, CommandOpMode opmode) {
+        this.elevetor = elevetor;
         this.arm = arm;
         this.rotateArm = rotateArm;
         this.opmode = opmode;
@@ -95,27 +98,42 @@ public class Elevator_Arm_RotateArm_Actions {
                 new FailoverAction(rotateArm.reverseIntakeServosTimed(2), null, !rotateArm.sampleAtIntake()));
     }
 
-    public Action deliverSampleToBasket() {
+    public Action deliverSampleToUpperBasket() {
         return
                 new SequentialAction(
-                        new SleepAction(2),//elevator to basket
-                        new SleepAction(1),//tip bucket
-                        new SleepAction(2));//elevator to bucket height
+                        elevetor.elevatorToUpperBasket(),
+                        elevetor.cycleBucket(2),
+                        elevetor.elevatorToHome());
     }
 
-    public Action testForDeliverSampleToBasket() {//use in auto to not raise elevator if sample wasn't picked up
+    public Action deliverSampleToBucket(boolean hasSample) {//use in auto to not raise elevator if sample wasn't picked up
         return
-                new FailoverAction(deliverSampleToBasket(), null, !rotateArm.sampleInIntake);
+                new FailoverAction(deliverSampleToBucket(), null, hasSample);
     }
 
     public Action collectSpecimenFromWall() {
         return
-                new SleepAction(2);
+                elevetor.closeSpecimenClaw();
     }
 
-    public Action deliverSpecimenToSubmersible() {
+    public Action deliverSpecimenToUpperSubmersible() {
         return
-                new SleepAction(2);
+                new ParallelAction(
+                        elevetor.elevatorToUpperSubmersible(),
+                        new SequentialAction(
+                                new SleepAction(.5),
+                                elevetor.openSpecimenClaw()));
+
+    }
+
+    public Action deliverSpecimenToLowerSubmersible() {
+        return
+                new ParallelAction(
+                        elevetor.elevatorToLowSubmersible(),
+                        new SequentialAction(
+                                new SleepAction(.5),
+                                elevetor.openSpecimenClaw()));
+
     }
 
 
@@ -166,6 +184,8 @@ public class Elevator_Arm_RotateArm_Actions {
     public Action deliverSampleToZone() {
         return rotateArm.reverseIntakeServosTimed(3);
     }
+
+
 }
 
 

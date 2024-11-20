@@ -122,12 +122,6 @@ public final class Constants {
         public static final double IN_POSITION_LIMIT = .5;
 
 
-        public static final double AUTO_DELIVER_POSITION = 12.5;
-        public static final double HOME_POSITION = 1;
-
-
-        public static final double MAX_VEL = 13;
-        public static final double MAX_ACCEL = 13;
 
         public static final double TRAJ_VEL = 5;
         public static final double TRAJ_ACCEL = 5;
@@ -171,23 +165,22 @@ public final class Constants {
         public static final double POSITION_TOLERANCE_INCHES = .1;
 
 
-        public static double MAX_VEL = 30;
-        public static double MAX_ACCEL = 30;
+
         public static double TRAJ_VEL = 20;
         public static double TRAJ_ACCEL = 20;
-        public static double POSITION_Kg = 0;
+
 
         public static double bucketUprightAngle = 0;
         public static double bucketTippedAngle = .4;
 
         public static double elevatorDownHeight = 0;
-        public static double elevatorLowerBasketHeight = 36;
-        public static double elevatorUpperBasketHeight = 36;
-        public static double elevatorSpecimenWallHeight = 36;
-        public static double elevatorSpecimenAboveLowPlaceHeight = 36;
-        public static double elevatorSpecimenLowPlaceHeight = 36;
-        public static double elevatorSpecimenAboveHighPlaceHeight = 36;
-        public static double elevatorSpecimenAtHighPlaceHeight = 36;
+        public static double elevatorLowerBasketHeight = 28;
+        public static double elevatorUpperBasketHeight = 45;
+        public static double elevatorSpecimenWallHeight = 9;
+        public static double elevatorSpecimenAboveLowPlaceHeight = 19;
+        public static double elevatorSpecimenLowPlaceHeight = 10;
+        public static double elevatorSpecimenAboveHighPlaceHeight = 30;
+        public static double elevatorSpecimenAtHighPlaceHeight = 22;
 
 
         public static double specimenClawOpenAngle = 0.3;
@@ -197,11 +190,26 @@ public final class Constants {
         public static double lowerBasketDeliverPosition = 24;
         public static double upperBasketDeliverPosition = 44;
 
-        public static double specimenApproachPosition = 30;
-        public static double specimenDeliverPosition = 30;
+    }
+
+    public static final class MiscConstants {
+
+        public static final int minShowSelectCount = 0;
+        public static final int maxShowSelectCount = 9;
+
+        public static final int showNone = 0;
+
+        public static final int showDrive1 = 1;
+        public static final int showDrive2 = 2;
+        public static final int showElevator1 = 3;
+        public static final int showElevator2 = 4;
+        public static final int showArm1 = 5;
+        public static final int showArm2 = 6;
+        public static final int showRotateArm1 = 7;
+        public static final int showRotateArm2 = 8;
+        public static final int showLimelight = 9;
 
 
-        public static double specimenPickupPosition = 12;
     }
 
 

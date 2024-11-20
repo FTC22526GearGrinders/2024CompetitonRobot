@@ -28,26 +28,25 @@ import org.firstinspires.ftc.teamcode.Constants;
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
-    public static double lks = 0.08;//1% motor power
-    public static double lkg = 0.04;
-    public static double lkv = .05;//per inch per second (max 17 ips )
-    public static double lka = 0;
+    public static double eks = 0.08;//1% motor power
+    public static double ekg = 0.04;
+    public static double ekv = .05;//per inch per second (max 17 ips )
+    public static double eka = 0;
+
     public static double lkp = 0.05;
     public static double lki = 0;
     public static double lkd = 0;
 
-    public static double rks = 0.08;//1% motor power
-    public static double rkg = 0.04;
-    public static double rkv = .05;//per inch per second (max 17 ips )
-    public static double rka = 0;
+
     public static double rkp = 0.05;
     public static double rki = 0;
     public static double rkd = 0;
 
-
     public static boolean TUNING = false;
 
     public static double targetInches;
+
+
     private final Telemetry telemetry;
     public TrapezoidProfile.Constraints constraints;
     public Motor leftElevatorMotor;
@@ -55,18 +54,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ProfiledPIDController leftPidController;
     public TrapezoidProfile.State leftGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State leftSetpoint = new TrapezoidProfile.State();
-    public ElevatorFeedforward leftFeedForward;
+    public ElevatorFeedforward elevatorFeedForward;
     public Motor rightElevatorMotor;
     public Motor.Encoder rightElevatorEncoder;
     public ProfiledPIDController rightPidController;
     public TrapezoidProfile.State rightGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
-    public ElevatorFeedforward rightFeedForward;
     public Servo bucketServo;
     public Servo specimenClawServo;
     public Sensor specimenClawSwitch;
     public int holdCtr;
-    public int show = 0;
+    public int showSelect = 0;
 
     public double currentSpecimenClawAngle;
     public int posrng;
@@ -106,7 +104,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftElevatorEncoder.setDirection(Motor.Direction.FORWARD);
         leftElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
 
-        leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
+        elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
         leftPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
         leftPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         leftPidController.reset();
@@ -120,7 +118,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightElevatorEncoder.setDirection(Motor.Direction.FORWARD);
         rightElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
 
-        rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
         rightPidController = new ProfiledPIDController(rkp, rki, rkd, constraints);
         rightPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         rightPidController.reset();
@@ -214,12 +211,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-
-
-
-
-
-
     public double getPositionInches() {
         return leftElevatorEncoder.getPosition();
     }
@@ -255,6 +246,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         };
     }
 
+
     public Action tipBucket() {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketTippedAngle));
     }
@@ -267,6 +259,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Action levelBucket() {
         return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
+    }
+
+    public Action cycleBucket(double timeoutsecs) {
+        return new SequentialAction(
+                tipBucket(),
+                new SleepAction(timeoutsecs),
+                levelBucket());
     }
 
     public Action closeSpecimenClaw() {
@@ -298,9 +297,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void periodic() {
 
-        //    if (show == 0) {// Constants.TelemetryConstants.showRotateArm) {
-        showLeftTelemetry();
-        //   }
+        if (showSelect == Constants.MiscConstants.showRotateArm1) {
+            showLeftTelemetry();
+        }
+        if (showSelect == Constants.MiscConstants.showRotateArm1) {
+            showRightTelemetry();
+        }
+
+
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
             holdCtr = 0;
@@ -321,12 +325,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void position() {
         posrng++;
 
+        if (inPositionCtr != 3) inPositionCtr++;
         leftPidout = leftPidController.calculate(getLeftPositionInches());
         leftSetpoint = leftPidController.getSetpoint();
         leftSetVel = leftSetpoint.velocity;
         leftSetPos = leftSetpoint.position;
         leftAccel = (leftSetVel - leftLastVel) * 50;
-        leftFf = leftFeedForward.calculate(leftSetVel, leftAccel);
+        leftFf = elevatorFeedForward.calculate(leftSetVel, leftAccel);
         leftElevatorMotor.set(leftFf + leftPidout);
         leftLastVel = leftSetVel;
 
@@ -335,7 +340,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightSetVel = rightSetpoint.velocity;
         rightSetPos = rightSetpoint.position;
         rightAccel = (rightSetVel - rightLastVel) * 50;
-        rightFf = rightFeedForward.calculate(rightSetVel, rightAccel);
+        rightFf = elevatorFeedForward.calculate(rightSetVel, rightAccel);
         rightElevatorMotor.set(rightFf + rightPidout);
         rightLastVel = rightSetVel;
     }
@@ -365,8 +370,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setNewFFValues() {
-        leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
-        rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
+        elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
+
     }
 
     public boolean getSpecimenClawPressed() {
@@ -435,7 +440,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
     public void showLeftTelemetry() {
-        telemetry.addData("ElevatorLeft", show);
+        telemetry.addData("ElevatorLeft", showSelect);
 
         telemetry.addData("HoldRng", posrng);
 
@@ -456,7 +461,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void showRightTelemetry() {
-        telemetry.addData("ElevatorRight", show);
+        telemetry.addData("ElevatorRight", showSelect);
 
         telemetry.addData("HoldRng", posrng);
 

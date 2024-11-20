@@ -40,7 +40,7 @@ public class RotateArmSubsystem extends SubsystemBase {
     public RevColorSensorV3 intakeSensor;
     public Servo leftTiltServo;
     public Servo rightTiltServo;
-    public int show = 0;
+    public int showSelect = 0;
     public boolean intaking;
     public boolean reversing;
     public boolean colorDetected;
@@ -78,7 +78,11 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //   showTelemetry();
+
+        if (showSelect == Constants.MiscConstants.showRotateArm1)
+            showTelemetry();
+        if (showSelect == Constants.MiscConstants.showRotateArm2)
+            showTelemetryColors();
 
     }
 
@@ -292,11 +296,17 @@ public class RotateArmSubsystem extends SubsystemBase {
         return getSensorDistance() > Constants.RotateArmConstants.sampleClearDistance;
     }
 
-
     public void showTelemetry() {
-        telemetry.addData("Intakeing", intaking);
-        telemetry.addData("Reversinging", reversing);
+        telemetry.addData("Intaking", intaking);
+        telemetry.addData("Reversing", reversing);
 
+        telemetry.addData("Inches", intakeSensor.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Team", PoseStorage.currentTeam);
+        telemetry.update();
+
+    }
+
+    public void showTelemetryColors() {
         telemetry.addData("TiltClear", tiltPositionClear);
         telemetry.addData("Light", intakeSensor.getLightDetected());
         telemetry.addData("Red", intakeSensor.red());
@@ -307,11 +317,9 @@ public class RotateArmSubsystem extends SubsystemBase {
         telemetry.addData("YellSeen", getYellowSeen());
         telemetry.addData("AtIntake", sampleAtIntake());
         telemetry.addData("ClearIntake", sampleClearOfIntake());
-
-
-        telemetry.addData("Inches", intakeSensor.getDistance(DistanceUnit.INCH));
-        telemetry.addData("Team", PoseStorage.currentTeam);
         telemetry.update();
+
+
     }
 
 

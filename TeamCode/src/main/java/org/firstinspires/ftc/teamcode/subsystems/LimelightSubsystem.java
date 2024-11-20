@@ -10,12 +10,13 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class LimelightSubsystem extends SubsystemBase {
 
     private final Limelight3A limelight;
     public Telemetry telemetry;
-    public boolean show = true;
+    public int showSelect = 0;
 
     public int yellowPipeline = 0;
     public int redPipeline = 1;
@@ -45,9 +46,9 @@ public class LimelightSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-//        if (show) {
-//            showTelemetry();
-//        }
+        if (showSelect == Constants.MiscConstants.showLimelight) {
+            showTelemetry();
+        }
 
     }
 
@@ -123,7 +124,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
 
     public void showTelemetry() {
-        telemetry.addData("Limelight", show);
+        telemetry.addData("Limelight", showSelect);
         telemetry.addData("ResultValid", getLatestResult().isValid());
         telemetry.addData("DDD", test);
         telemetry.addData("Connected", limelight.isConnected());

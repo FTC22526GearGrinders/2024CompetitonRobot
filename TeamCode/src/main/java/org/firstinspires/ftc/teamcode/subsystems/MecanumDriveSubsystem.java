@@ -56,6 +56,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.Localizer;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
@@ -102,9 +103,10 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     public PosePatcher posePatcher;
     public PoseStorage.Team currentteam;
     public boolean slowMode;
-    public boolean show1 = false;
-    public boolean show2 = false;
+    public int showSelect = 0;
+
     public double tempy;
+    CommandOpMode opMode;
 
     public MecanumDriveSubsystem(CommandOpMode opMode, Pose2d pose) {
         this.pose = pose;
@@ -112,7 +114,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
         LynxFirmware.throwIfModulesAreOutdated(opMode.hardwareMap);
-
+        this.opMode = opMode;
         for (LynxModule module : opMode.hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
@@ -189,13 +191,14 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-//        if (show1) {
-        // showTelemetry1();
-//        }
-//
-//        if (show2) {
-//            showTelemetry2();
-//        }
+
+        if (showSelect == Constants.MiscConstants.showDrive1) {
+            showTelemetry1();
+        }
+
+        if (showSelect == Constants.MiscConstants.showDrive2) {
+            showTelemetry2();
+        }
 
     }
 
@@ -222,6 +225,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
             currentteam = PoseStorage.Team.BLUE;
         else currentteam = PoseStorage.Team.RED;
     }
+
     public void resetEncoders() {
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -305,7 +309,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
         // telemetry.addData("Current Pose", getPoseEstimate().toString());
 
-        telemetry.addData("MecanumDrive 1", show1);
+        telemetry.addData("MecanumDrive 1", showSelect);
 
         telemetry.addData("TMPY", tempy);
         // telemetry.addData("FrontLeftTicks", leftFront.getCurrentPosition());
@@ -317,6 +321,10 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         telemetry.addData("H", pose.heading);
         telemetry.addData("FieldCentric", fieldCentric);
         telemetry.update();
+    }
+
+    public void showTelemetry2() {
+
     }
 
 
