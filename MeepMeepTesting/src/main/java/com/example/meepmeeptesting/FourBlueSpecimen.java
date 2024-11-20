@@ -41,7 +41,7 @@ public class FourBlueSpecimen {
         MeepMeep meepMeep = new MeepMeep(800);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(100, 100, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(60, 100, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
                 .setColorScheme(new ColorSchemeBlueLight())
                 .setStartPose(FieldConstantsBlueMM.specimenSideStartPose)
@@ -65,6 +65,8 @@ public class FourBlueSpecimen {
         secondSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsBlueMM.sample1ObservationZoneDropPose)
                 .strafeTo(FieldConstantsBlueMM.firstStagePushMidPose.position)
                 .strafeTo(FieldConstantsBlueMM.secondStagePushMidVector)
+                .strafeTo(FieldConstantsBlueMM.thirdStagePushMidVector)
+
                 .strafeTo(FieldConstantsBlueMM.sample2ObservationZoneDropPose.position)
                 .build();
 

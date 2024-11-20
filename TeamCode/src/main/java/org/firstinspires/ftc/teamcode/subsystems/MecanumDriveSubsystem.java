@@ -101,7 +101,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     public boolean fieldCentric;
     public PosePatcher posePatcher;
     public PoseStorage.Team currentteam;
-    public int slowMode;
+    public boolean slowMode;
     public boolean show1 = false;
     public boolean show2 = false;
     public double tempy;
@@ -133,10 +133,10 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -151,6 +151,8 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+
+        setSlowMode(false);
     }
 
     public static double round2dp(double number, int dp) {
@@ -188,7 +190,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 //        if (show1) {
-        showTelemetry1();
+        // showTelemetry1();
 //        }
 //
 //        if (show2) {
@@ -196,6 +198,19 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 //        }
 
     }
+
+    public boolean isSlowMode() {
+        return slowMode;
+    }
+
+    public void setSlowMode(boolean slow) {
+        slowMode = slow;
+    }
+
+    public void toggleSlowMode() {
+        slowMode = !slowMode;
+    }
+
 
     public void toggleFieldCentric() {
         fieldCentric = !fieldCentric;

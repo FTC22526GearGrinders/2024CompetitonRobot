@@ -7,146 +7,149 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 
-;
 
 @Config
 public class ExtendArmSubsystem extends SubsystemBase {
 
-    public static CRServo leftIntakeServo;
-  //  public static CRServo rightIntakeServo;
 
-    public static Servo leftTiltServo;
-    public static Servo rightTiltServo;
     public static double targetInches;
-    public static double ks = 0;//1% motor power
-    public static double kv = .06;//per inch per second (max 17 ips )
+    public static double ks = .12;//1% motor power
+    public static double kv = .02;//100 rps through 5: gear = 20 ipm max so if kv is to make up 60% .6/20 = .03
     public static double ka = 0;
-    public static double kp = 0.05;
+    public static double kp = 0.2;
     public static double ki = 0;
     public static double kd = 0;
     public static boolean TUNING = false;
-    private final FtcDashboard dashboard;
-    private Telemetry telemetry;
-    public Motor armMotor;
-    public Motor.Encoder armEncoder;
+    public double lastTargetInches;
+    public Motor leftArmMotor;
+    public Motor rightArmMotor;
+    public Motor.Encoder leftArmEncoder;
+    public Motor.Encoder rightArmEncoder;
     public double power;
-    public ProfiledPIDController armController;
-    public TrapezoidProfile.State armGoal = new TrapezoidProfile.State();
-    public TrapezoidProfile.State armSetpoint = new TrapezoidProfile.State();
+    public ProfiledPIDController leftArmController;
+    public ProfiledPIDController rightArmController;
+    public TrapezoidProfile.State leftArmSetpoint = new TrapezoidProfile.State();
+    public TrapezoidProfile.State rightArmSetpoint = new TrapezoidProfile.State();
+
     public TrapezoidProfile.Constraints constraints;
-    public SimpleMotorFeedforward armFF;
+    public SimpleMotorFeedforward leftArmFF;
+    public SimpleMotorFeedforward rightArmFF;
     public int holdCtr;
     public int show = 0;
+    public int tst;
+    public boolean armTest;
     ElapsedTime et;
-    double setVel;
-    double setPos;
-    double ff;
-    double pidout;
-    private int armDeliverLevel;
+    double leftSetVel;
+    double leftSetPos;
+    double leftff;
+    double leftpidout;
+    double rightSetVel;
+    double rightSetPos;
+    double rightff;
+    double rightpidout;
+    private int inPositiobCtr;
+    private Telemetry telemetry;
     private double scanTime;
-    private double accel;
-    private double lastVel;
+    private double leftAccel;
+    private double rightAccel;
+    private double lastRightVel;
+    private double lastLeftVel;
     private int targetSetCounter;
-
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
-        armMotor = new Motor(opMode.hardwareMap, "armMotor", Motor.GoBILDA.RPM_312);
+        constraints = new TrapezoidProfile.Constraints(Constants.ExtendArmConstants.TRAJ_VEL, Constants.ExtendArmConstants.TRAJ_ACCEL);
 
-        //
-        leftIntakeServo = opMode.hardwareMap.get(CRServo.class, "leftInServo");
-
-
-      //  rightIntakeServo = opMode.hardwareMap.get(CRServo.class, "rightInServo");
-
-        leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");
-        rightTiltServo = opMode.hardwareMap.get(Servo.class, "rightTiltServo");
-
-        leftTiltServo.setDirection(Servo.Direction.FORWARD);
-        rightTiltServo.setDirection(Servo.Direction.REVERSE);
-
-        dashboard = FtcDashboard.getInstance();
-
-        telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
-
-        armMotor.setInverted(true);
-
-        armMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-
-        armEncoder = armMotor.encoder;
-
-        armEncoder.setDirection(Motor.Direction.FORWARD);
-
-        armEncoder.setDistancePerPulse(1 / Constants.ArmConstants.ENCODER_COUNTS_PER_INCH);//ENCODER_COUNTS_PER_INCH);
-
-        armFF = new SimpleMotorFeedforward(ks, kv, ka);
+        leftArmMotor = new Motor(opMode.hardwareMap, "leftArmMotor");
+        rightArmMotor = new Motor(opMode.hardwareMap, "rightArmMotor");
 
 
-        constraints = new TrapezoidProfile.Constraints(Constants.ArmConstants.TRAJ_VEL, Constants.ArmConstants.TRAJ_ACCEL);
+        leftArmMotor.setInverted(false);
+        leftArmMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        leftArmEncoder = leftArmMotor.encoder;
+        leftArmEncoder.setDirection(Motor.Direction.FORWARD);
+        leftArmEncoder.setDistancePerPulse(1 / Constants.ExtendArmConstants.ENCODER_COUNTS_PER_INCH);//ENCODER_COUNTS_PER_INCH);
+        leftArmFF = new SimpleMotorFeedforward(ks, kv, ka);
+        leftArmController = new ProfiledPIDController(kp, ki, kd, constraints);
+        leftArmController.setTolerance(Constants.ExtendArmConstants.POSITION_TOLERANCE_INCHES);
+        leftArmController.reset(0);
 
+        rightArmMotor.setInverted(false);
+        rightArmMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightArmEncoder = rightArmMotor.encoder;
+        rightArmEncoder.setDirection(Motor.Direction.FORWARD);
+        rightArmEncoder.setDistancePerPulse(1 / Constants.ExtendArmConstants.ENCODER_COUNTS_PER_INCH);//ENCODER_COUNTS_PER_INCH);
+        rightArmFF = new SimpleMotorFeedforward(ks, kv, ka);
+        rightArmController = new ProfiledPIDController(kp, ki, kd, constraints);
+        rightArmController.setTolerance(Constants.ExtendArmConstants.POSITION_TOLERANCE_INCHES);
+        rightArmController.reset(0);
 
-        armController = new ProfiledPIDController(kp, ki, kd, constraints);
+        resetEncoders();
 
+        FtcDashboard dashboard1 = FtcDashboard.getInstance();
 
-        armController.setTolerance(Constants.ArmConstants.POSITION_TOLERANCE_INCHES);
+        telemetry = new MultipleTelemetry(opMode.telemetry, dashboard1.getTelemetry());
 
-        armController.reset(0);
-
-        resetEncoder();
-
-        // setDefaultCommand(new PositionHoldArm(this));
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
 
         et = new ElapsedTime();
+
+        setDefaultCommand(new PositionHoldArm(this));
+
     }
 
-    public static double getTargetInches() {
+    public static double round2dp(double number, int dp) {
+        double temp = Math.pow(10, dp);
+        double temp1 = Math.round(number * temp);
+        return temp1 / temp;
+    }
+
+    public double getTargetInches() {
         return targetInches;
     }
 
     public void setTargetInches(double target) {
         targetInches = target;
-        armController.setGoal(targetInches);
+
+        leftArmController.setGoal(targetInches);
+        rightArmController.setGoal(targetInches);
     }
 
-    public Action setWaitAtTarget(double target) {
+    public Action positionArm(double target) {
         return new Action() {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
+                    inPositiobCtr = 0;
                     setTargetInches(target);
                     initialized = true;
                 }
-                packet.put("target", target);
-                packet.put("actual", getPositionInches());
-                return atGoal();
+                packet.put("moving", atGoal());
+                return !atGoal();
             }
         };
     }
 
     @Override
     public void periodic() {
-      //  showTelemetry();
+        showTelemetry();
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;
             holdCtr = 0;
@@ -156,180 +159,216 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
     public void tuning() {
-        setTargetInches(targetInches);
-        if (armFF.kv != kv || armFF.ks != ks || armFF.ka != ka)
+        if (lastTargetInches != targetInches) {
+            setTargetInches(targetInches);
+            lastTargetInches = targetInches;
+        }
+        if (leftArmFF.kv != kv || leftArmFF.ks != ks || leftArmFF.ka != ka)
             setNewFFValues();
-        if (armController.getP() != kp)
-            armController.setP(kp);
-        if (armController.getI() != ki)
-            armController.setI(ki);
-        if (armController.getD() != kd)
-            armController.setD(kd);
+        if (leftArmController.getP() != kp)
+            leftArmController.setP(kp);
+        if (leftArmController.getI() != ki)
+            leftArmController.setI(ki);
+        if (leftArmController.getD() != kd)
+            leftArmController.setD(kd);
+
+        if (rightArmFF.kv != kv || rightArmFF.ks != ks || rightArmFF.ka != ka)
+            setNewFFValues();
+        if (rightArmController.getP() != kp)
+            rightArmController.setP(kp);
+        if (rightArmController.getI() != ki)
+            rightArmController.setI(ki);
+        if (rightArmController.getD() != kd)
+            rightArmController.setD(kd);
     }
 
     public void setNewFFValues() {
-        armFF = new SimpleMotorFeedforward(ks, kv, ka);
-    }
+        leftArmFF = new SimpleMotorFeedforward(ks, kv, ka);
+        rightArmFF = new SimpleMotorFeedforward(ks, kv, ka);
 
+    }
 
     public void position() {
+
+        if (inPositiobCtr != 3) inPositiobCtr++;
         // Retrieve the profiled setpoint for the next timestep. This setpoint moves
 
+        leftpidout = leftArmController.calculate(getLeftPositionInches());
+        leftArmSetpoint = leftArmController.getSetpoint();
+        leftSetVel = leftArmSetpoint.velocity;
+        leftSetPos = leftArmSetpoint.position;
+        leftAccel = (lastLeftVel - leftSetVel) * 50;
+        leftff = leftArmFF.calculate(leftSetVel, leftAccel);
+        leftArmMotor.set(leftff + leftpidout);
+//        leftArmMotor.set(leftff);
+        // leftArmMotor.set(leftpidout);
+        lastLeftVel = leftSetVel;
 
-        armSetpoint = armController.getSetpoint();
+        //right
+        rightpidout = rightArmController.calculate(getRightPositionInches());
+        rightArmSetpoint = rightArmController.getSetpoint();
+        rightSetVel = rightArmSetpoint.velocity;
+        rightSetPos = rightArmSetpoint.position;
+        rightAccel = (lastRightVel - rightSetVel) * 50;
+        rightff = rightArmFF.calculate(rightSetVel, rightAccel);
+        rightArmMotor.set(rightff + rightpidout);
+        //  rightArmMotor.set(rightff);
+        //   rightArmMotor.set(rightpidout);
+        lastRightVel = rightSetVel;
 
-        setVel = armSetpoint.velocity;
-        setPos = armSetpoint.position;
-
-        accel = (lastVel - setVel) * 50;
-
-        pidout = armController.calculate(getPositionInches());
-
-        ff = armFF.calculate(setVel, accel);
-
-        armMotor.set(ff + pidout);
-
-        lastVel = armSetpoint.velocity;
+        if (TUNING) {
+            if (getLeftPositionInches() < 0 || getLeftPositionInches() > 15
+                    || getRightPositionInches() < 0 || getRightPositionInches() > 15) {
+                leftArmMotor.set(0);
+                rightArmMotor.set(0);
+            }
+        }
     }
 
-    public void resetEncoder() {
-        armEncoder.reset();
+    public void resetEncoders() {
+        leftArmEncoder.reset();
+        rightArmEncoder.reset();
+        setTargetInches(0);
     }
 
-    public double getPositionInches() {
-        return armEncoder.getDistance();
+    public double getLeftPositionInches() {
+        return round2dp(leftArmEncoder.getDistance(), 2);
     }
 
-    public boolean inPosition() {
-        return armController.atSetpoint();
+    public double getRightPositionInches() {
+        return round2dp(rightArmEncoder.getDistance(), 2);
     }
 
-    public double getGoalPosition() {
-        return armController.getGoal().position;
+    public boolean leftInPosition() {
+        return leftArmController.atSetpoint();
     }
 
-    public double getPositionKp() {
-        return armController.getP();
+    public double getLeftGoalPosition() {
+        return leftArmController.getGoal().position;
     }
 
-    public void setPositionKp(double kp) {
-        armController.setP(kp);
+    public double getLeftPositionKp() {
+        return leftArmController.getP();
     }
 
-    public double getPositionKi() {
-        return armController.getD();
+    public void setLeftPositionKp(double kp) {
+        leftArmController.setP(kp);
     }
 
-    public void setPositionKi(double ki) {
-        armController.setI(ki);
+    public double getLeftPositionKi() {
+        return leftArmController.getD();
     }
 
-    public double getPositionKd() {
-        return armController.getD();
+    public void setLeftPositionKi(double ki) {
+        leftArmController.setI(ki);
     }
 
-    public void setPositionKd(double kd) {
-        armController.setD(kd);
+    public double getLeftPositionKd() {
+        return leftArmController.getD();
+    }
+
+    public void setLeftPositionKd(double kd) {
+        leftArmController.setD(kd);
+    }
+
+    public boolean rightInPosition() {
+        return rightArmController.atSetpoint();
+    }
+
+    public double getRightGoalPosition() {
+        return rightArmController.getGoal().position;
+    }
+
+    public double getRightPositionKp() {
+        return rightArmController.getP();
+    }
+
+    public void setRightPositionKp(double kp) {
+        rightArmController.setP(kp);
+    }
+
+    public double getRightPositionKi() {
+        return rightArmController.getD();
+    }
+
+    public void setRightPositionKi(double ki) {
+        rightArmController.setI(ki);
+    }
+
+    public double getRightPositionKd() {
+        return rightArmController.getD();
+    }
+
+    public void setRightPositionKd(double kd) {
+        rightArmController.setD(kd);
     }
 
     public void setTrapConstraints(double vel, double acc) {
-        armController.setConstraints(new TrapezoidProfile.Constraints(vel, acc));
+        leftArmController.setConstraints(new TrapezoidProfile.Constraints(vel, acc));
+        rightArmController.setConstraints(new TrapezoidProfile.Constraints(vel, acc));
     }
 
-    public double getPower() {
-        return armMotor.get();
+    public double getLeftPower() {
+        return leftArmMotor.get();
     }
 
-    public void setPower(double power) {
-        armMotor.set(power);
+    public void setLeftPower(double power) {
+        leftArmMotor.set(power);
+    }
+
+    public double getRightPower() {
+        return rightArmMotor.get();
+    }
+
+    public void setRightPower(double power) {
+        rightArmMotor.set(power);
+    }
+
+    public boolean atLeftGoal() {
+        return inPositiobCtr == 3 && leftArmController.atGoal();
+    }
+
+    public boolean atRightGoal() {
+        return inPositiobCtr == 3 && rightArmController.atGoal();
     }
 
     public boolean atGoal() {
-        return armController.atGoal();
+        return atLeftGoal() && atRightGoal();
     }
 
-
-    public Action setAndWaitForAtTarget(double target) {
-        return new Action() {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    targetSetCounter = 0;
-                    setTargetInches(target);
-                    initialized = true;
-                }
-                packet.put("target", target);
-                packet.put("actual", getPositionInches());
-                targetSetCounter++;
-                return targetSetCounter >= 5 && atGoal();
-            }
-        };
+    public double getLeftVelocity() {
+        return leftArmEncoder.getCorrectedVelocity() / 60;
     }
 
-    public Action tiltBothDown() {
-        return new ParallelAction(
-                new InstantAction(() -> leftTiltServo.setPosition(Constants.ArmConstants.leftIntakeTiltDownAngle)),
-                new InstantAction(() -> rightTiltServo.setPosition(Constants.ArmConstants.rightIntakeTiltDownAngle)));
+    public double getRightVelocity() {
+        return rightArmEncoder.getCorrectedVelocity() / 60;
     }
 
-    public Action tiltBothClear() {
-        return new ParallelAction(
-                new InstantAction(() -> leftTiltServo.setPosition(Constants.ArmConstants.leftIntakeTiltClearAngle)),
-                new InstantAction(() -> rightTiltServo.setPosition(Constants.ArmConstants.rightIntakeTiltClearAngle)));
+    public Action armToPickupAction() {
+        return positionArm(Constants.ExtendArmConstants.pickupDistance);
     }
 
-    public Action runLeftIntake() {
-        return new InstantAction(() -> leftIntakeServo.setPower(1));
+    public Action armToBucketAction() {
+        return positionArm(Constants.ExtendArmConstants.bucketDistance);
     }
-
-//    public Action runRightIntake(double speed) {
-//        return new InstantAction(() -> rightIntakeServo.set(speed));
-//    }
-
-    public Action runIntakeServo() {
-        return new ParallelAction(
-                runLeftIntake());
-        //    runRightIntake(speed));
-    }
-
-    public Action reverseIntakeServo() {
-        return new InstantAction(() -> leftIntakeServo.setPower(-1));
-
-
-    }
-
-    public Action stopIntakeServos() {
-        return new ParallelAction(
-                new InstantAction(() -> leftIntakeServo.setPower(0)));
-            //    new InstantAction(() -> rightIntakeServo.stop()));
-    }
-
-//    public Action goPickupSample() {
-//        return new ParallelAction(
-//                new InstantAction(() -> setTargetInches(Constants.ArmConstants.pickupDistance)),
-//                tiltBothDown(),
-//                runIntakeServos(1));
-//    }
-//
-//    public Action deliverToBucket() {
-//        return new SequentialAction(
-//                tiltBothClear(),
-//                setAndWaitForAtTarget(Constants.ArmConstants.bucketDistance),
-//                runIntakeServos(-1));
-//    }
-
 
     public void showTelemetry() {
-        telemetry.addData("Arm", show);
-        telemetry.addData("HoldRng", holdCtr);
-        telemetry.addData("Scantime", scanTime);
+        telemetry.addData("ArmTest", armTest);
+        telemetry.addData("Arm Tuning", atGoal());
+        telemetry.addData("Arm FF", leftff);
+        telemetry.addData("ArmLeftTargetInches", targetInches);
+        telemetry.addData("ArmLeftInches", getLeftPositionInches());
+        telemetry.addData("ArmLeftSetpointP", round2dp(leftArmSetpoint.position, 2));
+        telemetry.addData("ArmLeftSetpointV", round2dp(leftArmSetpoint.velocity, 2));
+        telemetry.addData("ArmLeftPosError", round2dp(leftArmController.getPositionError(), 2));
+        telemetry.addData("ArmLeftVelError", round2dp(leftArmController.getVelocityError(), 2));
 
-        telemetry.addData("ArmInches", getPositionInches());
-        telemetry.addData("GoalInches", getGoalPosition());
-        telemetry.addData("TargetInches", targetInches);
-        telemetry.addData("ArmPower", armMotor.get());
+
+        telemetry.addData("ArmLeftVel", round2dp(getLeftVelocity(), 2));
+
+        telemetry.addData("ArmLeftPID", round2dp(leftpidout, 2));
+
+        telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
 
 
         telemetry.update();

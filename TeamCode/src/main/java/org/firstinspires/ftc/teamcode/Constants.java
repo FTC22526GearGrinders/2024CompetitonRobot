@@ -44,18 +44,18 @@ public final class Constants {
 
 
         public static final double GEARBOX_RATIO = 1;
-        public static final double WHEEL_DIAMETER_INCH = 5.5;
+        public static final double WHEEL_DIAMETER_INCH = 3.5;
 
         public static final double WHEELBASE = 12;//distance between pairs of wheels on the same side of the robot
 
         public static final double TRACKWIDTH = 16.25;// from code sourec seemed to work better measured is 14.5;//lateral distance between pairs of wheels on different sides of the robot
         public static final double ENCODER_COUNTS_PER_WHEEL_REV = 751.8;//1:1 RATIO
-        public static final double WHEEL_CIRCUMFERENCE_INCH = Math.PI * WHEEL_DIAMETER_INCH;//17.27
-        public static final double INCHES_PER_ENCODER_COUNT = WHEEL_CIRCUMFERENCE_INCH / ENCODER_COUNTS_PER_WHEEL_REV;//.0234
-        public static final double MAX_IPM = MAX_MOTOR_RPM * WHEEL_CIRCUMFERENCE_INCH;// 312 *12.57 = 3900 IPM
+        public static final double WHEEL_CIRCUMFERENCE_INCH = Math.PI * WHEEL_DIAMETER_INCH;//11.
+        public static final double INCHES_PER_ENCODER_COUNT = WHEEL_CIRCUMFERENCE_INCH / ENCODER_COUNTS_PER_WHEEL_REV;//.0146
+        public static final double MAX_IPM = MAX_MOTOR_RPM * WHEEL_CIRCUMFERENCE_INCH;// 312 * 11 = 3432 IPM
 
-        public static final double MAX_IPS = MAX_IPM / 60;//65 IPS
-        public static double MAX_VEL = MAX_IPS * .9;
+        public static final double MAX_IPS = MAX_IPM / 60;//57 IPS
+        public static double MAX_VEL = MAX_IPS * .9;//51
         public static final double POSITION_TOLERANCE_INCHES = .25;
         public static final double AT_BACKBOARD_ANGLE_DISTANCE = 6;
         public static final double POSN_VEL = 4;
@@ -103,47 +103,50 @@ public final class Constants {
 
     }
 
-    public static final class ArmConstants {
+    public static final class ExtendArmConstants {
 
-        public static final double MAX_MOTOR_RPM = 223;
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 751.8;
+        public static final double MAX_MOTOR_RPM = 6000;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
 
-        public static final double GEARING_RATIO = 1;
+        public static final double GEARING_RATIO = 5;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
-        public static final double PULLEY_TEETH = 60;
+        public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//4.5"approx
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28 a pprox
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC * GEARING_RATIO * .8;//13
-
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC / GEARING_RATIO * .8;//16
 
         public static final double POSITION_TOLERANCE_INCHES = .5;
-        public static final double UPPER_POSITION_LIMIT = 27.00;
-        public static final int LOWER_POSITION_LIMIT = -1;
+        public static final double OUT_POSITION_LIMIT = 15.00;
+        public static final double IN_POSITION_LIMIT = .5;
 
-        public static final double JOG_UP_POWER = +.5;
-        public static final double JOG_DOWN_POWER = -.4;
-        public static final double AUTO_DELIVER_POSITION = 7.5;
+
+        public static final double AUTO_DELIVER_POSITION = 12.5;
         public static final double HOME_POSITION = 1;
 
 
         public static final double MAX_VEL = 13;
         public static final double MAX_ACCEL = 13;
 
-        public static final double TRAJ_VEL = 10;
-        public static final double TRAJ_ACCEL = 10;
+        public static final double TRAJ_VEL = 5;
+        public static final double TRAJ_ACCEL = 5;
 
-
-        public static double leftIntakeTiltClearAngle = 0;
-        public static double leftIntakeTiltDownAngle = 1;
-        public static double rightIntakeTiltClearAngle = 0;
-        public static double rightIntakeTiltDownAngle = 1;
 
         public static double homeDistance = 1;
-        public static double pickupDistance = 10;
+
+        public static double pickupDistance = 12;
 
         public static double bucketDistance = 2;
+    }
+
+    public static final class RotateArmConstants {
+
+        public static double armDistanceOKTilt = 10;
+
+        public static double sampleDetectedDistance = 1.2;
+
+        public static double sampleClearDistance = 2;
     }
 
     public static final class ElevatorConstants {
@@ -162,8 +165,8 @@ public final class Constants {
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC * GEARING_RATIO;
 
 
-        public static final double UPPER_POSITION_LIMIT = 20;
-        public static final int LOWER_POSITION_LIMIT = 5;
+        public static final double UPPER_POSITION_LIMIT = 200;
+        public static final int LOWER_POSITION_LIMIT = -50;
         public static final double HOME_POSITION = 0;
         public static final double POSITION_TOLERANCE_INCHES = .1;
 
@@ -175,16 +178,16 @@ public final class Constants {
         public static double POSITION_Kg = 0;
 
         public static double bucketUprightAngle = 0;
-        public static double bucketTippedAngle = 1;
+        public static double bucketTippedAngle = .4;
 
         public static double elevatorDownHeight = 0;
         public static double elevatorLowerBasketHeight = 36;
         public static double elevatorUpperBasketHeight = 36;
-        public static double elevatorSpecimenPickupHeight = 36;
+        public static double elevatorSpecimenWallHeight = 36;
         public static double elevatorSpecimenAboveLowPlaceHeight = 36;
         public static double elevatorSpecimenLowPlaceHeight = 36;
-        public static double elevatorAbveHighChamber = 36;
-        public static double elevatorAtHighChamber = 36;
+        public static double elevatorSpecimenAboveHighPlaceHeight = 36;
+        public static double elevatorSpecimenAtHighPlaceHeight = 36;
 
 
         public static double specimenClawOpenAngle = 0.3;

@@ -92,9 +92,8 @@ public class BlueSamples {
                 .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
                 .build();
 
-
         parkAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.ascentZonePickupPose.position, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsBlueMM.ascentZoneParkPose.position, Math.toRadians(180))
                 .build();
 
         deliverFourSamples = new SequentialAction(

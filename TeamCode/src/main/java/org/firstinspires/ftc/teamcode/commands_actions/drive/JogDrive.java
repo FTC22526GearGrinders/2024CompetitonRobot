@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.commandsandactions.drive;
+package org.firstinspires.ftc.teamcode.commands_actions.drive;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
@@ -11,17 +11,16 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 public class JogDrive extends CommandBase {
     private final MecanumDriveSubsystem drive;
 
-    private final GamepadEx gamepad;
+    private final Gamepad gamepad;
+    private final double speedMultiplier = .25;
 
-    private final boolean slow;
     CommandOpMode myOpmode;
     private double startRadians;
 
 
-    public JogDrive(MecanumDriveSubsystem drive, GamepadEx gamepad, boolean slow, CommandOpMode opmode) {
+    public JogDrive(MecanumDriveSubsystem drive, Gamepad gamepad, CommandOpMode opmode) {
         this.drive = drive;
         this.gamepad = gamepad;
-        this.slow = slow;
         myOpmode = opmode;
 
         addRequirements(this.drive);
@@ -31,42 +30,40 @@ public class JogDrive extends CommandBase {
 
     @Override
     public void initialize() {
-        drive.tempy = 911;
-        double gyro_radians = startRadians - drive.getYawRads();
     }
 
 
     @Override
     public void execute() {
-        drive.tempy++;
+
         if (!drive.fieldCentric) {
 
-            double y = this.gamepad.getLeftY();
-            double x = this.gamepad.getLeftX();
-            double rx = this.gamepad.getRightX();
+            double y = this.gamepad.left_stick_y;
+            double x = this.gamepad.left_stick_x;
+            double rx = this.gamepad.right_stick_x;
 
-//            myOpmode.telemetry.addData("X", x);
-//            myOpmode.telemetry.update();
 
-            if (slow) {
-                y *= .2;
-                x *= .2;
-                rx *= .2;
+            if (drive.isSlowMode()) {
+                y *= speedMultiplier;
+                x *= speedMultiplier;
+                rx *= speedMultiplier;
             }
 
             drive.jog(y, x, rx);
 
         }
 
+
         if (drive.fieldCentric) {
             /* Invert stick Y axis */
-            double forward = -this.gamepad.getLeftY();
-            double strafe = this.gamepad.getLeftX();
-            double rcw = this.gamepad.getRightX();
-            if (slow) {
-                strafe *= .2;
-                forward *= .2;
-                rcw *= .2;
+            double forward = -this.gamepad.left_stick_y;
+            double strafe = this.gamepad.left_stick_x;
+            double rcw = this.gamepad.right_stick_x;
+            if (drive.isSlowMode()) {
+                strafe *= speedMultiplier;
+                ;
+                forward *= speedMultiplier;
+                rcw *= speedMultiplier;
             }
             /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
 
@@ -80,10 +77,10 @@ public class JogDrive extends CommandBase {
             forward = temp;
 
 
-            if (drive.currentteam == PoseStorage.Team.RED) {
-                forward = -this.gamepad.getLeftY();
-                strafe = this.gamepad.getLeftX(); /* Invert stick Y axis */
-                rcw = this.gamepad.getRightX();
+            if (PoseStorage.currentTeam == PoseStorage.Team.RED) {
+                forward = -this.gamepad.left_stick_x;
+                strafe = this.gamepad.left_stick_x; /* Invert stick Y axis */
+                rcw = this.gamepad.left_stick_x;
             }
 
 
@@ -98,7 +95,7 @@ public class JogDrive extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-
+        drive.jog(0, 0, 0);
     }
 
     @Override

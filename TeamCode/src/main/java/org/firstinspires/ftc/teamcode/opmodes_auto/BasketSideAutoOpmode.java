@@ -48,6 +48,7 @@ import org.firstinspires.ftc.teamcode.FieldConstantsBlue;
 import org.firstinspires.ftc.teamcode.FieldConstantsRed;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.FailoverAction;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
@@ -251,8 +252,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         // dropSampleAction,
                         // new ParallelAction(
                         new SleepAction(.2),
-//                        new FailoverAction(
-//                                secondSamplePickupMoveAction, dropSampleAction, Math.abs(limelight.getTX()) > 5),
+                        new FailoverAction(
+                                secondSamplePickupMoveAction, dropSampleAction, Math.abs(limelight.getTX()) > 5),
                         secondSamplePickupMoveAction,
 //                        //   pickupSampleAction),
                         new SleepAction(.25),

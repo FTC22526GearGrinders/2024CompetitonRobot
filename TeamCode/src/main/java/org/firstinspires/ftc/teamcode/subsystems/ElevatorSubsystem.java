@@ -72,6 +72,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public int posrng;
     public double leftPower;
     public double rightPower;
+    public boolean elevatorTest;
     ElapsedTime et;
     CommandOpMode myOpmode;
     double leftSetVel;
@@ -88,6 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double rightLastVel;
     private double scanTime;
     private int targetSetCounter;
+    private int inPositionCtr;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
 
@@ -96,24 +98,28 @@ public class ElevatorSubsystem extends SubsystemBase {
         constraints = new TrapezoidProfile.Constraints(Constants.ElevatorConstants.TRAJ_VEL, Constants.ElevatorConstants.TRAJ_ACCEL);
 
 
-        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevatorMotor", Motor.GoBILDA.RPM_312);
+        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator", Motor.GoBILDA.RPM_312);
         leftElevatorMotor.setInverted(true);
         leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
         leftElevatorEncoder = leftElevatorMotor.encoder;
         leftElevatorEncoder.setDirection(Motor.Direction.FORWARD);
         leftElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
+
         leftFeedForward = new ElevatorFeedforward(lks, lkg, lkv, lka);
         leftPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
         leftPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         leftPidController.reset();
 
 
-        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevatorMotor", Motor.GoBILDA.RPM_312);
-        rightElevatorMotor.setInverted(false);
+        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevator", Motor.GoBILDA.RPM_312);
+        rightElevatorMotor.setInverted(true);
         rightElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
         rightElevatorEncoder = rightElevatorMotor.encoder;
         rightElevatorEncoder.setDirection(Motor.Direction.FORWARD);
         rightElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
+
         rightFeedForward = new ElevatorFeedforward(rks, rkg, rkv, rka);
         rightPidController = new ProfiledPIDController(rkp, rki, rkd, constraints);
         rightPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
@@ -123,7 +129,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
         specimenClawServo = opMode.hardwareMap.get(Servo.class, "specimenClawServo");
 
-        bucketServo.setDirection(Servo.Direction.FORWARD);
+        bucketServo.setDirection(Servo.Direction.REVERSE);
         specimenClawServo.setDirection(Servo.Direction.REVERSE);
 
         // specimenClawSwitch = new Sensor()
@@ -138,6 +144,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
         et = new ElapsedTime();
+
+        levelBucket();
     }
 
     public static double round2dp(double number, int dp) {
@@ -150,43 +158,88 @@ public class ElevatorSubsystem extends SubsystemBase {
         return targetInches;
     }
 
-    private void setTargetInches(double inches) {
+    public void setTargetInches(double inches) {
         targetInches = inches;
         leftPidController.setGoal(targetInches);
         rightPidController.setGoal(targetInches);
     }
 
-    public Action setAndWaitForAtTarget(double target) {
+    public Action positionElevator(double target) {
         return new Action() {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    targetSetCounter = 0;
+                    inPositionCtr = 0;
                     setTargetInches(target);
                     initialized = true;
                 }
-                packet.put("target", target);
-                packet.put("actual", getPositionInches());
-                targetSetCounter++;
-                return targetSetCounter >= 5 && atGoal();
+                packet.put("moving", atGoal());
+                return !atGoal();
             }
         };
     }
+
+    public Action elevatorToHome() {
+        return positionElevator(Constants.ElevatorConstants.HOME_POSITION);
+    }
+
+    public Action elevatorToSpecimenOnWall() {
+        return positionElevator(Constants.ElevatorConstants.elevatorSpecimenWallHeight);
+    }
+
+    public Action elevatorToAboveLowSubmersible() {
+        return positionElevator(Constants.ElevatorConstants.elevatorSpecimenAboveLowPlaceHeight);
+    }
+
+    public Action elevatorToLowSubmersible() {
+        return positionElevator(Constants.ElevatorConstants.elevatorSpecimenLowPlaceHeight);
+    }
+
+    public Action elevatorToAboveUpperSubmersible() {
+        return positionElevator(Constants.ElevatorConstants.elevatorSpecimenAboveHighPlaceHeight);
+    }
+
+    public Action elevatorToUpperSubmersible() {
+        return positionElevator(Constants.ElevatorConstants.elevatorSpecimenAtHighPlaceHeight);
+    }
+
+    public Action elevatorToLowBasket() {
+        return positionElevator(Constants.ElevatorConstants.elevatorLowerBasketHeight);
+    }
+
+    public Action elevatorToUpperBasket() {
+        return positionElevator(Constants.ElevatorConstants.elevatorUpperBasketHeight);
+    }
+
+
+
+
+
+
+
 
     public double getPositionInches() {
         return leftElevatorEncoder.getPosition();
     }
 
     public boolean atGoal() {
-        return leftPidController.atGoal() && rightPidController.atGoal();
+        return atLeftGoal() && atRightGoal();
     }
+
+    public boolean atLeftGoal() {
+        return inPositionCtr == 3 && leftPidController.atGoal();
+    }
+
+    public boolean atRightGoal() {
+        return inPositionCtr == 3 && rightPidController.atGoal();
+    }
+
 
     public Action setTarget(double targetInches) {
         return new Action() {
             private boolean initialized = false;
-
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -246,7 +299,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
 
         //    if (show == 0) {// Constants.TelemetryConstants.showRotateArm) {
-        //  showLeftTelemetry();
+        showLeftTelemetry();
         //   }
         if (holdCtr >= 100) {
             scanTime = et.milliseconds() / holdCtr;

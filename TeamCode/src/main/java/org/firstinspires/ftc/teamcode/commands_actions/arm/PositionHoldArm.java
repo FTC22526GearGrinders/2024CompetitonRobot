@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.commandsandactions.arm;
+package org.firstinspires.ftc.teamcode.commands_actions.arm;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
@@ -16,11 +16,15 @@ public class PositionHoldArm extends CommandBase {
 
     @Override
     public void initialize() {
-        arm.armController.setGoal(arm.getPositionInches());
+        double temp = arm.getLeftPositionInches();
+        arm.leftArmController.setGoal(temp);
+        temp = arm.getRightPositionInches();
+        arm.rightArmController.setGoal(temp);
     }
 
     @Override
     public void execute() {
+        arm.holdCtr++;
         arm.position();
     }
 
@@ -33,4 +37,5 @@ public class PositionHoldArm extends CommandBase {
     public boolean isFinished() {
         return false;
     }
+
 }
