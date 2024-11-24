@@ -38,7 +38,7 @@ public class JogDrive extends CommandBase {
 
         if (!drive.fieldCentric) {
 
-            double y = this.gamepad.left_stick_y;
+            double y = -this.gamepad.left_stick_y;
             double x = this.gamepad.left_stick_x;
             double rx = this.gamepad.right_stick_x;
 

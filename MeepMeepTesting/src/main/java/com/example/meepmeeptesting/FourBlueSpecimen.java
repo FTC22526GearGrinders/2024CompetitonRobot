@@ -55,7 +55,7 @@ public class FourBlueSpecimen {
                 .build();//move to place first specimen
 
         firstSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverPose1)
-                .splineToSplineHeading(FieldConstantsBlueMM.firstStagePushInnerPose, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsBlueMM.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeTo(FieldConstantsBlueMM.secondStagePushInnerVector)
                 .strafeTo(FieldConstantsBlueMM.thirdStagePushInnerVector)
                 .strafeTo(FieldConstantsBlueMM.sample1ObservationZoneDropPose.position)
@@ -66,42 +66,40 @@ public class FourBlueSpecimen {
                 .strafeTo(FieldConstantsBlueMM.firstStagePushMidPose.position)
                 .strafeTo(FieldConstantsBlueMM.secondStagePushMidVector)
                 .strafeTo(FieldConstantsBlueMM.thirdStagePushMidVector)
-
                 .strafeTo(FieldConstantsBlueMM.sample2ObservationZoneDropPose.position)
                 .build();
 
         secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.sample2ObservationZoneDropPose)
-                .lineToXLinearHeading(FieldConstantsBlueMM.specimenPrePickupPose.position.x, Math.toRadians(-90))
+                .lineToXLinearHeading(FieldConstantsBlueMM.specimenPrePickupPose.position.x, FieldConstantsBlueMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsBlueMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
 
         secondSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose2, Math.toRadians(-90))
-                .lineToY(FieldConstantsBlueMM.specimenDeliverPose2.position.y)
+                .strafeToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose2.position, FieldConstantsBlueMM.specimenDropAngle)
+                .strafeTo(FieldConstantsBlueMM.specimenDeliverPose2.position)
                 .build();//place second specimen
 
         thirdSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverPose2)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenPrePickupPose, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsBlueMM.specimenPrePickupPose.position, FieldConstantsBlueMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsBlueMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
 
         thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose3, Math.toRadians(-90))
-                .lineToY(FieldConstantsBlueMM.specimenDeliverPose3.position.y)
+                .strafeToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose3.position, FieldConstantsBlueMM.specimenDropAngle)
+                .strafeTo(FieldConstantsBlueMM.specimenDeliverPose3.position)
                 .build();//place second specimen
 
         fourthSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverPose3)
-                .lineToY(FieldConstantsBlueMM.specimenDeliverApproachPose3.position.y)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenPrePickupPose, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsBlueMM.specimenPrePickupPose.position, FieldConstantsBlueMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsBlueMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
 
         fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose4, Math.toRadians(-90))
-                .lineToY(FieldConstantsBlueMM.specimenDeliverPose4.position.y)
+                .strafeToLinearHeading(FieldConstantsBlueMM.specimenDeliverApproachPose4.position, FieldConstantsBlueMM.specimenDropAngle)
+                .strafeTo(FieldConstantsBlueMM.specimenDeliverPose4.position)
                 .build();//place second specimen
 
         parkAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverPose4)
@@ -113,7 +111,6 @@ public class FourBlueSpecimen {
                 new SequentialAction(
 
                         firstSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
                         firstSampleMoveToObservationZoneAction,
                         secondSampleMoveToObservationZoneAction,
                         secondSpecimenPickupMoveAction,

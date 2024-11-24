@@ -145,18 +145,17 @@ public final class Constants {
 
     public static final class ElevatorConstants {
 
-        public static final double MAX_MOTOR_RPM = 312;
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 537.5;
+        public static final double MAX_MOTOR_RPM = 6000;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
+
+        public static final double GEARING_RATIO = 3;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
-
-        public static final double GEARING_RATIO = 1;
-        public static final double PULLEY_TEETH = 60;
+        public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH;//approx 4.9"
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28 a pprox
 
-
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC * GEARING_RATIO;
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC / GEARING_RATIO * .8;//16
 
 
         public static final double UPPER_POSITION_LIMIT = 200;
@@ -183,8 +182,8 @@ public final class Constants {
         public static double elevatorSpecimenAtHighPlaceHeight = 22;
 
 
-        public static double specimenClawOpenAngle = 0.3;
-        public static double specimenClawClosedAngle = .5;
+        public static double specimenClawOpenAngle = 0.0;
+        public static double specimenClawClosedAngle = .2;
 
         public static double homePosition = 1;
         public static double lowerBasketDeliverPosition = 24;

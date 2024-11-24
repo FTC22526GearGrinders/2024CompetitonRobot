@@ -25,13 +25,17 @@ public final class FieldConstantsBlueMM {
     public static Pose2d midYellowPickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
     public static Pose2d midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
-    public static Pose2d outerYellowApproachPose = new Pose2d(60 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
+    public static Pose2d outerYellowApproachPose = new Pose2d(66 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
     public static Pose2d outerYellowPickupPose = new Pose2d(72 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
 
     public static Pose2d ascentZoneParkPose = new Pose2d(24, -12, Math.toRadians(180));
     public static Pose2d ascentZonePickupPose = new Pose2d(24, -12, Math.toRadians(180));
 
     //specimen
+
+    public static double specimenDropAngle = Math.toRadians(90);
+    public static double specimenPickupAngle = Math.toRadians(-90);
+
 
     public static Pose2d specimenSideStartPose = new Pose2d(-12, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, Math.toRadians(90));
 

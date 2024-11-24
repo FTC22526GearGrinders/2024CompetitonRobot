@@ -31,7 +31,7 @@ public class TeleopOpMode extends CommandOpMode {
 
     private final Trigger gp2lb = new Trigger(() -> gamepad2.left_bumper);
     private final Trigger gp2rb = new Trigger(() -> gamepad2.right_bumper);
-
+    public int showSelect;
     protected MecanumDriveSubsystem drive;
     protected ExtendArmSubsystem arm;
     protected RotateArmSubsystem rotateArm;
@@ -40,8 +40,6 @@ public class TeleopOpMode extends CommandOpMode {
     TelemetryPacket packet;
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
-    public int showSelect;
-
 
     // @Override
     public void initialize() {
@@ -99,7 +97,7 @@ public class TeleopOpMode extends CommandOpMode {
             doDriverButtons();
 
             arm.armTest = gamepad2.left_trigger > .75;
-            elevator.elevatorTest = gamepad2.right_trigger < -.75;
+            elevator.elevatorTest = gamepad2.right_trigger > .75;
 
             if (!arm.armTest) // && !elevatorTest)
                 doCoDriveButtons();
@@ -210,12 +208,22 @@ public class TeleopOpMode extends CommandOpMode {
         showSelect++;
         if (showSelect > Constants.MiscConstants.maxShowSelectCount)
             showSelect = Constants.MiscConstants.minShowSelectCount;
+        updateSubs();
     }
 
     void decShowSelect() {
         showSelect--;
         if (showSelect < Constants.MiscConstants.minShowSelectCount)
             showSelect = Constants.MiscConstants.maxShowSelectCount;
+        updateSubs();
+    }
+
+    void updateSubs() {
+        drive.showSelect = showSelect;
+        arm.showSelect = showSelect;
+        elevator.showSelect = showSelect;
+        rotateArm.showSelect = showSelect;
+        // limelight.showSelect = showSelect;
     }
 
 }

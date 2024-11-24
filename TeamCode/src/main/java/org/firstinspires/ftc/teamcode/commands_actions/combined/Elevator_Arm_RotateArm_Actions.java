@@ -1,27 +1,21 @@
 package org.firstinspires.ftc.teamcode.commands_actions.combined;
 
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.FailoverAction;
+import org.firstinspires.ftc.teamcode.utils.RumbleDefs;
 
 public class Elevator_Arm_RotateArm_Actions {
-    public final Gamepad.RumbleEffect twoStepRumbleEffect;
-    public final Gamepad.RumbleEffect threeStepRumbleEffect;
-    public final Gamepad.RumbleEffect fourStepRumbleEffect;
-    public final Gamepad.RumbleEffect fiveStepRumbleEffect;
+
     private final ExtendArmSubsystem arm;
     private final RotateArmSubsystem rotateArm;
     private final ElevatorSubsystem elevetor;
@@ -33,49 +27,9 @@ public class Elevator_Arm_RotateArm_Actions {
         this.rotateArm = rotateArm;
         this.opmode = opmode;
 
-        twoStepRumbleEffect = new Gamepad.RumbleEffect.Builder()
-                .addStep(0.0, 1.0, 500)  //  Rumble right motor 100% for 500 mSec
-                .addStep(0.0, 0.0, 300)  //  Pause for 300 mSec
-                .build();
-        threeStepRumbleEffect = new Gamepad.RumbleEffect.Builder()
-                .addStep(0.0, 1.0, 500)  //  Rumble right motor 100% for 500 mSec
-                .addStep(0.0, 0.0, 300)  //  Pause for 300 mSec
-                .addStep(1.0, 0.0, 250)  //  Rumble left motor 100% for 250 mSec
-                .build();
-        fourStepRumbleEffect = new Gamepad.RumbleEffect.Builder()
-                .addStep(0.0, 1.0, 500)  //  Rumble right motor 100% for 500 mSec
-                .addStep(0.0, 0.0, 300)  //  Pause for 300 mSec
-                .addStep(1.0, 0.0, 250)  //  Rumble left motor 100% for 250 mSec
-                .addStep(0.0, 0.0, 250)  //  Pause for 250 mSec
-                .build();
-        fiveStepRumbleEffect = new Gamepad.RumbleEffect.Builder()
-                .addStep(0.0, 1.0, 500)  //  Rumble right motor 100% for 500 mSec
-                .addStep(0.0, 0.0, 300)  //  Pause for 300 mSec
-                .addStep(1.0, 0.0, 250)  //  Rumble left motor 100% for 250 mSec
-                .addStep(0.0, 0.0, 250)  //  Pause for 250 mSec
-                .addStep(1.0, 0.0, 250)  //  Rumble left motor 100% for 250 mSec
-                .build();
-    }
-
-    public Action rumble(Gamepad gamepad, Gamepad.RumbleEffect gre, double duration_ms) {
-        return new Action() {
-            private boolean initialized = false;
-            private long startTime;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    startTime = System.currentTimeMillis();
-                    initialized = true;
-                }
-                gamepad.runRumbleEffect(gre);
-
-                packet.put("rumbling", true);
-                return System.currentTimeMillis() < startTime + duration_ms;
-            }
-        };
 
     }
+
 
     //auto actions - these differ from teleop
 
@@ -164,7 +118,7 @@ public class Elevator_Arm_RotateArm_Actions {
     //if sample present go check its color, if not rumble thr driver
     public Action checkSamplePresent() {
         return
-                new FailoverAction(checkValidColor(), rumble(opmode.gamepad1, fourStepRumbleEffect, 1500), !rotateArm.sampleAtIntake());
+                new FailoverAction(checkValidColor(), RumbleDefs.rumble(opmode.gamepad1, RumbleDefs.fourStepRumbleEffect, 1500), !rotateArm.sampleAtIntake());
     }
 
     //if valid color deliver to bucket else kick it out of intake
@@ -177,7 +131,7 @@ public class Elevator_Arm_RotateArm_Actions {
         return
                 new ParallelAction(
                         rotateArm.reverseIntakeServosTimed(2),
-                        rumble(opmode.gamepad1, fourStepRumbleEffect, 1200));
+                        RumbleDefs.rumble(opmode.gamepad1, RumbleDefs.fourStepRumbleEffect, 1200));
     }
 
 

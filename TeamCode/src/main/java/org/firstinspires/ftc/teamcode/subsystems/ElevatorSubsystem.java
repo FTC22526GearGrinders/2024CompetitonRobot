@@ -96,7 +96,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         constraints = new TrapezoidProfile.Constraints(Constants.ElevatorConstants.TRAJ_VEL, Constants.ElevatorConstants.TRAJ_ACCEL);
 
 
-        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator", Motor.GoBILDA.RPM_312);
+        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator");
         leftElevatorMotor.setInverted(true);
         leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
@@ -110,7 +110,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftPidController.reset();
 
 
-        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevator", Motor.GoBILDA.RPM_312);
+        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevator");
         rightElevatorMotor.setInverted(true);
         rightElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
@@ -127,7 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         specimenClawServo = opMode.hardwareMap.get(Servo.class, "specimenClawServo");
 
         bucketServo.setDirection(Servo.Direction.REVERSE);
-        specimenClawServo.setDirection(Servo.Direction.REVERSE);
+        specimenClawServo.setDirection(Servo.Direction.FORWARD);
 
         // specimenClawSwitch = new Sensor()
 

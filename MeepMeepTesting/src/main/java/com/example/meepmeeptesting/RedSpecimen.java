@@ -2,10 +2,8 @@ package com.example.meepmeeptesting;
 
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueLight;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
@@ -16,6 +14,7 @@ public class RedSpecimen {
 
 
     public static void main(String[] args) {
+
         Action firstSpecimenDeliverMoveAction;
         Action secondSpecimenDeliverMoveAction;
         Action thirdSpecimenDeliverMoveAction;
@@ -43,7 +42,7 @@ public class RedSpecimen {
         MeepMeep meepMeep = new MeepMeep(800);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(100, 100, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(60, 100, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
                 .setColorScheme(new ColorSchemeBlueLight())
                 .setStartPose(FieldConstantsRedMM.specimenSideStartPose)
@@ -57,59 +56,61 @@ public class RedSpecimen {
                 .build();//move to place first specimen
 
         firstSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsRedMM.specimenDeliverPose1)
-                .splineToSplineHeading(new Pose2d(-36, 42, Math.toRadians(180)), Math.toRadians(180))
-                .strafeTo(new Vector2d(-36, 10))
-                .strafeTo(new Vector2d(-48, 10))
+                .strafeToLinearHeading(FieldConstantsRedMM.firstStagePushInnerPose.position, Math.toRadians(180))
+                .strafeTo(FieldConstantsRedMM.secondStagePushInnerVector)
+                .strafeTo(FieldConstantsRedMM.thirdStagePushInnerVector)
                 .strafeTo(FieldConstantsRedMM.sample1ObservationZoneDropPose.position)
                 .build();
 
-
         secondSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsRedMM.sample1ObservationZoneDropPose)
-                .splineToSplineHeading(new Pose2d(-36, 10, Math.toRadians(180)), Math.toRadians(180))
-                .strafeTo(new Vector2d(-56, 10))
+                .strafeTo(FieldConstantsRedMM.firstStagePushMidPose.position)
+                .strafeTo(FieldConstantsRedMM.secondStagePushMidVector)
+                .strafeTo(FieldConstantsRedMM.thirdStagePushMidVector)
                 .strafeTo(FieldConstantsRedMM.sample2ObservationZoneDropPose.position)
                 .build();
 
         secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRedMM.sample2ObservationZoneDropPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenPrePickupPose, Math.toRadians(-100))
+                .lineToXLinearHeading(FieldConstantsRedMM.specimenPrePickupPose.position.x, FieldConstantsRedMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsRedMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
 
         secondSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose2, Math.toRadians(-90))
-                .lineToY(FieldConstantsRedMM.specimenDeliverPose2.position.y)
+                .strafeToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose2.position, FieldConstantsRedMM.specimenDropAngle)
+                .strafeTo(FieldConstantsRedMM.specimenDeliverPose2.position)
                 .build();//place second specimen
 
         thirdSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenDeliverPose2)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenPrePickupPose, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsRedMM.specimenPrePickupPose.position, FieldConstantsRedMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsRedMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
 
         thirdSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose3, Math.toRadians(-90))
-                .lineToY(FieldConstantsRedMM.specimenDeliverPose3.position.y)
+                .strafeToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose3.position, FieldConstantsRedMM.specimenDropAngle)
+                .strafeTo(FieldConstantsRedMM.specimenDeliverPose3.position)
                 .build();//place second specimen
 
         fourthSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenDeliverPose3)
-                .lineToY(FieldConstantsRedMM.specimenDeliverApproachPose3.position.y)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenPrePickupPose, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsRedMM.specimenPrePickupPose.position, FieldConstantsRedMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsRedMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
 
         fourthSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenPickupPose)
-                .splineToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose4, Math.toRadians(-90))
-                .lineToY(FieldConstantsRedMM.specimenDeliverPose4.position.y)
+                .strafeToLinearHeading(FieldConstantsRedMM.specimenDeliverApproachPose4.position, FieldConstantsRedMM.specimenDropAngle)
+                .strafeTo(FieldConstantsRedMM.specimenDeliverPose4.position)
                 .build();//place second specimen
+
+        parkAction = drive.actionBuilder(FieldConstantsRedMM.specimenDeliverPose4)
+                .strafeTo(FieldConstantsRedMM.parkPose.position)
+                .build();
 
 
         deliverFourSpecimens =
                 new SequentialAction(
 
                         firstSpecimenDeliverMoveAction,
-                        placeSpecimenAction,
                         firstSampleMoveToObservationZoneAction,
                         secondSampleMoveToObservationZoneAction,
                         secondSpecimenPickupMoveAction,
@@ -118,8 +119,8 @@ public class RedSpecimen {
                         thirdSpecimenDeliverMoveAction,
                         fourthSpecimenPickupMoveAction,
                         fourthSpecimenDeliverMoveAction,
-//park
-                        secondSampleMoveToObservationZoneAction
+                        parkAction
+
 
                 );
 
