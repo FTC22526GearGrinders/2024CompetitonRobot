@@ -28,6 +28,8 @@ public final class FieldConstantsRedMM {
     public static Pose2d specimenSideStartPose = flipBlueToRedPose(FieldConstantsBlueMM.specimenSideStartPose);
     public static Pose2d sample1ObservationZoneDropPose = flipBlueToRedPose(FieldConstantsBlueMM.sample1ObservationZoneDropPose);
     public static Pose2d sample2ObservationZoneDropPose = flipBlueToRedPose(FieldConstantsBlueMM.sample2ObservationZoneDropPose);
+    public static Pose2d sample3ObservationZoneDropPose = flipBlueToRedPose(FieldConstantsBlueMM.sample3ObservationZoneDropPose);
+
     public static Pose2d specimenDeliverPose1 = flipBlueToRedPose(FieldConstantsBlueMM.specimenDeliverPose1);
     public static Pose2d specimenDeliverPose2 = flipBlueToRedPose(FieldConstantsBlueMM.specimenDeliverPose2);
     public static Pose2d specimenDeliverPose3 = flipBlueToRedPose(FieldConstantsBlueMM.specimenDeliverPose3);
@@ -37,14 +39,14 @@ public final class FieldConstantsRedMM {
     public static Pose2d specimenDeliverApproachPose3 = flipBlueToRedPose(FieldConstantsBlueMM.specimenDeliverApproachPose3);
     public static Pose2d specimenDeliverApproachPose4 = flipBlueToRedPose(FieldConstantsBlueMM.specimenDeliverApproachPose4);
     public static Pose2d specimenPickupPose = flipBlueToRedPose(FieldConstantsBlueMM.specimenPickupPose);
-    public static Pose2d specimenPrePickupPose = flipBlueToRedPose(FieldConstantsBlueMM.specimenPrePickupPose);
+    public static Pose2d specimenPrePickupPose = flipBlueToRedPose(FieldConstantsBlueMM.specimenPickupApproachPose);
     public static Pose2d firstStagePushInnerPose = flipBlueToRedPose(FieldConstantsBlueMM.firstStagePushInnerPose);
     public static Vector2d secondStagePushInnerVector = flipBlueToRedVector(FieldConstantsBlueMM.secondStagePushInnerVector);
     public static Vector2d thirdStagePushInnerVector = flipBlueToRedVector(FieldConstantsBlueMM.thirdStagePushInnerVector);
     public static Pose2d firstStagePushMidPose = flipBlueToRedPose(FieldConstantsBlueMM.firstStagePushMidPose);
     public static Vector2d secondStagePushMidVector = flipBlueToRedVector(FieldConstantsBlueMM.secondStagePushMidVector);
     public static Vector2d thirdStagePushMidVector = flipBlueToRedVector(FieldConstantsBlueMM.thirdStagePushMidVector);
-    public static Pose2d parkPose = flipBlueToRedPose(FieldConstantsBlueMM.parkPose);
+    public static Pose2d parkPose = flipBlueToRedPose(FieldConstantsBlueMM.specimenParkPose);
 
     static Vector2d flipBlueToRedVector(Vector2d blue) {
         return new Vector2d(-blue.x, -blue.y);

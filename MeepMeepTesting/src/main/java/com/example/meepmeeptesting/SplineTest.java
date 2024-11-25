@@ -40,7 +40,7 @@ public class SplineTest {
                 .build();
 
         Action secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.sample1ObservationZoneDropPose)
-                .lineToXSplineHeading(FieldConstantsBlueMM.specimenPrePickupPose.position.x, Math.toRadians(90))
+                .lineToXSplineHeading(FieldConstantsBlueMM.specimenPickupApproachPose.position.x, Math.toRadians(90))
                 .strafeTo(FieldConstantsBlueMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();

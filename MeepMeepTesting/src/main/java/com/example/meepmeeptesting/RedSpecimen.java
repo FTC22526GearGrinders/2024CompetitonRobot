@@ -51,26 +51,25 @@ public class RedSpecimen {
         DriveShim drive = myBot.getDrive();
 
         firstSpecimenDeliverMoveAction = drive.actionBuilder(FieldConstantsRedMM.specimenSideStartPose)
-                .lineToY(FieldConstantsRedMM.specimenDeliverApproachPose1.position.y)
-                .lineToY(FieldConstantsRedMM.specimenDeliverPose1.position.y)
+                .strafeTo(FieldConstantsRedMM.specimenDeliverApproachPose1.position)
+                .strafeTo(FieldConstantsRedMM.specimenDeliverPose1.position)
                 .build();//move to place first specimen
 
         firstSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsRedMM.specimenDeliverPose1)
-                .strafeToLinearHeading(FieldConstantsRedMM.firstStagePushInnerPose.position, Math.toRadians(180))
+                .strafeToLinearHeading(FieldConstantsRedMM.firstStagePushInnerPose.position, Math.toRadians(0))
                 .strafeTo(FieldConstantsRedMM.secondStagePushInnerVector)
                 .strafeTo(FieldConstantsRedMM.thirdStagePushInnerVector)
                 .strafeTo(FieldConstantsRedMM.sample1ObservationZoneDropPose.position)
                 .build();
 
         secondSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsRedMM.sample1ObservationZoneDropPose)
-                .strafeTo(FieldConstantsRedMM.firstStagePushMidPose.position)
-                .strafeTo(FieldConstantsRedMM.secondStagePushMidVector)
+                .strafeToLinearHeading(FieldConstantsRedMM.firstStagePushMidPose.position, FieldConstantsRedMM.specimenPickupAngle)
                 .strafeTo(FieldConstantsRedMM.thirdStagePushMidVector)
                 .strafeTo(FieldConstantsRedMM.sample2ObservationZoneDropPose.position)
                 .build();
 
         secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsRedMM.sample2ObservationZoneDropPose)
-                .lineToXLinearHeading(FieldConstantsRedMM.specimenPrePickupPose.position.x, FieldConstantsRedMM.specimenPickupAngle)
+                .strafeTo(FieldConstantsRedMM.specimenPrePickupPose.position)
                 .strafeTo(FieldConstantsRedMM.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
