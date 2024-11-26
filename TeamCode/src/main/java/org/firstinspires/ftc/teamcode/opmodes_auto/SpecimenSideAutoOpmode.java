@@ -123,48 +123,6 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle)
                 .build();//move to place first specimen
 
-        secondSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose2.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose1)
-                .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        thirdSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose3.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        thirdSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose3)
-                .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        fourthSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose4.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        fourthSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose4)
-                .strafeToLinearHeading(fcs.specimenDeliverPose4.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-
-        specimenPickuoMoveAction = drive.actionBuilder(fcs.specimenPickupApproachPose)
-                .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle)
-                .build();
-
-        secondSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
-                .build();
-
-        thirdSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
-                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
-                .build();
-
-        fourthSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
-                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
-                .build();
-
-
         firstSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeTo(fcs.secondStagePushInnerVector)
@@ -179,20 +137,51 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle)
                 .build();
 
-
-        firstSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
+        secondSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.sample2ObservationZoneDropPose)
                 .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
-                .waitSeconds(1)
                 .build();
+
+        secondSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
+                .strafeToLinearHeading(fcs.specimenDeliverApproachPose2.position, fcs.specimenDropAngle)
+                .build();//move to place first specimen
+
+        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose2)
+                .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle)
+                .build();//move to place first specimen
+
+        thirdSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
+                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
+                .build();
+
+        thirdSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
+                .strafeToLinearHeading(fcs.specimenDeliverApproachPose3.position, fcs.specimenDropAngle)
+                .build();//move to place first specimen
+
+        thirdSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose3)
+                .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle)
+                .build();//move to place first specimen
+
 
         fourthSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
                 .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
                 .waitSeconds(1)
                 .build();
 
+        fourthSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
+                .strafeToLinearHeading(fcs.specimenDeliverApproachPose4.position, fcs.specimenDropAngle)
+                .build();//move to place first specimen
+
+        fourthSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose4)
+                .strafeToLinearHeading(fcs.specimenDeliverPose4.position, fcs.specimenDropAngle)
+                .build();//move to place first specimen
 
         parkAction = drive.actionBuilder(fcs.specimenDeliverPose4)
                 .strafeTo(fcs.specimenParkPose.position)
+                .build();
+
+
+        specimenPickuoMoveAction = drive.actionBuilder(fcs.specimenPickupApproachPose)
+                .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle)
                 .build();
 
     }

@@ -94,7 +94,7 @@ public class Elevator_Arm_RotateArm_Actions {
     public Action testSampleColor() {
         return new SequentialAction(
                 new InstantAction(rotateArm::clearColors),
-                rotateArm.colorDetectAction(1),
+                rotateArm.colorDetectAction(),
                 new FailoverAction(deliverSampleToBucket(), rotateArm.rejectSampleAction(), rotateArm.wrongAllianceSampleSeen()));
     }
 

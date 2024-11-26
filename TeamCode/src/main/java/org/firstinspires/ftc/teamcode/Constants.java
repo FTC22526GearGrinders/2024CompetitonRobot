@@ -141,6 +141,7 @@ public final class Constants {
         public static double sampleDetectedDistance = 1.2;
 
         public static double sampleClearDistance = 2;
+
     }
 
     public static final class ElevatorConstants {

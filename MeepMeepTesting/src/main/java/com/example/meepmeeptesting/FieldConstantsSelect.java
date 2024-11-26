@@ -89,8 +89,8 @@ public final class FieldConstantsSelect {
         secondStagePushInnerVector = new Vector2d(-36, 10);
         thirdStagePushInnerVector = new Vector2d(-48, 10);
 
-        firstStagePushMidPose = new Pose2d(-24, 42, Math.toRadians(180));
-        secondStagePushMidVector = new Vector2d(-48, 0);
+        firstStagePushMidPose = new Pose2d(-28, 42, Math.toRadians(180));
+        secondStagePushMidVector = new Vector2d(-58, 0);
         thirdStagePushMidVector = new Vector2d(-58, 10);
 
 

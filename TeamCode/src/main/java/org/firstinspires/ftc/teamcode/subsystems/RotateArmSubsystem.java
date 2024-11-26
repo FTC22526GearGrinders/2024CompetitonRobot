@@ -33,6 +33,7 @@ public class RotateArmSubsystem extends SubsystemBase {
     public static double leftIntakeTiltDownAngle = 1;
     public static double rightIntakeTiltClearAngle = .4;
     public static double rightIntakeTiltDownAngle = 1;
+    public static double touchSubmersibleAngle = .3;
     public static double intakeServoInPower = 1;
     public static double intakeServoOutPower = -1;
     public CRServo leftIntakeServo;
@@ -104,6 +105,12 @@ public class RotateArmSubsystem extends SubsystemBase {
                                 new InstantAction(() -> rightTiltServo.setPosition(rightIntakeTiltClearAngle))),
                         new SleepAction(timeout),
                         new InstantAction(this::setTiltPositionClear));
+    }
+
+    public Action tiltToSubmersibleAction() {
+        return new ParallelAction(
+                new InstantAction(() -> leftTiltServo.setPosition(touchSubmersibleAngle)),
+                new InstantAction(() -> rightTiltServo.setPosition(touchSubmersibleAngle)));
     }
 
     public void setTiltPositionClear() {
@@ -198,10 +205,9 @@ public class RotateArmSubsystem extends SubsystemBase {
         return sampleAtIntake() && (PoseStorage.currentTeam == PoseStorage.Team.BLUE && getRedSeen() || PoseStorage.currentTeam == PoseStorage.Team.RED && getBlueSeen());
     }
 
-    public Action colorDetectAction(double timeout_secs) {
+    public Action colorDetectAction() {
         return new Action() {
             private boolean initialized = false;
-
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {

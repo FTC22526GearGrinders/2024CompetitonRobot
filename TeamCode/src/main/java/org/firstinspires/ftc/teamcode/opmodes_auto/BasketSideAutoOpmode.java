@@ -42,8 +42,12 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
+import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
+import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
@@ -61,6 +65,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     Action secondSamplePickupMoveAction;
     Action thirdSamplePickupMoveAction;
     Action fourthSamplePickupMoveAction;
+    Action parkAction;
     Action samplePickUpActoin;
     Action placeSpecimenAction = new SleepAction(2);
     Action pickupSampleAction = new SleepAction(2);
@@ -68,6 +73,12 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     Action dropSampleAction = new SleepAction(2);
     SequentialAction deliverFourSamples;
     private MecanumDriveSubsystem drive;
+    private ElevatorSubsystem elevator;
+    private ExtendArmSubsystem arm;
+    private RotateArmSubsystem rotate;
+
+    private Elevator_Arm_RotateArm_Actions ears;
+
     private LimelightSubsystem limelight;
     private TelemetryPacket packet;
     private FieldConstantsSelect fcs;
@@ -75,6 +86,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     @Override
     public void initialize() {
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
+        elevator = new ElevatorSubsystem(this);
+        arm = new ExtendArmSubsystem(this);
+        rotate = new RotateArmSubsystem(this);
+        ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
         //   limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
@@ -114,35 +129,68 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
                 .lineToX(fcs.outerYellowApproachPose.position.x)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
-                .build();//move to place first specimen
+                .build();//
+
+        parkAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.ascentZoneParkPose.position, Math.toRadians(180))
+                .build();
 
     }
 
 
     private SequentialAction createMotionSequence() {
-        return new SequentialAction(
-                new SleepAction(.3),
-                firstSampleDeliverMoveAction,
-                dropSampleAction,
-                new ParallelAction(
-                        secondSamplePickupMoveAction,
-                        pickupSampleAction),
-                secondSampleDeliverMoveAction,
-                dropSampleAction,
-                new ParallelAction(
-                        thirdSamplePickupMoveAction,
-                        pickupSampleAction),
-                thirdSampleDeliverMoveAction,
-                dropSampleAction,
-                new ParallelAction(
-                        fourthSamplePickupMoveAction,
-                        pickupSampleAction),
-                fourthSampleDeliverMoveAction,
-                dropSampleAction,
+        return
+                new SequentialAction(
+                        //move, raise elevator to upper basket
+                        new ParallelAction(
+                                firstSampleDeliverMoveAction,
+                                elevator.elevatorToUpperBasket()),
+                        //deliver to basket
+                        elevator.cycleBucket(1),
 
-                pickupSampleAction);
+                        //go get second sample and place in bucket
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                secondSamplePickupMoveAction,
+                                ears.pickupSample(5)),
+                        ears.deliverSampleToBucket(rotate.sampleInIntake),
 
+                        //deliver second sample to basket
+                        new ParallelAction(
+                                secondSampleDeliverMoveAction,
+                                elevator.elevatorToUpperBasket()),
+                        elevator.cycleBucket(1),
 
+                        //go get third sample and place in bucket
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                thirdSamplePickupMoveAction,
+                                ears.pickupSample(5)),
+                        ears.deliverSampleToBucket(rotate.sampleInIntake),
+
+                        //deliver third sample to basket
+                        new ParallelAction(
+                                thirdSampleDeliverMoveAction,
+                                elevator.elevatorToUpperBasket()),
+                        elevator.cycleBucket(1),
+
+                        //go get fourth sample and place in bucket
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                fourthSamplePickupMoveAction,
+                                ears.pickupSample(5)),
+                        ears.deliverSampleToBucket(rotate.sampleInIntake),
+
+                        //deliver third sample to basket
+                        new ParallelAction(
+                                fourthSampleDeliverMoveAction,
+                                elevator.elevatorToUpperBasket()),
+                        elevator.cycleBucket(1),
+
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                parkAction),
+                        rotate.tiltToSubmersibleAction());
     }
 
 
