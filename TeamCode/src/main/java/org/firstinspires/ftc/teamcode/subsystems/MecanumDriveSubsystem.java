@@ -101,7 +101,6 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     public Telemetry telemetry;
     public boolean fieldCentric;
     public PosePatcher posePatcher;
-    public PoseStorage.Team currentteam;
     public boolean slowMode;
     public int showSelect = 0;
 
@@ -221,9 +220,9 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
 
     public void toggleAlliance() {
-        if (currentteam == PoseStorage.Team.RED)
-            currentteam = PoseStorage.Team.BLUE;
-        else currentteam = PoseStorage.Team.RED;
+        if (PoseStorage.currentTeam == PoseStorage.Team.RED)
+            PoseStorage.currentTeam = PoseStorage.Team.BLUE;
+        else PoseStorage.currentTeam = PoseStorage.Team.RED;
     }
 
     public void resetEncoders() {

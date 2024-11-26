@@ -12,7 +12,7 @@ import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 
-public class BlueSamplesA {
+public class RedOrBlueSamples {
 
 
     public static void main(String[] args) {
@@ -35,6 +35,7 @@ public class BlueSamplesA {
         Action transferSampleToBucketAction = new SleepAction(2);
         Action dropSampleAction = new SleepAction(2);
 
+
         FieldConstantsSelect fcs;
         Action deliverFourSamples;
 
@@ -49,7 +50,6 @@ public class BlueSamplesA {
                 .build();
 
         DriveShim drive = myBot.getDrive();
-
 
         firstSampleDeliverMoveAction = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
@@ -76,9 +76,6 @@ public class BlueSamplesA {
 
         fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading)
-                .waitSeconds(.1)
-                .lineToX(fcs.outerYellowPickupPose.position.x)
-
                 .build();
 
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)

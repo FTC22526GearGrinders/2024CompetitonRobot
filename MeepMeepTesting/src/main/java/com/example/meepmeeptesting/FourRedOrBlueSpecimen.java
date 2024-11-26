@@ -10,7 +10,7 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class FourBlueSpecimen {
+public class FourRedOrBlueSpecimen {
 
 
     public static void main(String[] args) {

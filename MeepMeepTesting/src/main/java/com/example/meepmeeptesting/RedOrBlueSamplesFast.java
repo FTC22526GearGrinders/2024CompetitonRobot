@@ -11,7 +11,8 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class RedSamples {
+
+public class RedOrBlueSamplesFast {
 
 
     public static void main(String[] args) {
@@ -20,10 +21,12 @@ public class RedSamples {
         Action secondSampleDeliverMoveAction;
         Action thirdSampleDeliverMoveAction;
         Action fourthSampleDeliverMoveAction;
+        Action fifthSampleDeliverMoveAction;
 
         Action secondSamplePickupMoveAction;
         Action thirdSamplePickupMoveAction;
         Action fourthSamplePickupMoveAction;
+        Action fifthSamplePickupMoveAction;
 
         Action parkAction;
 
@@ -33,7 +36,6 @@ public class RedSamples {
         Action dropSampleAction = new SleepAction(2);
 
         FieldConstantsSelect fcs;
-
         Action deliverFourSamples;
 
         MeepMeep meepMeep = new MeepMeep(800);
@@ -47,7 +49,7 @@ public class RedSamples {
                 .build();
 
         DriveShim drive = myBot.getDrive();
-
+        // fcs.setBlue();
         fcs.setRed();
 
         firstSampleDeliverMoveAction = drive.actionBuilder(fcs.basketSideStartPose)
@@ -55,7 +57,7 @@ public class RedSamples {
                 .build();//move to place first specimen
 
         secondSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading)
+                //  .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading)
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading)
                 .build();
 
@@ -65,7 +67,7 @@ public class RedSamples {
                 .build();//move to place first specimen
 
         thirdSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading)
+                // .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading)
                 .build();
 
@@ -83,13 +85,22 @@ public class RedSamples {
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
                 .lineToX(fcs.outerYellowApproachPose.position.x)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
-                .build();//move to place first specimen
+                .build();//
+
+        fifthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.ascentZonePickupPose.position, fcs.ascentZonePickupPose.heading)
+                .build();
+
+        fifthSampleDeliverMoveAction = drive.actionBuilder(fcs.ascentZonePickupPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
+                .build();
 
         parkAction = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.ascentZoneParkPose.position, fcs.ascentZoneParkPose.heading)
                 .build();
 
         deliverFourSamples = new SequentialAction(
+                new SleepAction(.3),
                 firstSampleDeliverMoveAction,
                 dropSampleAction,
                 new ParallelAction(
@@ -107,6 +118,9 @@ public class RedSamples {
                         pickupSampleAction),
                 fourthSampleDeliverMoveAction,
                 dropSampleAction,
+                fifthSamplePickupMoveAction,
+                pickupSampleAction,
+                fifthSampleDeliverMoveAction,
                 parkAction
 
 

@@ -85,7 +85,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     Action sequenceThree;
     Action sequenceFour;
 
-   
+
     FieldConstantsSelect fcs;
 
 
@@ -191,6 +191,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         return
                 new SequentialAction(
                         new ParallelAction(
+                                elevator.closeSpecimenClaw(),
                                 firstSpecimenDeliverApproachMoveAction,
                                 elevator.elevatorToAboveUpperSubmersible()),
                         firstSpecimenDeliverMoveAction,
@@ -266,7 +267,6 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         PoseStorage.currentPose = drive.pose;
         PoseStorage.poseUpdatedTime = System.currentTimeMillis();
 
-        PoseStorage.currentTeam = drive.currentteam;
 
         reset();
     }
@@ -291,9 +291,10 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
+                PoseStorage.currentTeam = PoseStorage.Team.RED;
+
                 fcs.setRed();
 
-                drive.currentteam = PoseStorage.Team.RED;
 
                 drive.pose = fcs.specimenSideStartPose;
 
@@ -308,8 +309,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 telemetry.addData("BLUE ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-
-                drive.currentteam = PoseStorage.Team.BLUE;
+                PoseStorage.currentTeam = PoseStorage.Team.BLUE;
 
                 fcs.setBlue();
 

@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -38,6 +39,10 @@ public class TeleopOpMode extends CommandOpMode {
     protected ElevatorSubsystem elevator;
     FtcDashboard dashboard;
     TelemetryPacket packet;
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
 
@@ -86,27 +91,50 @@ public class TeleopOpMode extends CommandOpMode {
         //     dashboard.sendTelemetryPacket(packet);
     }
 
+    void copyGamepads() {
+        // Store the gamepad values from the previous loop iteration in
+        // previousGamepad1/2 to be used in this loop iteration.
+        // This is equivalent to doing this at the end of the previous
+        // loop iteration, as it will run in the same order except for
+        // the first/last iteration of the loop.
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
+
+        // Store the gamepad values from this loop iteration in
+        // currentGamepad1/2 to be used for the entirety of this loop iteration.
+        // This prevents the gamepad values from changing between being
+        // used and stored in previousGamepad1/2.
+        currentGamepad1.copy(gamepad1);
+        currentGamepad2.copy(gamepad2);
+    }
 
     public void runOpMode() throws InterruptedException {
         initialize();
+
         waitForStart();
         rotateArm.tiltBothClear(1).run(packet);
         while (!isStopRequested() && opModeIsActive()) {
             run();
             actionLoop();
-            doDriverButtons();
+
+            copyGamepads();
 
             arm.armTest = gamepad2.left_trigger > .75;
+
             elevator.elevatorTest = gamepad2.right_trigger > .75;
 
             if (!arm.armTest) // && !elevatorTest)
                 doCoDriveButtons();
+
+            if (!elevator.elevatorTest)
+                doDriverButtons();
 
             if (arm.armTest)
                 doArmTestCoDriverButtons();
 
             if (elevator.elevatorTest)
                 doElevatorTestCoDriverButtons();
+
 
             //  telemetry.update();
             //    showField();
@@ -141,41 +169,42 @@ public class TeleopOpMode extends CommandOpMode {
 
     public void doCoDriveButtons() {
 
-        if (gamepad2.a) runningActions.add(eara.getSampleAutoBasket());
+        if (gamepad2.a && !previousGamepad2.a) runningActions.add(eara.getSampleAutoBasket());
 
-        if (gamepad2.dpad_up) incShowSelect();
-        if (gamepad2.dpad_down) decShowSelect();
+        if (gamepad2.dpad_up && !previousGamepad2.dpad_up) incShowSelect();
+        if (gamepad2.dpad_down && !previousGamepad2.dpad_down) decShowSelect();
 
     }
 
     void doArmTestCoDriverButtons() {
 
-        if (gamepad2.a)
+        if (gamepad2.a && !previousGamepad2.a)
             runningActions.add(rotateArm.runIntakeServos());
 
-        if (gamepad2.b)
+        if (gamepad2.b && !previousGamepad2.b)
             runningActions.add(rotateArm.stopIntakeServos());
 
-        if (gamepad2.x)
+        if (gamepad2.x && !previousGamepad2.x)
             runningActions.add(rotateArm.reverseIntakeServosTimed(3));
 
-        if (gamepad2.y)
+        if (gamepad2.y && !previousGamepad2.y)
             runningActions.add(new InstantAction(() -> arm.resetEncoders()));
 
 
-        if (gamepad2.dpad_up && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
+        if (gamepad2.dpad_up && !previousGamepad2.dpad_up && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
             runningActions.add(rotateArm.tiltBothClear(1));
 
-        if (gamepad2.dpad_down && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
+        if (gamepad2.dpad_down && !previousGamepad2.dpad_down && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
             runningActions.add(rotateArm.tiltBothDown());
 
-        if (gamepad2.dpad_left)
+        if (gamepad2.dpad_left && !previousGamepad2.dpad_left)
             runningActions.add(arm.armToBucketAction());
 
-        if (gamepad2.dpad_right)
+        if (gamepad2.dpad_right && !previousGamepad2.dpad_right)
             runningActions.add(arm.armToPickupAction());
 
-        if (gamepad2.right_bumper) runningActions.add(eara.deliverSpecimenToUpperSubmersible());
+        if (gamepad2.right_bumper && !previousGamepad2.right_bumper)
+            runningActions.add(eara.deliverSpecimenToUpperSubmersible());
 
 
     }
@@ -183,15 +212,19 @@ public class TeleopOpMode extends CommandOpMode {
 
     void doElevatorTestCoDriverButtons() {
 
-        if (gamepad2.a) runningActions.add(elevator.openSpecimenClaw());
-        if (gamepad2.b) runningActions.add(elevator.closeSpecimenClaw());
-        if (gamepad2.x) runningActions.add(elevator.tipBucket());
-        if (gamepad2.y) runningActions.add(elevator.levelBucket());
+        if (gamepad2.a && !previousGamepad2.a) runningActions.add(elevator.openSpecimenClaw());
+        if (gamepad2.b && !previousGamepad2.b) runningActions.add(elevator.closeSpecimenClaw());
+        if (gamepad2.x && !previousGamepad2.x) runningActions.add(elevator.tipBucket());
+        if (gamepad2.y && !previousGamepad2.y) runningActions.add(elevator.levelBucket());
 
-        if (gamepad2.dpad_up) runningActions.add(elevator.elevatorToAboveUpperSubmersible());
-        if (gamepad2.dpad_down) runningActions.add(elevator.elevatorToUpperSubmersible());
-        if (gamepad2.dpad_left) runningActions.add(elevator.elevatorToHome());
-        if (gamepad2.dpad_right) runningActions.add(elevator.elevatorToUpperBasket());
+        if (gamepad2.dpad_up && !previousGamepad2.dpad_up)
+            runningActions.add(elevator.elevatorToAboveUpperSubmersible());
+        if (gamepad2.dpad_down && !previousGamepad2.dpad_down)
+            runningActions.add(elevator.elevatorToUpperSubmersible());
+        if (gamepad2.dpad_left && !previousGamepad2.dpad_left)
+            runningActions.add(elevator.elevatorToHome());
+        if (gamepad2.dpad_right && !previousGamepad2.dpad_right)
+            runningActions.add(elevator.elevatorToUpperBasket());
 
 
     }

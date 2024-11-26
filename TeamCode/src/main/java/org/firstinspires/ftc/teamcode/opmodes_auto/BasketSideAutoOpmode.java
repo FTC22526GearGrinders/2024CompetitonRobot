@@ -36,7 +36,6 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -57,20 +56,19 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
     public String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public int TEAM_NUMBER = 22526; //Enter team Number
-    public Pose2d startPosition;
     public Action firstSampleDeliverMoveAction;
     Action secondSampleDeliverMoveAction;
     Action thirdSampleDeliverMoveAction;
     Action fourthSampleDeliverMoveAction;
+    Action fifthSampleDeliverMoveAction;
+
     Action secondSamplePickupMoveAction;
     Action thirdSamplePickupMoveAction;
     Action fourthSamplePickupMoveAction;
+    Action fifthSamplePickupMoveAction;
+
     Action parkAction;
-    Action samplePickUpActoin;
-    Action placeSpecimenAction = new SleepAction(2);
-    Action pickupSampleAction = new SleepAction(2);
-    Action transferSampleToBucketAction = new SleepAction(2);
-    Action dropSampleAction = new SleepAction(2);
+
     SequentialAction deliverFourSamples;
     private MecanumDriveSubsystem drive;
     private ElevatorSubsystem elevator;
@@ -100,18 +98,21 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         drive.pose = fcs.basketSideStartPose;
 
         firstSampleDeliverMoveAction = drive.actionBuilder(fcs.basketSideStartPose)
-                .strafeTo(fcs.basketDeliverPose.position)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
         secondSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading)
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading)
                 .build();
+
 
         secondSampleDeliverMoveAction = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
         thirdSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading)
                 .build();
 
@@ -131,13 +132,21 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//
 
+        fifthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.ascentZonePickupPose.position, Math.toRadians(180))
+                .build();
+
+        fifthSampleDeliverMoveAction = drive.actionBuilder(fcs.ascentZonePickupPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
+                .build();
+
         parkAction = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.ascentZoneParkPose.position, Math.toRadians(180))
                 .build();
 
     }
 
-
+    double samplePickupTimeout = 3;
     private SequentialAction createMotionSequence() {
         return
                 new SequentialAction(
@@ -152,7 +161,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 secondSamplePickupMoveAction,
-                                ears.pickupSample(5)),
+                                ears.pickupSample(samplePickupTimeout)),
                         ears.deliverSampleToBucket(rotate.sampleInIntake),
 
                         //deliver second sample to basket
@@ -165,7 +174,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 thirdSamplePickupMoveAction,
-                                ears.pickupSample(5)),
+                                ears.pickupSample(samplePickupTimeout)),
                         ears.deliverSampleToBucket(rotate.sampleInIntake),
 
                         //deliver third sample to basket
@@ -178,7 +187,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 fourthSamplePickupMoveAction,
-                                ears.pickupSample(5)),
+                                ears.pickupSample(samplePickupTimeout)),
                         ears.deliverSampleToBucket(rotate.sampleInIntake),
 
                         //deliver third sample to basket
@@ -217,10 +226,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         PoseStorage.currentPose = drive.pose;
         PoseStorage.poseUpdatedTime = System.currentTimeMillis();
 
-        PoseStorage.currentPose = drive.pose;
-        PoseStorage.poseUpdatedTime = System.currentTimeMillis();
 
-        PoseStorage.currentTeam = drive.currentteam;
 
         reset();
     }
@@ -230,15 +236,14 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
-        //******select start pose*****
         while (!isStopRequested()) {
             telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
             telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
-            telemetry.addData("    Blue All Basket   ", "(X / ▢)");
+            telemetry.addData("    Red All Specimen   ", "(A / O)");
 
-            telemetry.addData("    Red All Basket    ", "(A / O)");
+            telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
 
             if (gamepad1.a) {
 
@@ -246,8 +251,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-
-                drive.currentteam = PoseStorage.Team.RED;
+                PoseStorage.currentTeam = PoseStorage.Team.RED;
                 fcs.setRed();
                 drive.pose = fcs.basketSideStartPose;
                 createMotionActions();
@@ -260,7 +264,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 telemetry.addData("BLUE ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-                drive.currentteam = PoseStorage.Team.BLUE;
+                PoseStorage.currentTeam = PoseStorage.Team.BLUE;
+
                 fcs.setBlue();
 
                 drive.pose = fcs.basketSideStartPose;

@@ -55,7 +55,6 @@ public final class FieldConstantsSelect {
     public FieldConstantsSelect() {
 
         setBlue();
-
     }
 
     public void setBlue() {
