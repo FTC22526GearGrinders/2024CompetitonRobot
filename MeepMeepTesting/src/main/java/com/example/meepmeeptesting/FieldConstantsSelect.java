@@ -83,14 +83,14 @@ public final class FieldConstantsSelect {
         specimenSideStartPose = new Pose2d(-12, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, Math.toRadians(90));
 
         sample1ObservationZoneDropPose = new Pose2d(-48, 60 - Constants.RobotConstants.width / 2 + 8, Math.toRadians(180));
-        sample2ObservationZoneDropPose = new Pose2d(-58, 60 - Constants.RobotConstants.width / 2 + 8, Math.toRadians(180));
+        sample2ObservationZoneDropPose = new Pose2d(-58, 60 - Constants.RobotConstants.width / 2 + 8, specimenPickupAngle);
 
         firstStagePushInnerPose = new Pose2d(-36, 42, Math.toRadians(180));
         secondStagePushInnerVector = new Vector2d(-36, 10);
         thirdStagePushInnerVector = new Vector2d(-48, 10);
 
-        firstStagePushMidPose = new Pose2d(-48, 42, Math.toRadians(180));
-        secondStagePushMidVector = new Vector2d(-48, 10);
+        firstStagePushMidPose = new Pose2d(-24, 42, Math.toRadians(180));
+        secondStagePushMidVector = new Vector2d(-48, 0);
         thirdStagePushMidVector = new Vector2d(-58, 10);
 
 

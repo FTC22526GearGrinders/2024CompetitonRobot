@@ -15,6 +15,7 @@ public class SplineTest {
 
     public static void main(String[] args) {
 
+        FieldConstantsSelect fcs = new FieldConstantsSelect();
 
         MeepMeep meepMeep = new MeepMeep(800);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
@@ -32,16 +33,16 @@ public class SplineTest {
 //        .splineToLinearHeading(new Pose2d(48, 0,Math.PI/2), 0)
 //        .build();
 
-        Action firstSampleMoveToObservationZoneAction = drive.actionBuilder(FieldConstantsBlueMM.specimenDeliverPose1)
+        Action firstSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .splineToSplineHeading(new Pose2d(-36, 42, Math.toRadians(180)), Math.toRadians(180))
                 .strafeTo(new Vector2d(-36, 10))
                 .strafeTo(new Vector2d(-48, 10))
-                .strafeTo(FieldConstantsBlueMM.sample1ObservationZoneDropPose.position)
+                .strafeTo(fcs.sample1ObservationZoneDropPose.position)
                 .build();
 
-        Action secondSpecimenPickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.sample1ObservationZoneDropPose)
-                .lineToXSplineHeading(FieldConstantsBlueMM.specimenPickupApproachPose.position.x, Math.toRadians(90))
-                .strafeTo(FieldConstantsBlueMM.specimenPickupPose.position)
+        Action secondSpecimenPickupMoveAction = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
+                .lineToXSplineHeading(fcs.specimenPickupApproachPose.position.x, Math.toRadians(90))
+                .strafeTo(fcs.specimenPickupPose.position)
                 .waitSeconds(1)
                 .build();
         Action test = secondSpecimenPickupMoveAction;

@@ -36,64 +36,66 @@ public class BlueSamples {
         Action dropSampleAction = new SleepAction(2);
 
 
+        FieldConstantsSelect fcs;
         Action deliverFourSamples;
 
         MeepMeep meepMeep = new MeepMeep(800);
+        fcs = new FieldConstantsSelect();
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
                 .setColorScheme(new ColorSchemeBlueLight())
-                .setStartPose(FieldConstantsBlueMM.basketSideStartPose)
+                .setStartPose(fcs.basketSideStartPose)
                 .build();
 
         DriveShim drive = myBot.getDrive();
 
-        firstSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketSideStartPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
+        firstSampleDeliverMoveAction = drive.actionBuilder(fcs.basketSideStartPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
-        secondSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.innerYellowPrePickupPose.position, FieldConstantsBlueMM.innerYellowPrePickupPose.heading)
-                .strafeToLinearHeading(FieldConstantsBlueMM.innerYellowPickupPose.position, FieldConstantsBlueMM.innerYellowPickupPose.heading)
+        secondSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading)
+                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading)
                 .build();
 
 
-        secondSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.innerYellowPickupPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
+        secondSampleDeliverMoveAction = drive.actionBuilder(fcs.innerYellowPickupPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
-        thirdSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.midYellowPrePickupPose.position, FieldConstantsBlueMM.midYellowPrePickupPose.heading)
-                .strafeToLinearHeading(FieldConstantsBlueMM.midYellowPickupPose.position, FieldConstantsBlueMM.midYellowPickupPose.heading)
+        thirdSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading)
+                .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading)
                 .build();
 
-        thirdSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.midYellowPickupPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
+        thirdSampleDeliverMoveAction = drive.actionBuilder(fcs.midYellowPickupPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
-        fourthSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.outerYellowApproachPose.position, FieldConstantsBlueMM.outerYellowApproachPose.heading)
+        fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading)
                 .waitSeconds(.1)
-                .lineToX(FieldConstantsBlueMM.outerYellowPickupPose.position.x)
+                .lineToX(fcs.outerYellowPickupPose.position.x)
 
                 .build();
 
-        fourthSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.outerYellowPickupPose)
-                .lineToX(FieldConstantsBlueMM.outerYellowApproachPose.position.x)
-                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
+        fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
+                .lineToX(fcs.outerYellowApproachPose.position.x)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//
 
-        fifthSamplePickupMoveAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.ascentZonePickupPose.position, Math.toRadians(180))
+        fifthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.ascentZonePickupPose.position, Math.toRadians(180))
                 .build();
 
-        fifthSampleDeliverMoveAction = drive.actionBuilder(FieldConstantsBlueMM.ascentZonePickupPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.basketDeliverPose.position, FieldConstantsBlueMM.basketDeliverPose.heading)
+        fifthSampleDeliverMoveAction = drive.actionBuilder(fcs.ascentZonePickupPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();
 
-        parkAction = drive.actionBuilder(FieldConstantsBlueMM.basketDeliverPose)
-                .strafeToLinearHeading(FieldConstantsBlueMM.ascentZoneParkPose.position, Math.toRadians(180))
+        parkAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.ascentZoneParkPose.position, Math.toRadians(180))
                 .build();
 
         deliverFourSamples = new SequentialAction(
