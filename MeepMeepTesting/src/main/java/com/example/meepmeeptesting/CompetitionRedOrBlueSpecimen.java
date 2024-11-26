@@ -11,7 +11,7 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class CompetitionBlueSpecimen {
+public class CompetitionRedOrBlueSpecimen {
 
 
     public static void main(String[] args) {
@@ -160,9 +160,9 @@ public class CompetitionBlueSpecimen {
                         secondSpecimenDeliverMoveAction,
                         new SleepAction(1),
 
-                        new ParallelAction(
-                                thirdSpecimenPickupApproachMoveAction,
-                                elevatorMove),
+//                        new ParallelAction(
+//                                thirdSpecimenPickupApproachMoveAction,
+//                                elevatorMove),
                         specimenPickuoMoveAction,
                         new SleepAction(1),
 

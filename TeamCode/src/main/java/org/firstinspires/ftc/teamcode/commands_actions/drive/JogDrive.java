@@ -15,7 +15,7 @@ public class JogDrive extends CommandBase {
     private final double speedMultiplier = .25;
 
     CommandOpMode myOpmode;
-    private double startRadians;
+
 
 
     public JogDrive(MecanumDriveSubsystem drive, Gamepad gamepad, CommandOpMode opmode) {
@@ -67,7 +67,7 @@ public class JogDrive extends CommandBase {
             }
             /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
 
-            double gyro_radians = startRadians - drive.getYawRads();
+            double gyro_radians = drive.startRadians - drive.pose.heading.toDouble();
 
 
             double temp = strafe * Math.sin(gyro_radians) + forward * (float) Math.cos(gyro_radians);

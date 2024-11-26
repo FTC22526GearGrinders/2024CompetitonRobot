@@ -100,6 +100,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     public Pose2d pose;
     public Telemetry telemetry;
     public boolean fieldCentric;
+    public double startRadians;
     public PosePatcher posePatcher;
     public boolean slowMode;
     public int showSelect = 0;

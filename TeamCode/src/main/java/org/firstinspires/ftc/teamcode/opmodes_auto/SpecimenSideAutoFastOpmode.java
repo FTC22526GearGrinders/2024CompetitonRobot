@@ -50,42 +50,30 @@ import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Specimen", group = "Auto")
+@Autonomous(name = "Specimen Fast", group = "Auto")
 //@Disabled
-public class SpecimenSideAutoOpmode extends CommandOpMode {
+public class SpecimenSideAutoFastOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
 
-
-    Action firstSpecimenDeliverApproachMoveAction;
-    Action secondSpecimenDeliverApproachMoveAction;
-    Action thirdSpecimenDeliverApproachMoveAction;
-    Action fourthSpecimenDeliverApproachMoveAction;
 
     Action firstSpecimenDeliverMoveAction;
     Action secondSpecimenDeliverMoveAction;
     Action thirdSpecimenDeliverMoveAction;
     Action fourthSpecimenDeliverMoveAction;
 
-    Action firstSpecimenPickupApproachMoveAction;
-    Action secondSpecimenPickupApproachMoveAction;
-    Action thirdSpecimenPickupApproachMoveAction;
-    Action fourthSpecimenPickupApproachMoveAction;
+    Action secondSpecimenPickupMoveAction;
+    Action thirdSpecimenPickupMoveAction;
+    Action fourthSpecimenPickupMoveAction;
 
-    Action specimenPickuoMoveAction;
 
     Action firstSampleMoveToObservationZoneAction;
     Action secondSampleMoveToObservationZoneAction;
 
     Action parkAction;
 
-    Action sequenceOne;
-    Action sequenceTwo;
-    Action sequenceThree;
-    Action sequenceFour;
-
-
+    SequentialAction sequenceOne;
     FieldConstantsSelect fcs;
 
 
@@ -115,11 +103,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
     void makeMotionActions() {
 
-        firstSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        firstSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose1)
+        firstSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenSideStartPose)
                 .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle)
                 .build();//move to place first specimen
 
@@ -131,58 +115,38 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 .build();
 
         secondSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.firstStagePushMidPose.position, fcs.specimenPickupAngle)
-                .strafeTo(fcs.secondStagePushMidVector)
+                .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenPickupAngle)
                 .strafeTo(fcs.thirdStagePushMidVector)
-                .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle)
+                .strafeTo(fcs.sample2ObservationZoneDropPoseFast.position)
                 .build();
 
-        secondSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.sample2ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
+        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.sample2ObservationZoneDropPoseFast)
+                // .splineToSplineHeading(fcs.specimenDeliverPose2,fcs.specimenPickupAngle)
+                .splineToLinearHeading(fcs.specimenDeliverPose2, Math.toRadians(90))
+                .build();//move to place first specimen
+
+        thirdSpecimenPickupMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
+                //.splineToSplineHeading(fcs.specimenPickupPose, fcs.specimenDropAngle)
+                .splineToLinearHeading(fcs.specimenPickupPose, Math.toRadians(-90))
                 .build();
 
-        secondSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose2.position, fcs.specimenDropAngle)
+        thirdSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
+                //.splineToSplineHeading(fcs.specimenDeliverPose3, fcs.specimenPickupAngle)
+                .splineToLinearHeading(fcs.specimenDeliverPose3, Math.toRadians(90))
                 .build();//move to place first specimen
 
-        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose2)
-                .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        thirdSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
-                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
+        fourthSpecimenPickupMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
+                .splineToLinearHeading(fcs.specimenPickupPose, Math.toRadians(-90))
                 .build();
 
-        thirdSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose3.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        thirdSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose3)
-                .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-
-        fourthSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
-                .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
-                .waitSeconds(1)
-                .build();
-
-        fourthSpecimenDeliverApproachMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose4.position, fcs.specimenDropAngle)
-                .build();//move to place first specimen
-
-        fourthSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenDeliverApproachPose4)
-                .strafeToLinearHeading(fcs.specimenDeliverPose4.position, fcs.specimenDropAngle)
+        fourthSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose4, Math.toRadians(90))
                 .build();//move to place first specimen
 
         parkAction = drive.actionBuilder(fcs.specimenDeliverPose4)
                 .strafeTo(fcs.specimenParkPose.position)
                 .build();
 
-
-        specimenPickuoMoveAction = drive.actionBuilder(fcs.specimenPickupApproachPose)
-                .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle)
-                .build();
 
     }
 
@@ -192,51 +156,43 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 new SequentialAction(
                         new ParallelAction(
                                 elevator.closeSpecimenClaw(),
-                                firstSpecimenDeliverApproachMoveAction,
+                                firstSpecimenDeliverMoveAction,
                                 elevator.elevatorToAboveUpperSubmersible()),
-                        firstSpecimenDeliverMoveAction,
                         ears.deliverSpecimenToUpperSubmersible(),
 
                         new ParallelAction(
                                 firstSampleMoveToObservationZoneAction,
                                 elevator.elevatorToHome()),
-                        secondSampleMoveToObservationZoneAction,
-
                         new ParallelAction(
-                                secondSpecimenPickupApproachMoveAction,
+                                secondSampleMoveToObservationZoneAction,
                                 elevator.elevatorToSpecimenOnWall()),
-                        specimenPickuoMoveAction,
+
                         elevator.closeSpecimenClaw(),
 
                         new ParallelAction(
-                                secondSpecimenDeliverApproachMoveAction,
+                                secondSpecimenDeliverMoveAction,
                                 elevator.elevatorToAboveUpperSubmersible()),
-                        secondSpecimenDeliverMoveAction,
                         ears.deliverSpecimenToUpperSubmersible(),
 
                         new ParallelAction(
-                                thirdSpecimenPickupApproachMoveAction,
+                                thirdSpecimenPickupMoveAction,
                                 elevator.elevatorToSpecimenOnWall()),
-                        specimenPickuoMoveAction,
                         elevator.closeSpecimenClaw(),
 
 
                         new ParallelAction(
-                                thirdSpecimenDeliverApproachMoveAction,
+                                thirdSpecimenDeliverMoveAction,
                                 elevator.elevatorToAboveUpperSubmersible()),
-                        thirdSpecimenDeliverMoveAction,
                         ears.deliverSpecimenToUpperSubmersible(),
 
                         new ParallelAction(
-                                fourthSpecimenPickupApproachMoveAction,
+                                fourthSpecimenPickupMoveAction,
                                 elevator.elevatorToSpecimenOnWall()),
-                        specimenPickuoMoveAction,
                         elevator.closeSpecimenClaw(),
 
                         new ParallelAction(
-                                fourthSpecimenDeliverApproachMoveAction,
+                                fourthSpecimenDeliverMoveAction,
                                 elevator.elevatorToAboveUpperSubmersible()),
-                        fourthSpecimenDeliverMoveAction,
                         ears.deliverSpecimenToUpperSubmersible(),
 
                         parkAction);

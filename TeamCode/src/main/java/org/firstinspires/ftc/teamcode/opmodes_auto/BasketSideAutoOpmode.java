@@ -254,6 +254,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 PoseStorage.currentTeam = PoseStorage.Team.RED;
                 fcs.setRed();
                 drive.pose = fcs.basketSideStartPose;
+                drive.startRadians = fcs.basketSideStartPose.heading.toDouble();
                 createMotionActions();
 
 
@@ -269,6 +270,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 fcs.setBlue();
 
                 drive.pose = fcs.basketSideStartPose;
+                drive.startRadians = fcs.basketSideStartPose.heading.toDouble();
                 createMotionActions();
             }
 
