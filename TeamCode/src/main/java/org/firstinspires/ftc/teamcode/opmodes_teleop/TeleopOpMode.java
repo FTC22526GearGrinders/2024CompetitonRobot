@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode.opmodes_teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -188,8 +187,7 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(rotateArm.reverseIntakeServosTimed(3));
 
         if (gamepad2.y && !previousGamepad2.y)
-            runningActions.add(new InstantAction(() -> arm.resetEncoders()));
-
+            runningActions.add(rotateArm.runUntilSampleOrTimeout(5));
 
         if (gamepad2.dpad_up && !previousGamepad2.dpad_up && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
             runningActions.add(rotateArm.tiltBothClear(1));

@@ -59,11 +59,11 @@ public class RotateArmSubsystem extends SubsystemBase {
         rightIntakeServo = opMode.hardwareMap.get(CRServo.class, "rightInServo");
         intakeSensor = opMode.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
 
-        leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");
+        leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");//.4
         rightTiltServo = opMode.hardwareMap.get(Servo.class, "rightTiltServo");
 
-        leftTiltServo.setDirection(Servo.Direction.REVERSE);
-        rightTiltServo.setDirection(Servo.Direction.FORWARD);
+        leftTiltServo.setDirection(Servo.Direction.FORWARD);
+        rightTiltServo.setDirection(Servo.Direction.REVERSE);
 
         FtcDashboard dashboard1 = FtcDashboard.getInstance();
 
@@ -164,7 +164,7 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     public Action reverseIntakeServosTimed(double secs) {
         return
-                new ParallelAction(
+                new SequentialAction(
                         reverseIntakeServos(),
                         new SleepAction(secs),
                         stopIntakeServos(),

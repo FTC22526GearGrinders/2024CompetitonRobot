@@ -59,7 +59,7 @@ public class CompetitionRedOrBlueSpecimenFast {
         fcs.setRed();
 
         firstSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle)
+                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenPickupAngle)
                 .build();//move to place first specimen
 
         firstSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.specimenDeliverPose1)
@@ -70,32 +70,32 @@ public class CompetitionRedOrBlueSpecimenFast {
                 .build();
 
         secondSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenPickupAngle)
+                .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenDropAngle)
                 .strafeTo(fcs.thirdStagePushMidVector)
                 .strafeTo(fcs.sample2ObservationZoneDropPoseFast.position)
                 .build();
 
         secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.sample2ObservationZoneDropPoseFast)
                 // .splineToSplineHeading(fcs.specimenDeliverPose2,fcs.specimenPickupAngle)
-                .splineToLinearHeading(fcs.specimenDeliverPose2, Math.toRadians(90))
+                .splineToLinearHeading(fcs.specimenDeliverPose2, fcs.specimenPickupAngle)
                 .build();//move to place first specimen
 
         thirdSpecimenPickupMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
                 //.splineToSplineHeading(fcs.specimenPickupPose, fcs.specimenDropAngle)
-                .splineToLinearHeading(fcs.specimenPickupPose, Math.toRadians(-90))
+                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle)
                 .build();
 
         thirdSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
                 //.splineToSplineHeading(fcs.specimenDeliverPose3, fcs.specimenPickupAngle)
-                .splineToLinearHeading(fcs.specimenDeliverPose3, Math.toRadians(90))
+                .splineToLinearHeading(fcs.specimenDeliverPose3, fcs.specimenPickupAngle)
                 .build();//move to place first specimen
 
         fourthSpecimenPickupMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
-                .splineToLinearHeading(fcs.specimenPickupPose, Math.toRadians(-90))
+                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle)
                 .build();
 
         fourthSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverPose4, Math.toRadians(90))
+                .splineToLinearHeading(fcs.specimenDeliverPose4, fcs.specimenPickupAngle)
                 .build();//move to place first specimen
 
         parkAction = drive.actionBuilder(fcs.specimenDeliverPose4)

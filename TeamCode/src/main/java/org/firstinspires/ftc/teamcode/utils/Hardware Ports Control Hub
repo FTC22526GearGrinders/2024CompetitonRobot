@@ -1,0 +1,36 @@
+Into The Deep Hardeare Assignments
+
+Control Hub
+
+
+Motors
+
+Left Front
+Right Front
+Left Back
+Right Back
+
+Encoders
+
+par 0 left front
+par 1 right back
+perp right front
+
+Servos
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+I2c Bus0
+
+I2c Bus 1
+
+I2c Bus 2

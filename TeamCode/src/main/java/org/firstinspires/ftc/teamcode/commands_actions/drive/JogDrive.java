@@ -5,7 +5,6 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
-import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
 public class JogDrive extends CommandBase {
@@ -13,9 +12,8 @@ public class JogDrive extends CommandBase {
 
     private final Gamepad gamepad;
     private final double speedMultiplier = .25;
-
+    double denominator;
     CommandOpMode myOpmode;
-
 
 
     public JogDrive(MecanumDriveSubsystem drive, Gamepad gamepad, CommandOpMode opmode) {
@@ -24,74 +22,52 @@ public class JogDrive extends CommandBase {
         myOpmode = opmode;
 
         addRequirements(this.drive);
-
     }
 
 
     @Override
     public void initialize() {
+
     }
 
 
     @Override
     public void execute() {
 
-        if (!drive.fieldCentric) {
-
-            double y = -this.gamepad.left_stick_y;
-            double x = this.gamepad.left_stick_x;
-            double rx = this.gamepad.right_stick_x;
+        double y = -this.gamepad.left_stick_y;
+        double x = this.gamepad.left_stick_x * 1.1;
+        double rx = this.gamepad.right_stick_x;
 
 
-            if (drive.isSlowMode()) {
-                y *= speedMultiplier;
-                x *= speedMultiplier;
-                rx *= speedMultiplier;
-            }
-
-            drive.jog(y, x, rx);
-
+        if (drive.isSlowMode()) {
+            y *= speedMultiplier;
+            x *= speedMultiplier;
+            rx *= speedMultiplier;
         }
-
 
         if (drive.fieldCentric) {
-            /* Invert stick Y axis */
-            double forward = -this.gamepad.left_stick_y;
-            double strafe = this.gamepad.left_stick_x;
-            double rcw = this.gamepad.right_stick_x;
-            if (drive.isSlowMode()) {
-                strafe *= speedMultiplier;
-                ;
-                forward *= speedMultiplier;
-                rcw *= speedMultiplier;
-            }
-            /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
 
-            double gyro_radians = drive.startRadians - drive.pose.heading.toDouble();
+//shift the gyro to the starting heading and limit to +/- 180 degrees in radians
+            double botHeading = Math.IEEEremainder(drive.startRadians + drive.getYawRads(), Math.PI);
+            // Rotate the movement direction counter to the bot's rotation
+            double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
+            double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
 
+            rotX = rotX * 1.1;  // Counteract imperfect strafing
 
-            double temp = strafe * Math.sin(gyro_radians) + forward * (float) Math.cos(gyro_radians);
+            x = rotX;
+            y = rotY;
 
-            strafe = strafe * Math.cos(gyro_radians) - forward * Math.sin(gyro_radians);
-
-            forward = temp;
-
-
-            if (PoseStorage.currentTeam == PoseStorage.Team.RED) {
-                forward = -this.gamepad.left_stick_x;
-                strafe = this.gamepad.left_stick_x; /* Invert stick Y axis */
-                rcw = this.gamepad.left_stick_x;
-            }
-
-
-
-
-            /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
-
-            drive.jog(forward, strafe, rcw);
         }
 
+        denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        drive.leftFront.setPower((y + x + rx) / denominator);
+        drive.leftBack.setPower((y - x + rx) / denominator);
+        drive.rightFront.setPower((y - x - rx) / denominator);
+        drive.rightBack.setPower((y + x - rx) / denominator);
     }
+
 
     @Override
     public void end(boolean interrupted) {
