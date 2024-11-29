@@ -16,6 +16,7 @@ public class CompetitionRedOrBlueSpecimen {
 
     public static void main(String[] args) {
 
+
         Action firstSpecimenDeliverApproachMoveAction;
         Action secondSpecimenDeliverApproachMoveAction;
         Action thirdSpecimenDeliverApproachMoveAction;

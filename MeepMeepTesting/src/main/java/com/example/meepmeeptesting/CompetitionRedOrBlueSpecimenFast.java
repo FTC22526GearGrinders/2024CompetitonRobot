@@ -72,10 +72,10 @@ public class CompetitionRedOrBlueSpecimenFast {
         secondSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenDropAngle)
                 .strafeTo(fcs.thirdStagePushMidVector)
-                .strafeTo(fcs.sample2ObservationZoneDropPoseFast.position)
+                .strafeTo(fcs.sample2ObservationZonePoseFast.position)
                 .build();
 
-        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.sample2ObservationZoneDropPoseFast)
+        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.sample2ObservationZonePoseFast)
                 // .splineToSplineHeading(fcs.specimenDeliverPose2,fcs.specimenPickupAngle)
                 .splineToLinearHeading(fcs.specimenDeliverPose2, fcs.specimenPickupAngle)
                 .build();//move to place first specimen

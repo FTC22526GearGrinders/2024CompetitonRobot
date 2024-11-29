@@ -76,15 +76,12 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     }
 
-
     @Override
     public void periodic() {
-
-        if (showSelect == Constants.MiscConstants.showRotateArm1)
+        if (showSelect == Constants.ShowTelemtryConstants.showRotateArm1)
             showTelemetry();
-        if (showSelect == Constants.MiscConstants.showRotateArm2)
+        if (showSelect == Constants.ShowTelemtryConstants.showRotateArm2)
             showTelemetryColors();
-
     }
 
     public Action tiltBothDown() {
@@ -305,11 +302,9 @@ public class RotateArmSubsystem extends SubsystemBase {
     public void showTelemetry() {
         telemetry.addData("Intaking", intaking);
         telemetry.addData("Reversing", reversing);
-
         telemetry.addData("Inches", intakeSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Team", PoseStorage.currentTeam);
         telemetry.update();
-
     }
 
     public void showTelemetryColors() {
@@ -324,8 +319,6 @@ public class RotateArmSubsystem extends SubsystemBase {
         telemetry.addData("AtIntake", sampleAtIntake());
         telemetry.addData("ClearIntake", sampleClearOfIntake());
         telemetry.update();
-
-
     }
 
 

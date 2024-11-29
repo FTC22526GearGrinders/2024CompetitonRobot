@@ -75,17 +75,23 @@ public class RedOrBlueSamplesFast {
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
-        fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading)
-                .waitSeconds(.1)
-                .lineToX(fcs.outerYellowPickupPose.position.x)
+//        fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+//                .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading)
+//                .waitSeconds(.1)
+//                .lineToX(fcs.outerYellowPickupPose.position.x)
+//                .build();
 
+        fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
+                .splineToLinearHeading(fcs.outerYellowPickupPose, Math.toRadians(180))
+                .waitSeconds(.1)
+                //    .lineToX(fcs.outerYellowPickupPose.position.x)
                 .build();
 
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
-                .lineToX(fcs.outerYellowApproachPose.position.x)
+                //         .lineToX(fcs.outerYellowApproachPose.position.x)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//
+
 
         fifthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.ascentZonePickupPose.position, fcs.ascentZonePickupPose.heading)

@@ -145,8 +145,25 @@ public class TeleopOpMode extends CommandOpMode {
 
     private void doDriverButtons() {
 
+        if (gamepad1.left_bumper) runningActions.add(eara.pickupSample(10));
 
-        // eara.pickupSample(5))
+        if (gamepad1.right_bumper) runningActions.add(elevator.cycleBucket(1));
+
+        if (gamepad1.left_trigger > .75) eara.deliverSpecimenToUpperSubmersible();
+
+        if (gamepad1.right_trigger > .75) runningActions.add(elevator.closeSpecimenClaw());
+
+//        if (gamepad1.a)runningActions.add(
+//        if (gamepad1.b)runningActions.add(
+//        if (gamepad1.x)runningActions.add(
+//        if (gamepad1.y)runningActions.add(
+
+
+        if (gamepad1.dpad_up) runningActions.add(elevator.elevatorToUpperBasket());
+        if (gamepad1.dpad_down) runningActions.add(elevator.elevatorToHome());
+        if (gamepad1.dpad_right) runningActions.add(elevator.elevatorToUpperSubmersible());
+        if (gamepad1.dpad_up) runningActions.add(elevator.elevatorToUpperSubmersible());
+
 
         //pickup specimen from wall
 
@@ -237,19 +254,20 @@ public class TeleopOpMode extends CommandOpMode {
 
     void incShowSelect() {
         showSelect++;
-        if (showSelect > Constants.MiscConstants.maxShowSelectCount)
-            showSelect = Constants.MiscConstants.minShowSelectCount;
+        if (showSelect > Constants.ShowTelemtryConstants.maxShowSelectCount)
+            showSelect = Constants.ShowTelemtryConstants.minShowSelectCount;
         updateSubs();
     }
 
     void decShowSelect() {
         showSelect--;
-        if (showSelect < Constants.MiscConstants.minShowSelectCount)
-            showSelect = Constants.MiscConstants.maxShowSelectCount;
+        if (showSelect < Constants.ShowTelemtryConstants.minShowSelectCount)
+            showSelect = Constants.ShowTelemtryConstants.maxShowSelectCount;
         updateSubs();
     }
 
     void updateSubs() {
+        telemetry.clearAll();
         drive.showSelect = showSelect;
         arm.showSelect = showSelect;
         elevator.showSelect = showSelect;

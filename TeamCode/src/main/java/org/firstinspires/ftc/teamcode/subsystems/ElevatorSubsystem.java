@@ -296,11 +296,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
 
     public void periodic() {
+        if (showSelect == Constants.ShowTelemtryConstants.showElevatorCommon) {
+            showCommonTelemetry();
+        }
 
-        if (showSelect == Constants.MiscConstants.showRotateArm1) {
+
+        if (showSelect == Constants.ShowTelemtryConstants.showElevator1) {
             showLeftTelemetry();
         }
-        if (showSelect == Constants.MiscConstants.showRotateArm1) {
+        if (showSelect == Constants.ShowTelemtryConstants.showElevator2) {
             showRightTelemetry();
         }
 
@@ -439,22 +443,32 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
+    public void showCommonTelemetry() {
+        telemetry.addData("ElevatorCommon", showSelect);
+        telemetry.addData("LeftPositionInches", getLeftPositionInches());
+        telemetry.addData("RightPositionInches", getRightPositionInches());
+        telemetry.addData("LeftPower", getLeftPower());
+        telemetry.addData("RightPower", getRightPower());
+
+        telemetry.update();
+
+    }
+
+
     public void showLeftTelemetry() {
         telemetry.addData("ElevatorLeft", showSelect);
 
         telemetry.addData("HoldRng", posrng);
 
         telemetry.addData("LeftPositionInches", getLeftPositionInches());
-        telemetry.addData("RightPositionInches", getRightPositionInches());
         telemetry.addData("ElevatorGoal", leftPidController.getGoal().position);
         telemetry.addData("LeftPower", getLeftPower());
-        telemetry.addData("RightPower", getRightPower());
         telemetry.addData("LeftPosErr", leftPidController.getPositionError());
         telemetry.addData("RightPosErr", rightPidController.getPositionError());
-//        telemetry.addData("LeftFF", leftFf);
-//        telemetry.addData("LeftPIDout", leftPidout);
-//        telemetry.addData("LeftSetVel", leftSetVel);
-//        telemetry.addData("LeftSetPos", leftSetPos);
+        telemetry.addData("LeftFF", leftFf);
+        telemetry.addData("LeftPIDout", leftPidout);
+        telemetry.addData("LeftSetVel", leftSetVel);
+        telemetry.addData("LeftSetPos", leftSetPos);
 
         telemetry.update();
 

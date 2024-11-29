@@ -149,7 +149,7 @@ public final class Constants {
         public static final double MAX_MOTOR_RPM = 6000;
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
 
-        public static final double GEARING_RATIO = 3;
+        public static final double GEARING_RATIO = 5;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
@@ -159,8 +159,8 @@ public final class Constants {
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC / GEARING_RATIO * .8;//16
 
 
-        public static final double UPPER_POSITION_LIMIT = 200;
-        public static final int LOWER_POSITION_LIMIT = -50;
+        public static final double UPPER_POSITION_LIMIT = 36;
+        public static final int LOWER_POSITION_LIMIT = 0;
         public static final double HOME_POSITION = 0;
         public static final double POSITION_TOLERANCE_INCHES = .1;
 
@@ -192,23 +192,22 @@ public final class Constants {
 
     }
 
-    public static final class MiscConstants {
+    public static final class ShowTelemtryConstants {
 
         public static final int minShowSelectCount = 0;
-        public static final int maxShowSelectCount = 9;
-
+        public static final int maxShowSelectCount = 11;
         public static final int showNone = 0;
-
         public static final int showDrive1 = 1;
         public static final int showDrive2 = 2;
-        public static final int showElevator1 = 3;
-        public static final int showElevator2 = 4;
-        public static final int showArm1 = 5;
-        public static final int showArm2 = 6;
-        public static final int showRotateArm1 = 7;
-        public static final int showRotateArm2 = 8;
-        public static final int showLimelight = 9;
-
+        public static final int showElevatorCommon = 3;
+        public static final int showElevator1 = 4;
+        public static final int showElevator2 = 5;
+        public static final int showArmCommon = 6;
+        public static final int showArm1 = 7;
+        public static final int showArm2 = 8;
+        public static final int showRotateArm1 = 9;
+        public static final int showRotateArm2 = 10;
+        public static final int showLimelight = 11;
 
     }
 

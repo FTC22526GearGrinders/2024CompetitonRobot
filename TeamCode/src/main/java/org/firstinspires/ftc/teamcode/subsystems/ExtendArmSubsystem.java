@@ -148,10 +148,11 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        if (showSelect == Constants.MiscConstants.showArm1)
+        if (showSelect == Constants.ShowTelemtryConstants.showArmCommon)
+            showTelemetryCommon();
+        if (showSelect == Constants.ShowTelemtryConstants.showArm1)
             showTelemetryLeft();
-        if (showSelect == Constants.MiscConstants.showArm2)
+        if (showSelect == Constants.ShowTelemtryConstants.showArm2)
             showTelemetryRight();
 
 
@@ -352,21 +353,31 @@ public class ExtendArmSubsystem extends SubsystemBase {
         return positionArm(Constants.ExtendArmConstants.bucketDistance);
     }
 
-    public void showTelemetryLeft() {
-        telemetry.addData("ArmLeft", showSelect);
-//        telemetry.addData("Arm Tuning", atGoal());
-//        telemetry.addData("Arm FF", leftff);
-        //  telemetry.addData("ArmLeftTargetInches", targetInches);
+
+    public void showTelemetryCommon() {
+        telemetry.addData("ArmCommon", showSelect);
         telemetry.addData("ArmLeftInches", getLeftPositionInches());
-//        telemetry.addData("ArmLeftSetpointPos", round2dp(leftArmSetpoint.position, 2));
-//        telemetry.addData("ArmLeftSetpointVel", round2dp(leftArmSetpoint.velocity, 2));
-//        telemetry.addData("ArmLeftPosError", round2dp(leftArmController.getPositionError(), 2));
-//        telemetry.addData("ArmLeftVelError", round2dp(leftArmController.getVelocityError(), 2));
-//        telemetry.addData("ArmLeftVel", round2dp(getLeftVelocity(), 2));
-//        telemetry.addData("ArmLeftPID", round2dp(leftpidout, 2));
+        telemetry.addData("ArmRightInches", getRightPositionInches());
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
         telemetry.addData("ArmRightInches", getRightPositionInches());
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
+    }
+
+    public void showTelemetryLeft() {
+        telemetry.addData("ArmLeft", showSelect);
+        telemetry.addData("Arm Tuning", atGoal());
+        telemetry.addData("Arm FF", leftff);
+        telemetry.addData("ArmLeftTargetInches", targetInches);
+        telemetry.addData("ArmLeftInches", getLeftPositionInches());
+        telemetry.addData("ArmLeftSetpointPos", round2dp(leftArmSetpoint.position, 2));
+        telemetry.addData("ArmLeftSetpointVel", round2dp(leftArmSetpoint.velocity, 2));
+        telemetry.addData("ArmLeftPosError", round2dp(leftArmController.getPositionError(), 2));
+        telemetry.addData("ArmLeftVelError", round2dp(leftArmController.getVelocityError(), 2));
+        telemetry.addData("ArmLeftVel", round2dp(getLeftVelocity(), 2));
+        telemetry.addData("ArmLeftPID", round2dp(leftpidout, 2));
+        telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
+
+
         telemetry.update();
 
     }

@@ -32,8 +32,10 @@ public class JogElevator extends CommandBase {
     @Override
     public void execute() {
 
+        double stickValue = -gamepad.right_stick_y;
 
-        double speedips = gamepad.right_stick_y * ipsec;//5ips
+
+        double speedips = -gamepad.right_stick_y * ipsec;//5ips
 
         ff = armFF.calculate(speedips);
         elevator.leftPower = ff;
@@ -41,6 +43,7 @@ public class JogElevator extends CommandBase {
 
         boolean overrideLimits = gamepad.start;
 
+        ff = stickValue;
 
         if (overrideLimits || (elevator.leftPower > 0 && elevator.getLeftPositionInches() < Constants.ElevatorConstants.UPPER_POSITION_LIMIT
                 || elevator.leftPower < 0 && elevator.getLeftPositionInches() > Constants.ElevatorConstants.LOWER_POSITION_LIMIT)
@@ -51,7 +54,6 @@ public class JogElevator extends CommandBase {
         } else {
             elevator.setLeftMotorPower(0);
             elevator.setRightMotorPower(0);
-
         }
 
         elevator.setTargetInches(elevator.getLeftPositionInches());

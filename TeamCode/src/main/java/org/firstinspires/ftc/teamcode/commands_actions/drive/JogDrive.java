@@ -27,7 +27,6 @@ public class JogDrive extends CommandBase {
 
     @Override
     public void initialize() {
-
     }
 
 
@@ -48,7 +47,7 @@ public class JogDrive extends CommandBase {
         if (drive.fieldCentric) {
 
 //shift the gyro to the starting heading and limit to +/- 180 degrees in radians
-            double botHeading = Math.IEEEremainder(drive.startRadians + drive.getYawRads(), Math.PI);
+            double botHeading = Math.IEEEremainder(drive.startRadians - drive.getYawRads(), 2 * Math.PI);
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
             double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);

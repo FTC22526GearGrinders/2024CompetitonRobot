@@ -46,7 +46,7 @@ public class LimelightSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if (showSelect == Constants.MiscConstants.showLimelight) {
+        if (showSelect == Constants.ShowTelemtryConstants.showLimelight) {
             showTelemetry();
         }
 

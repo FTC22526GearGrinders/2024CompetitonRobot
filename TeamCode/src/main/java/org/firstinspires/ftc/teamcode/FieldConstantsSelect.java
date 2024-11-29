@@ -32,6 +32,7 @@ public final class FieldConstantsSelect {
     public double specimenPickupAngle;
     public Pose2d specimenSideStartPose;
     public Pose2d sample1ObservationZoneDropPose;
+    public Pose2d sample2ObservationZoneApproachPoseFast;
     public Pose2d sample2ObservationZoneDropPoseFast;
     public Pose2d sample2ObservationZoneDropPose;
     public Pose2d firstStagePushInnerPose;
@@ -87,6 +88,7 @@ public final class FieldConstantsSelect {
         sample1ObservationZoneDropPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, Math.toRadians(180));
         sample2ObservationZoneDropPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, specimenPickupAngle);
         sample2ObservationZoneDropPoseFast = new Pose2d(-58, Constants.FieldConstants.width / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenPickupAngle);
+        sample2ObservationZoneApproachPoseFast = new Pose2d(-58, Constants.FieldConstants.width / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder - 6, specimenPickupAngle);
 
         firstStagePushInnerPose = new Pose2d(-36, 42, Math.toRadians(180));
         secondStagePushInnerVector = new Vector2d(-36, 10);
@@ -140,7 +142,7 @@ public final class FieldConstantsSelect {
         sample1ObservationZoneDropPose = flipBlueToRedPose(sample1ObservationZoneDropPose);
         sample2ObservationZoneDropPose = flipBlueToRedPose(sample2ObservationZoneDropPose);
         sample2ObservationZoneDropPoseFast = flipBlueToRedPose(sample2ObservationZoneDropPoseFast);
-
+        sample2ObservationZoneApproachPoseFast = flipBlueToRedPose(sample2ObservationZoneApproachPoseFast);
         firstStagePushInnerPose = flipBlueToRedPose(firstStagePushInnerPose);
         secondStagePushInnerVector = flipBlueToRedVector(secondStagePushInnerVector);
         thirdStagePushInnerVector = flipBlueToRedVector(thirdStagePushInnerVector);
