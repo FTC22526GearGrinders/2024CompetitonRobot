@@ -145,24 +145,32 @@ public class TeleopOpMode extends CommandOpMode {
 
     private void doDriverButtons() {
 
-        if (gamepad1.left_bumper) runningActions.add(eara.pickupSample(10));
+        if (gamepad1.left_bumper && !previousGamepad2.left_bumper)
+            runningActions.add(eara.pickupSample(10));
 
-        if (gamepad1.right_bumper) runningActions.add(elevator.cycleBucket(1));
+        if (gamepad1.right_bumper && !previousGamepad2.right_bumper)
+            runningActions.add(elevator.cycleBucket(1));
 
-        if (gamepad1.left_trigger > .75) eara.deliverSpecimenToUpperSubmersible();
+        if (gamepad1.left_trigger > .75)
+            runningActions.add(eara.deliverSpecimenToUpperSubmersible());
 
         if (gamepad1.right_trigger > .75) runningActions.add(elevator.closeSpecimenClaw());
 
-//        if (gamepad1.a)runningActions.add(
+        if (gamepad1.a && !previousGamepad1.a) runningActions.add(eara.getSampleAutoBasket());
+
 //        if (gamepad1.b)runningActions.add(
 //        if (gamepad1.x)runningActions.add(
 //        if (gamepad1.y)runningActions.add(
 
 
-        if (gamepad1.dpad_up) runningActions.add(elevator.elevatorToUpperBasket());
-        if (gamepad1.dpad_down) runningActions.add(elevator.elevatorToHome());
-        if (gamepad1.dpad_right) runningActions.add(elevator.elevatorToUpperSubmersible());
-        if (gamepad1.dpad_up) runningActions.add(elevator.elevatorToUpperSubmersible());
+        if (gamepad1.dpad_up && !previousGamepad1.dpad_up)
+            runningActions.add(elevator.elevatorToUpperBasket());
+        if (gamepad1.dpad_down && !previousGamepad1.dpad_down)
+            runningActions.add(elevator.elevatorToHome());
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right)
+            runningActions.add(elevator.elevatorToUpperSubmersible());
+        if (gamepad1.dpad_left && !previousGamepad1.dpad_left)
+            runningActions.add(elevator.elevatorToUpperSubmersible());
 
 
         //pickup specimen from wall
@@ -185,7 +193,7 @@ public class TeleopOpMode extends CommandOpMode {
 
     public void doCoDriveButtons() {
 
-        if (gamepad2.a && !previousGamepad2.a) runningActions.add(eara.getSampleAutoBasket());
+        //  if (gamepad2.a && !previousGamepad2.a)
 
         if (gamepad2.dpad_up && !previousGamepad2.dpad_up) incShowSelect();
         if (gamepad2.dpad_down && !previousGamepad2.dpad_down) decShowSelect();

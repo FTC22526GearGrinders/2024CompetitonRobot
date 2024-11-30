@@ -29,10 +29,12 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 @Config
 public class RotateArmSubsystem extends SubsystemBase {
 
-    public static double leftIntakeTiltClearAngle = 0.4;
+    public static double leftIntakeTiltClearAngle = 0.46;
     public static double leftIntakeTiltDownAngle = 1;
-    public static double rightIntakeTiltClearAngle = .4;
+    public static double leftIntakeBucketClearAngle = 0.25;
+    public static double rightIntakeTiltClearAngle = .46;
     public static double rightIntakeTiltDownAngle = 1;
+    public static double rightIntakeBucketClearAngle = 0.25;
     public static double touchSubmersibleAngle = .3;
     public static double intakeServoInPower = 1;
     public static double intakeServoOutPower = -1;
@@ -100,6 +102,16 @@ public class RotateArmSubsystem extends SubsystemBase {
                         new ParallelAction(
                                 new InstantAction(() -> leftTiltServo.setPosition(leftIntakeTiltClearAngle)),
                                 new InstantAction(() -> rightTiltServo.setPosition(rightIntakeTiltClearAngle))),
+                        new SleepAction(timeout),
+                        new InstantAction(this::setTiltPositionClear));
+    }
+
+    public Action tiltBothToBucket(double timeout) {
+        return
+                new SequentialAction(
+                        new ParallelAction(
+                                new InstantAction(() -> leftTiltServo.setPosition(leftIntakeBucketClearAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(rightIntakeBucketClearAngle))),
                         new SleepAction(timeout),
                         new InstantAction(this::setTiltPositionClear));
     }
@@ -205,6 +217,7 @@ public class RotateArmSubsystem extends SubsystemBase {
     public Action colorDetectAction() {
         return new Action() {
             private boolean initialized = false;
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
@@ -310,6 +323,7 @@ public class RotateArmSubsystem extends SubsystemBase {
     public void showTelemetryColors() {
         telemetry.addData("TiltClear", tiltPositionClear);
         telemetry.addData("Light", intakeSensor.getLightDetected());
+        telemetry.addData("Light", intakeSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Red", intakeSensor.red());
         telemetry.addData("Green", intakeSensor.green());
         telemetry.addData("Blue", intakeSensor.blue());

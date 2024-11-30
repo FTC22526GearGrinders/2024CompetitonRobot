@@ -47,9 +47,9 @@ public class Elevator_Arm_RotateArm_Actions {
                 arm.armToPickupAction(),
                 rotateArm.tiltBothDown(),
                 rotateArm.runUntilSampleOrTimeout(10),
-                rotateArm.tiltBothClear(3),
+                rotateArm.tiltBothToBucket(2),
                 arm.armToBucketAction(),
-                new FailoverAction(rotateArm.reverseIntakeServosTimed(2), null, !rotateArm.sampleAtIntake()));
+                rotateArm.reverseIntakeServosTimed(2));
     }
 
     public Action deliverSampleToUpperBasket() {

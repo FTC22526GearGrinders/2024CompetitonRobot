@@ -50,7 +50,7 @@ public class SensorColor extends LinearOpMode {
     @Override
     public void runOpMode() {
 //        colorSensor = hardwareMap.get(RevColorSensorV3.class, "sensor_color");
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "sensor_color");
+        colorSensor = hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
 
         waitForStart();
 

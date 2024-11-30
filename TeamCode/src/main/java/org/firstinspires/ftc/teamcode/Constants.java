@@ -131,7 +131,7 @@ public final class Constants {
 
         public static double pickupDistance = 12;
 
-        public static double bucketDistance = 2;
+        public static double bucketDistance = 0;
     }
 
     public static final class RotateArmConstants {
@@ -142,6 +142,7 @@ public final class Constants {
 
         public static double sampleClearDistance = 2;
 
+
     }
 
     public static final class ElevatorConstants {
@@ -149,7 +150,7 @@ public final class Constants {
         public static final double MAX_MOTOR_RPM = 6000;
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
 
-        public static final double GEARING_RATIO = 5;
+        public static final double GEARING_RATIO = 15;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
