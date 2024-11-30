@@ -38,6 +38,10 @@ public class RotateArmSubsystem extends SubsystemBase {
     public static double touchSubmersibleAngle = .3;
     public static double intakeServoInPower = 1;
     public static double intakeServoOutPower = -1;
+    public static double[] redLowerHue = {330, 0};
+    public static double[] redUpperHue = {0, 40};
+    public static double[] blueHue = {220, 260};
+    public static double[] yellowHue = {45, 100};
     public CRServo leftIntakeServo;
     public CRServo rightIntakeServo;
     public RevColorSensorV3 intakeSensor;
@@ -245,10 +249,6 @@ public class RotateArmSubsystem extends SubsystemBase {
         // values is a reference to the hsvValues array.
         final float values[] = hsvValues;
 
-        double[] redLowerHue = {330, 0};
-        double[] redUpperHue = {0, 40};
-        double[] blueHue = {220, 260};
-        double[] yellowHue = {45, 100};
 
         Color.RGBToHSV(intakeSensor.red() * 8, intakeSensor.green() * 8, intakeSensor.blue() * 8, hsvValues);
 
