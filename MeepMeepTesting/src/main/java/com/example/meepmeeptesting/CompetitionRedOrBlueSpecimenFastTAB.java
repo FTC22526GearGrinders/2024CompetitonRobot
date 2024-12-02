@@ -12,6 +12,7 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueLight;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveShim;
+import com.noahbres.meepmeep.roadrunner.DriveTrainType;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class CompetitionRedOrBlueSpecimenFastTAB {
@@ -31,14 +32,17 @@ public class CompetitionRedOrBlueSpecimenFastTAB {
 
 
         TrajectoryActionBuilder firstSampleMoveToObservationZone;
-        TrajectoryActionBuilder secondSampleMoveToObservationZonePickup;
+        TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach;
+        TrajectoryActionBuilder secondSampleObservationZonePickup;
 
         TrajectoryActionBuilder park;
 
         Action elevatorMove = new SleepAction(2);
 
         Action sequenceOne;
-        TrajectoryActionBuilder sequenceTwo;
+        Action sequenceTwo;
+
+        // TrajectoryActionBuilder sequenceTwo;
         TrajectoryActionBuilder sequenceThree;
         TrajectoryActionBuilder sequenceFour;
         TranslationalVelConstraint approachVel;
@@ -54,6 +58,7 @@ public class CompetitionRedOrBlueSpecimenFastTAB {
         approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+                .setDriveTrainType((DriveTrainType.MECANUM))
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
@@ -79,10 +84,12 @@ public class CompetitionRedOrBlueSpecimenFastTAB {
                 .strafeTo(fcs.sample1ObservationZoneDropPose.position);
 
 
-        secondSampleMoveToObservationZonePickup = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenDropAngle)
+        secondSampleMoveToObservationZoneApproach = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
+                .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenPickupAngle)
                 .strafeTo(fcs.thirdStagePushMidVector)
-                .strafeTo(fcs.sample2ObservationZoneApproachPoseFast.position)
+                .strafeTo(fcs.sample2ObservationZoneApproachPoseFast.position);
+
+        secondSampleObservationZonePickup = drive.actionBuilder(myBot.getPose())
                 .strafeTo(fcs.sample2ObservationZonePoseFast.position,
                         approachVel, approachAccel
                 );
@@ -132,12 +139,15 @@ public class CompetitionRedOrBlueSpecimenFastTAB {
                 new ParallelAction(
                         firstSampleMoveToObservationZone.build(),
                         elevatorMove),
-                secondSampleMoveToObservationZonePickup.build(),
+
+
+                secondSampleMoveToObservationZoneApproach.build(),
 
                 new SleepAction(1),
 
                 new ParallelAction(
                         secondSpecimenDeliverMove.build(),
+
                         elevatorMove),
 
                 new SleepAction(1),

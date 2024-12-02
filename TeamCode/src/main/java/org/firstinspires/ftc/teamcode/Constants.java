@@ -110,17 +110,17 @@ public final class Constants {
 
         public static final double GEARING_RATIO = 5;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
+        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//50
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
         public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28/1
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC / GEARING_RATIO * .8;//16
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC / GEARING_RATIO;//50
 
         public static final double POSITION_TOLERANCE_INCHES = .5;
         public static final double OUT_POSITION_LIMIT = 15.00;
         public static final double IN_POSITION_LIMIT = .5;
-
 
 
         public static final double TRAJ_VEL = 5;
@@ -152,19 +152,20 @@ public final class Constants {
 
         public static final double GEARING_RATIO = 15;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
+        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//50
+
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28 a pprox
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//5/15 appox .33
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28/.33 approx 85
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC / GEARING_RATIO * .8;//16
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//16
 
 
         public static final double UPPER_POSITION_LIMIT = 36;
         public static final int LOWER_POSITION_LIMIT = 0;
         public static final double HOME_POSITION = 0;
         public static final double POSITION_TOLERANCE_INCHES = .1;
-
 
 
         public static double TRAJ_VEL = 20;
@@ -175,6 +176,8 @@ public final class Constants {
         public static double bucketTippedAngle = .4;
 
         public static double elevatorDownHeight = 0;
+        public static double elevatorClearOfWall = 4;
+
         public static double elevatorLowerBasketHeight = 28;
         public static double elevatorUpperBasketHeight = 45;
         public static double elevatorSpecimenWallHeight = 9;

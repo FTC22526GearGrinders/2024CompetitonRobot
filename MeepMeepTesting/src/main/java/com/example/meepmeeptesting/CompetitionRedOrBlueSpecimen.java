@@ -111,7 +111,6 @@ public class CompetitionRedOrBlueSpecimen {
                 .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle)
                 .build();//move to place first specimen
 
-
         fourthSpecimenPickupApproachMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
                 .strafeToLinearHeading(fcs.specimenPickupApproachPose.position, fcs.specimenPickupAngle)
                 .waitSeconds(1)

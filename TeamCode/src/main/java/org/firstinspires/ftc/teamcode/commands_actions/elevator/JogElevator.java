@@ -13,12 +13,12 @@ public class JogElevator extends CommandBase {
 
     private final Gamepad gamepad;
     private final ElevatorSubsystem elevator;
-    public SimpleMotorFeedforward armFF = new SimpleMotorFeedforward(.18, .03);
+    public SimpleMotorFeedforward armFF = new SimpleMotorFeedforward(ElevatorSubsystem.eks, ElevatorSubsystem.ekv, ElevatorSubsystem.eka);
     private double deadband = .01;
-    private double ipsec = 5.;//ips
+    private double ipsec = 5;//ips
     private double ff;
 
-    private PIDController leftPIDController = new PIDController(.3, 0, 0);
+    private PIDController leftPIDController = new PIDController(.2, 0, 0);
     private PIDController rightPIDController = new PIDController(.2, 0, 0);
 
 
@@ -37,18 +37,25 @@ public class JogElevator extends CommandBase {
     public void execute() {
 
         double stickValue = -gamepad.right_stick_y / 2;
-        double speedips = -gamepad.right_stick_y * ipsec;//5ips
+
+        double speedips = -gamepad.right_stick_y * ipsec;
+
         ff = armFF.calculate(speedips);
-        double leftPID = leftPIDController.calculate(elevator.leftElevatorEncoder.getCorrectedVelocity());
-        double rightPID = rightPIDController.calculate(elevator.leftElevatorEncoder.getCorrectedVelocity());
 
-        elevator.leftPower = ff + leftPID;
-        elevator.rightPower = ff + rightPID;
+        double leftPID = leftPIDController.calculate(elevator.leftElevatorEncoder.getRate(), speedips);
+        double rightPID = rightPIDController.calculate(elevator.leftElevatorEncoder.getRate(), speedips);
 
+        boolean useFF = false;
+
+        if (useFF) {
+            elevator.leftPower = ff + leftPID;
+            elevator.rightPower = ff + rightPID;
+        } else {
+//using gamepad direct
+            elevator.leftPower = stickValue;
+            elevator.rightPower = stickValue;
+        }
         boolean overrideLimits = gamepad.start;
-
-//        elevator.leftPower = stickValue;
-//        elevator.rightPower = stickValue;
 
         if (overrideLimits || (elevator.leftPower > 0 && elevator.getLeftPositionInches() < Constants.ElevatorConstants.UPPER_POSITION_LIMIT
                 || elevator.leftPower < 0 && elevator.getLeftPositionInches() > Constants.ElevatorConstants.LOWER_POSITION_LIMIT)

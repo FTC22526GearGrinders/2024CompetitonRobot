@@ -86,7 +86,7 @@ public final class FieldConstantsSelect {
         specimenPickupAngle = Math.toRadians(-90);
 
 
-        specimenSideStartPose = new Pose2d(-12, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenDropAngle);
+        specimenSideStartPose = new Pose2d(-12, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, specimenDropAngle);
 
         sample1ObservationZoneDropPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, Math.toRadians(180));
 
@@ -113,7 +113,7 @@ public final class FieldConstantsSelect {
         specimenDeliverApproachPose3 = new Pose2d(-3, 24 + Constants.RobotConstants.length / 2 + 6, specimenDropAngle);
         specimenDeliverApproachPose4 = new Pose2d(0, 24 + Constants.RobotConstants.length / 2 + 6, specimenDropAngle);
 
-        specimenPickupPose = new Pose2d(-36, Constants.RobotConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenPickupAngle);
+        specimenPickupPose = new Pose2d(-36, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenPickupAngle);
         specimenPickupApproachPose = new Pose2d(-36, specimenPickupPose.position.y - 9, specimenPickupAngle);
         specimenParkPose = new Pose2d(-48, 60 - Constants.RobotConstants.length / 2 + 8, Math.toRadians(180));
     }

@@ -18,16 +18,14 @@ public class Elevator_Arm_RotateArm_Actions {
 
     private final ExtendArmSubsystem arm;
     private final RotateArmSubsystem rotateArm;
-    private final ElevatorSubsystem elevetor;
+    private final ElevatorSubsystem elevator;
     private CommandOpMode opmode;
 
     public Elevator_Arm_RotateArm_Actions(ElevatorSubsystem elevetor, ExtendArmSubsystem arm, RotateArmSubsystem rotateArm, CommandOpMode opmode) {
-        this.elevetor = elevetor;
+        this.elevator = elevetor;
         this.arm = arm;
         this.rotateArm = rotateArm;
         this.opmode = opmode;
-
-
     }
 
 
@@ -55,9 +53,9 @@ public class Elevator_Arm_RotateArm_Actions {
     public Action deliverSampleToUpperBasket() {
         return
                 new SequentialAction(
-                        elevetor.elevatorToUpperBasket(),
-                        elevetor.cycleBucket(2),
-                        elevetor.elevatorToHome());
+                        elevator.elevatorToUpperBasket(),
+                        elevator.cycleBucket(2),
+                        elevator.elevatorToHome());
     }
 
     public Action deliverSampleToBucket(boolean hasSample) {//use in auto to not raise elevator if sample wasn't picked up
@@ -67,26 +65,26 @@ public class Elevator_Arm_RotateArm_Actions {
 
     public Action collectSpecimenFromWall() {
         return
-                elevetor.closeSpecimenClaw();
+                elevator.closeSpecimenClaw();
     }
 
     public Action deliverSpecimenToUpperSubmersible() {
         return
                 new ParallelAction(
-                        elevetor.elevatorToUpperSubmersible(),
+                        elevator.elevatorToUpperSubmersible(),
                         new SequentialAction(
                                 new SleepAction(.5),
-                                elevetor.openSpecimenClaw()));
+                                elevator.openSpecimenClaw()));
 
     }
 
     public Action deliverSpecimenToLowerSubmersible() {
         return
                 new ParallelAction(
-                        elevetor.elevatorToLowSubmersible(),
+                        elevator.elevatorToLowSubmersible(),
                         new SequentialAction(
                                 new SleepAction(.5),
-                                elevetor.openSpecimenClaw()));
+                                elevator.openSpecimenClaw()));
 
     }
 
@@ -135,8 +133,11 @@ public class Elevator_Arm_RotateArm_Actions {
     }
 
 
-    public Action deliverSampleToZone() {
-        return rotateArm.reverseIntakeServosTimed(3);
+    public Action grabSpecimenAndClearWall() {
+        return new SequentialAction(
+                elevator.closeSpecimenClaw(),
+                new SleepAction(1),
+                elevator.elevatorToClearWall());
     }
 
 

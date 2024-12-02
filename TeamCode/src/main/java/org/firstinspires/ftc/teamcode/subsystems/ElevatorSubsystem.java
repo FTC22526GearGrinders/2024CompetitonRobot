@@ -30,7 +30,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
     public static double eks = 0.08;//1% motor power
     public static double ekg = 0.04;
-    public static double ekv = .05;//per inch per second (max 17 ips )
+    public static double ekv = .2;//max ips = 16 so 12/16 (assume 50%) = .35 volts per ips
     public static double eka = 0;
 
     public static double lkp = 0.05;
@@ -181,6 +181,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Action elevatorToHome() {
         return positionElevator(Constants.ElevatorConstants.HOME_POSITION);
     }
+
+    public Action elevatorToClearWall() {
+        return positionElevator(Constants.ElevatorConstants.elevatorClearOfWall);
+    }
+
 
     public Action elevatorToSpecimenOnWall() {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenWallHeight);
@@ -407,7 +412,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getLeftVelocityInPerSec() {
-        return round2dp(leftElevatorEncoder.getCorrectedVelocity() / 60, 2);
+        return round2dp(leftElevatorEncoder.getRate(), 2);
     }
 
     public double getRightPositionInches() {
@@ -415,7 +420,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getRightVelocityInPerSec() {
-        return round2dp(rightElevatorEncoder.getCorrectedVelocity() / 60, 2);
+        return round2dp(rightElevatorEncoder.getRate(), 2);
     }
 
     public boolean leftInPosition() {

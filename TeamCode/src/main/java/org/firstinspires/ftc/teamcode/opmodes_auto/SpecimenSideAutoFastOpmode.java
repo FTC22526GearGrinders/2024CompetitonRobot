@@ -35,7 +35,10 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -44,7 +47,6 @@ import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
@@ -58,34 +60,46 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
     public static int TEAM_NUMBER = 22526; //Enter team Number
 
 
-    Action firstSpecimenDeliverMoveAction;
-    Action secondSpecimenDeliverMoveAction;
-    Action thirdSpecimenDeliverMoveAction;
-    Action fourthSpecimenDeliverMoveAction;
 
-    Action secondSpecimenPickupMoveAction;
-    Action thirdSpecimenPickupMoveAction;
-    Action fourthSpecimenPickupMoveAction;
-
-
-    Action firstSampleMoveToObservationZoneAction;
-    Action secondSampleMoveToObservationZoneAction;
-
-    Action parkAction;
-
-    SequentialAction sequenceOne;
     FieldConstantsSelect fcs;
 
 
+    Action firstSpecimenDeliverMove;
+
+
+    Action secondSpecimenDeliverMove;
+
+
+    Action thirdSpecimenDeliverMove;
+
+
+    Action fourthSpecimenDeliverMove;
+
+    Action thirdSpecimenPickupMove;
+
+
+    Action fourthSpecimenPickupMove;
+
+
+    Action firstSampleMoveToObservationZone;
+    TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach;
+    Action secondSampleMoveToObservationZonePickup;
+    Action park;
+
+
+    TranslationalVelConstraint approachVel;
+    ProfileAccelConstraint approachAccel;
     private MecanumDriveSubsystem drive;
     private ElevatorSubsystem elevator;
     private ExtendArmSubsystem arm;
     private RotateArmSubsystem rotate;
 
+    private Action deliverSpecimenOne;
+
+    private Action deliverBothSamplesToObservationZone;
+
     private Elevator_Arm_RotateArm_Actions ears;
 
-
-    private LimelightSubsystem limelight;
 
     private TelemetryPacket packet;
 
@@ -97,101 +111,58 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
         rotate = new RotateArmSubsystem(this);
         ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
         fcs = new FieldConstantsSelect();
-        limelight = new LimelightSubsystem(this);
+        approachVel = new TranslationalVelConstraint(10.0);
+        approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
         packet = new TelemetryPacket();
     }
 
     void makeMotionActions() {
 
-        firstSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenPickupAngle)
-                .build();//move to place first specimen
 
-        firstSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.specimenDeliverPose1)
+        firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
+                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle).build();
+
+        firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeTo(fcs.secondStagePushInnerVector)
                 .strafeTo(fcs.thirdStagePushInnerVector)
-                .strafeTo(fcs.sample1ObservationZoneDropPose.position)
-                .build();
+                .strafeTo(fcs.sample1ObservationZoneDropPose.position).build();
 
-        secondSampleMoveToObservationZoneAction = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
+        secondSampleMoveToObservationZonePickup = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenDropAngle)
                 .strafeTo(fcs.thirdStagePushMidVector)
-                .strafeTo(fcs.sample2ObservationZoneDropPoseFast.position)
-                .build();
-
-        secondSpecimenDeliverMoveAction = drive.actionBuilder(fcs.sample2ObservationZoneDropPoseFast)
-                .splineToLinearHeading(fcs.specimenDeliverPose2, fcs.specimenPickupAngle)
-                .build();//move to place first specimen
-
-        thirdSpecimenPickupMoveAction = drive.actionBuilder(fcs.specimenDeliverPose2)
-                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle)
-                .build();
-
-        thirdSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverPose3, fcs.specimenPickupAngle)
-                .build();//move to place first specimen
-
-        fourthSpecimenPickupMoveAction = drive.actionBuilder(fcs.specimenDeliverPose3)
-                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle)
-                .build();
-
-        fourthSpecimenDeliverMoveAction = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverPose4, fcs.specimenPickupAngle)
-                .build();//move to place first specimen
-
-        parkAction = drive.actionBuilder(fcs.specimenDeliverPose4)
-                .strafeTo(fcs.specimenParkPose.position)
-                .build();
-    }
+                .strafeTo(fcs.sample2ObservationZonePickupPose.position).build();
 
 
-    private SequentialAction createSequenceOne() {
-        return
+        secondSpecimenDeliverMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose2, fcs.specimenPickupAngle).build();
+
+
+        thirdSpecimenPickupMove =
+                drive.actionBuilder(fcs.specimenDeliverPose2)
+                        .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle).build();
+
+
+        thirdSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose3, fcs.specimenPickupAngle).build();
+
+
+        fourthSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose3)
+                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle).build();
+
+
+        fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose4, fcs.specimenPickupAngle).build();
+
+
+        deliverSpecimenOne = firstSpecimenDeliverMove;
+
+        deliverBothSamplesToObservationZone =
                 new SequentialAction(
-                        new ParallelAction(
-                                elevator.closeSpecimenClaw(),
-                                firstSpecimenDeliverMoveAction,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-
-                        new ParallelAction(
-                                firstSampleMoveToObservationZoneAction,
-                                elevator.elevatorToHome()),
-                        new ParallelAction(
-                                secondSampleMoveToObservationZoneAction,
-                                elevator.elevatorToSpecimenOnWall()),
-
-                        elevator.closeSpecimenClaw(),
-
-                        new ParallelAction(
-                                secondSpecimenDeliverMoveAction,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-
-                        new ParallelAction(
-                                thirdSpecimenPickupMoveAction,
-                                elevator.elevatorToSpecimenOnWall()),
-                        elevator.closeSpecimenClaw(),
-
-
-                        new ParallelAction(
-                                thirdSpecimenDeliverMoveAction,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-
-                        new ParallelAction(
-                                fourthSpecimenPickupMoveAction,
-                                elevator.elevatorToSpecimenOnWall()),
-                        elevator.closeSpecimenClaw(),
-
-                        new ParallelAction(
-                                fourthSpecimenDeliverMoveAction,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-
-                        parkAction);
+                        firstSampleMoveToObservationZone,
+                        secondSampleMoveToObservationZonePickup);
     }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -200,7 +171,6 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
 
         selectStartingPosition();
 
-        sequenceOne = createSequenceOne();
 
         waitForStart();
 
@@ -210,7 +180,56 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
 
             telemetry.update();
 
-            Actions.runBlocking(sequenceOne);
+            Actions.runBlocking(
+                    new ParallelAction(
+                            firstSpecimenDeliverMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            deliverBothSamplesToObservationZone,
+                            elevator.elevatorToHome()));
+
+            Actions.runBlocking(secondSampleMoveToObservationZonePickup);
+            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            secondSpecimenDeliverMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            thirdSpecimenPickupMove,
+                            elevator.elevatorToHome()));
+            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            thirdSpecimenDeliverMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            fourthSpecimenPickupMove,
+                            elevator.elevatorToHome()));
+            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            fourthSpecimenDeliverMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(park);
+
+
         }
         PoseStorage.currentPose = drive.pose;
         PoseStorage.poseUpdatedTime = System.currentTimeMillis();
@@ -270,6 +289,8 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
         }
         telemetry.update();
     }
+
+
     //    telemetry.clearAll();
 }
 

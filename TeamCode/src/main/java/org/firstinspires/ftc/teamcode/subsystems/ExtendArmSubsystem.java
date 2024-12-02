@@ -26,7 +26,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public static double targetInches;
     public static double ks = .12;//1% motor power
-    public static double kv = .02;//100 rps through 5: gear = 20 ipm max so if kv is to make up 60% .6/20 = .03
+    public static double kv = .02;//max ips = 50 so 12/50 (assume 50%) = .06 volts per ips
     public static double ka = 0;
     public static double kp = 0.2;
     public static double ki = 0;
@@ -240,6 +240,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
         return round2dp(rightArmEncoder.getDistance(), 2);
     }
 
+    public double getLeftInchesPerSec() {
+        return round2dp(leftArmEncoder.getRate(), 2);
+    }
+
+    public double getRightInchesPerSec() {
+        return round2dp(rightArmEncoder.getRate(), 2);
+    }
+
+
+
     public boolean leftInPosition() {
         return leftArmController.atSetpoint();
     }
@@ -337,14 +347,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         return atLeftGoal() && atRightGoal();
     }
 
-    public double getLeftVelocity() {
-        return leftArmEncoder.getCorrectedVelocity() / 60;
-    }
-
-    public double getRightVelocity() {
-        return rightArmEncoder.getCorrectedVelocity() / 60;
-    }
-
     public Action armToPickupAction() {
         return positionArm(Constants.ExtendArmConstants.pickupDistance);
     }
@@ -373,7 +375,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmLeftSetpointVel", round2dp(leftArmSetpoint.velocity, 2));
         telemetry.addData("ArmLeftPosError", round2dp(leftArmController.getPositionError(), 2));
         telemetry.addData("ArmLeftVelError", round2dp(leftArmController.getVelocityError(), 2));
-        telemetry.addData("ArmLeftVel", round2dp(getLeftVelocity(), 2));
+        telemetry.addData("ArmLeftVel", round2dp(getLeftInchesPerSec(), 2));
         telemetry.addData("ArmLeftPID", round2dp(leftpidout, 2));
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
 
@@ -392,7 +394,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmRightSetpointV", round2dp(rightArmSetpoint.velocity, 2));
         telemetry.addData("ArmRightPosError", round2dp(rightArmController.getPositionError(), 2));
         telemetry.addData("ArmRightVelError", round2dp(rightArmController.getVelocityError(), 2));
-        telemetry.addData("ArmRightVel", round2dp(getRightVelocity(), 2));
+        telemetry.addData("ArmRightVel", round2dp(getRightInchesPerSec(), 2));
         telemetry.addData("ArmRightPID", round2dp(rightpidout, 2));
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
         telemetry.update();

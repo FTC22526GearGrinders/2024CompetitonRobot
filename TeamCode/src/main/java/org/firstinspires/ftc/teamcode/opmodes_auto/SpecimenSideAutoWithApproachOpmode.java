@@ -37,8 +37,6 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -48,71 +46,48 @@ import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Specimen Fast", group = "Auto")
+@Autonomous(name = "Specimen Fast With Approach", group = "Auto")
 //@Disabled
-public class SpecimenSideAutoFastTABDividedOpmode extends CommandOpMode {
+public class SpecimenSideAutoWithApproachOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
 
 
-//    TrajectoryActionBuilder firstSpecimenDeliverMoveAction;
-//    Action secondSpecimenDeliverMoveAction;
-//    Action thirdSpecimenDeliverMoveAction;
-//    Action fourthSpecimenDeliverMoveAction;
-//
-//    Action secondSpecimenPickupMoveAction;
-//    Action thirdSpecimenPickupMoveAction;
-//    Action fourthSpecimenPickupMoveAction;
-//
-//
-//    Action firstSampleMoveToObservationZoneAction;
-//    Action secondSampleMoveToObservationZoneAction;
-//
-//    Action parkAction;
-
-    SequentialAction sequenceOne;
     FieldConstantsSelect fcs;
-    TrajectoryActionBuilder firstSpecimenDeliverMove;
-    TrajectoryActionBuilder firstSpecimenApproachDeliverMove;
-    double specimenDeliverPose;
-    double plannedSpecimenDeliverY;
-    TrajectoryActionBuilder secondSpecimenDeliverMove;
-    TrajectoryActionBuilder thirdSpecimenDeliverMove;
-    TrajectoryActionBuilder fourthSpecimenDeliverMove;
-    TrajectoryActionBuilder secondSpecimenPickupMove;
-    TrajectoryActionBuilder thirdSpecimenPickupMove;
-    TrajectoryActionBuilder fourthSpecimenPickupMove;
-    TrajectoryActionBuilder firstSampleMoveToObservationZone;
-    TrajectoryActionBuilder secondSampleMoveToObservationZonePickup;
-    TrajectoryActionBuilder park;
-    Action elevatorMove = new SleepAction(2);
-    TrajectoryActionBuilder sequenceTwo;
-    TrajectoryActionBuilder sequenceThree;
-    TrajectoryActionBuilder sequenceFour;
+
+
+    Action firstSpecimenApproachDeliverMove;
+
+    Action firstSampleMoveToObservationZone;
+
+    Action secondSampleMoveToObservationZoneApproach;
+
+    Action secondSpecimenDeliverApproachMove;
+
+    Action thirdSpecimenDeliverApproachMove;
+
+    Action fourthSpecimenDeliverApproachMove;
+
+    Action thirdSpecimenPickupApproachMove;
+
+    Action fourthSpecimenPickupApproachMove;
+
+    Action park;
+
+
     TranslationalVelConstraint approachVel;
     ProfileAccelConstraint approachAccel;
     private MecanumDriveSubsystem drive;
     private ElevatorSubsystem elevator;
     private ExtendArmSubsystem arm;
     private RotateArmSubsystem rotate;
-
-    private Action approachDeliverSpecimenOne;
-
-    private Action deliverSpecimenOne;
-
-    private Action deliverBothSamples;
-
     private Elevator_Arm_RotateArm_Actions ears;
-
-
-    private LimelightSubsystem limelight;
 
     private TelemetryPacket packet;
 
@@ -126,129 +101,47 @@ public class SpecimenSideAutoFastTABDividedOpmode extends CommandOpMode {
         fcs = new FieldConstantsSelect();
         approachVel = new TranslationalVelConstraint(10.0);
         approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
-        specimenDeliverPose = fcs.specimenDeliverPose1.position.y;
-        plannedSpecimenDeliverY = fcs.specimenDeliverPose1.position.y - fcs.specimenDeliverApproachPose1.position.y;
-        limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
     }
 
     void makeMotionActions() {
 
-
         firstSpecimenApproachDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle);
+                .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle).build();
 
-        firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenDeliverApproachPose1)
-                .strafeTo(fcs.specimenDeliverPose1.position,
-                        approachVel, approachAccel
-                );
 
         firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeTo(fcs.secondStagePushInnerVector)
                 .strafeTo(fcs.thirdStagePushInnerVector)
-                .strafeTo(fcs.sample1ObservationZoneDropPose.position);
+                .strafeTo(fcs.sample1ObservationZoneDropPose.position).build();
 
-
-        secondSampleMoveToObservationZonePickup = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
+        secondSampleMoveToObservationZoneApproach = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenDropAngle)
                 .strafeTo(fcs.thirdStagePushMidVector)
-                .strafeTo(fcs.sample2ObservationZoneApproachPoseFast.position)
-                .strafeTo(fcs.sample2ObservationZoneDropPoseFast.position,
-                        approachVel, approachAccel
-                );
+                .strafeTo(fcs.sample2ObservationZoneApproachPoseFast.position).build();
 
-        secondSpecimenDeliverMove = drive.actionBuilder(fcs.sample2ObservationZoneDropPoseFast)
-                .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle)
-                .strafeTo(fcs.specimenDeliverPose2.position,
-                        approachVel, approachAccel
-                );
+        secondSpecimenDeliverApproachMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle).build();
+
+        thirdSpecimenPickupApproachMove =
+                drive.actionBuilder(fcs.specimenDeliverPose2)
+                        .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle).build();
+
+        thirdSpecimenDeliverApproachMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverApproachPose3, fcs.specimenPickupAngle).build();
 
 
-        thirdSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose2)
-                .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle)
-                .strafeTo(fcs.specimenPickupPose.position,
-                        approachVel, approachAccel
-                );
+        fourthSpecimenPickupApproachMove = drive.actionBuilder(fcs.specimenDeliverPose3)
+                .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle).build();
 
-        thirdSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverApproachPose3, fcs.specimenPickupAngle)
-                .strafeTo(fcs.specimenDeliverPose3.position,
-                        approachVel, approachAccel
-                );
 
-        fourthSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose3)
-                .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle)
-                .strafeTo(fcs.specimenPickupPose.position,
-                        approachVel, approachAccel
-                );
+        fourthSpecimenDeliverApproachMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverApproachPose4, fcs.specimenPickupAngle).build();
 
-        fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverApproachPose4, fcs.specimenPickupAngle)
-                .strafeTo(fcs.specimenDeliverPose4.position,
-                        approachVel, approachAccel
-                );
-
-        deliverSpecimenOne = new ParallelAction(firstSpecimenDeliverMove.build(), elevatorMove);
-
-        deliverBothSamples = new SequentialAction(
-                firstSampleMoveToObservationZone.build(),
-                secondSampleMoveToObservationZonePickup.build());
 
     }
 
-
-    private SequentialAction createSequenceOne() {
-        return new SequentialAction(
-
-                new ParallelAction(
-                        firstSpecimenDeliverMove.build(),
-                        elevatorMove),
-
-                new ParallelAction(
-                        firstSampleMoveToObservationZone.build(),
-                        elevatorMove),
-                secondSampleMoveToObservationZonePickup.build(),
-
-                new SleepAction(1),
-
-                new ParallelAction(
-                        secondSpecimenDeliverMove.build(),
-                        elevatorMove),
-
-                new SleepAction(1),
-
-                new ParallelAction(
-                        thirdSpecimenPickupMove.build(),
-                        elevatorMove),
-                new SleepAction(1),
-
-
-                new ParallelAction(
-                        thirdSpecimenDeliverMove.build(),
-                        elevatorMove),
-                new SleepAction(1),
-
-                new ParallelAction(
-                        fourthSpecimenPickupMove.build(),
-                        elevatorMove),
-
-                new SleepAction(1),
-
-                new ParallelAction(
-                        fourthSpecimenDeliverMove.build(),
-                        elevatorMove),
-
-                new SleepAction(1),
-
-                park.build());
-    }
-
-    public Pose2d getNewSpecimenDeliverPose() {
-        double sensorReading = 9;
-        double yDistanceError = fcs.specimenExpectedPickupDistance - sensorReading;
-        return new Pose2d(0, 0, 0);
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -257,7 +150,6 @@ public class SpecimenSideAutoFastTABDividedOpmode extends CommandOpMode {
 
         selectStartingPosition();
 
-        sequenceOne = createSequenceOne();
 
         waitForStart();
 
@@ -267,14 +159,85 @@ public class SpecimenSideAutoFastTABDividedOpmode extends CommandOpMode {
 
             telemetry.update();
 
-            Actions.runBlocking(new ParallelAction(deliverSpecimenOne, elevatorMove));
+            Actions.runBlocking(
+                    new ParallelAction(
+                            firstSpecimenApproachDeliverMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.specimenDeliverPose1.position,
+                            approachVel, approachAccel).build());
+
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    firstSampleMoveToObservationZone,
+                                    elevator.elevatorToHome()),
+                            secondSampleMoveToObservationZoneApproach));
+
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.sample2ObservationZonePickupPose.position,
+                            approachVel, approachAccel).build());
+
+            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            secondSpecimenDeliverApproachMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.specimenDeliverPose2.position,
+                            approachVel, approachAccel).build());
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            thirdSpecimenPickupApproachMove,
+                            elevator.elevatorToHome()));
+
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.specimenPickupPose.position,
+                            approachVel, approachAccel).build());
+            Actions.runBlocking(ears.grabSpecimenAndClearWall());
 
 
+            Actions.runBlocking(
+                    new ParallelAction(
+                            thirdSpecimenDeliverApproachMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.specimenDeliverPose3.position,
+                            approachVel, approachAccel).build());
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            fourthSpecimenPickupApproachMove,
+                            elevator.elevatorToHome()));
+
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.specimenPickupPose.position,
+                            approachVel, approachAccel).build());
+            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            fourthSpecimenDeliverApproachMove,
+                            elevator.elevatorToAboveUpperSubmersible()));
+            Actions.runBlocking(drive.actionBuilder(drive.pose)
+                    .strafeTo(fcs.specimenDeliverPose4.position,
+                            approachVel, approachAccel).build());
+            Actions.runBlocking(ears.deliverSpecimenToUpperSubmersible());
+
+            Actions.runBlocking(park);
         }
+
         PoseStorage.currentPose = drive.pose;
         PoseStorage.poseUpdatedTime = System.currentTimeMillis();
-
-
         reset();
     }
 
@@ -287,7 +250,7 @@ public class SpecimenSideAutoFastTABDividedOpmode extends CommandOpMode {
             telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
+            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
             telemetry.addData("    Red All Specimen   ", "(A / O)");
 
             telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
