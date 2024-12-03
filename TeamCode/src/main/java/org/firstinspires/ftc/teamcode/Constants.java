@@ -131,11 +131,6 @@ public final class Constants {
 
         public static double armDistanceOKTilt = 10;
 
-        public static double sampleDetectedDistance = 1.2;
-
-        public static double sampleClearDistance = 2;
-
-
     }
 
     public static final class ElevatorConstants {
@@ -155,15 +150,8 @@ public final class Constants {
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//16
 
 
-        public static final double UPPER_POSITION_LIMIT = 36;
-        public static final int LOWER_POSITION_LIMIT = 0;
         public static final double HOME_POSITION = 0;
         public static final double POSITION_TOLERANCE_INCHES = .1;
-
-
-
-        public static double bucketUprightAngle = 0;
-        public static double bucketTippedAngle = .4;
 
         public static double elevatorDownHeight = 0;
         public static double elevatorClearOfWall = 4;

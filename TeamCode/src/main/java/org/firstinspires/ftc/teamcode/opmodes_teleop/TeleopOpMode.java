@@ -149,20 +149,24 @@ public class TeleopOpMode extends CommandOpMode {
     private void doDriverButtons() {
 
         if (gamepad1.left_bumper && !previousGamepad2.left_bumper)
-            runningActions.add(eara.pickupSample(10));
+            runningActions.add(eara.pickupSample());
+
+        if (gamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
+            runningActions.add(eara.deliverSampleToBucket());
+
 
         if (gamepad1.right_bumper && !previousGamepad2.right_bumper)
-            runningActions.add(elevator.cycleBucket(1));
+            runningActions.add(elevator.grabSpecimenAndClearWall());
 
-        if (gamepad1.left_trigger > .75)
-            runningActions.add(eara.deliverSpecimenToUpperSubmersible());
+        if (gamepad1.right_trigger > .75 && !(previousGamepad1.right_trigger > .75))
+            runningActions.add(eara.deliverSpecimenToSubmersible());
 
-        if (gamepad1.right_trigger > .75) runningActions.add(elevator.elevatorToClearWall());
+        if (gamepad1.a && !previousGamepad1.a) runningActions.add(rotateArm.openIntakeClaw());
 
-        // if (gamepad1.a && !previousGamepad1.a)
+        if (gamepad1.b) runningActions.add(rotateArm.closeIntakeClaw());
 
-//        if (gamepad1.b)runningActions.add(
-//        if (gamepad1.x)runningActions.add(
+
+        if (gamepad1.x) runningActions.add(elevator.openSpecimenClaw());
 //        if (gamepad1.y)runningActions.add(
 
 
@@ -171,9 +175,9 @@ public class TeleopOpMode extends CommandOpMode {
         if (gamepad1.dpad_down && !previousGamepad1.dpad_down)
             runningActions.add(elevator.elevatorToHome());
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right)
-            runningActions.add(elevator.elevatorToAboveLowSubmersible());
-        if (gamepad1.dpad_left && !previousGamepad1.dpad_left)
             runningActions.add(elevator.elevatorToAboveUpperSubmersible());
+        if (gamepad1.dpad_left && !previousGamepad1.dpad_left)
+            runningActions.add(elevator.elevatorToAboveLowerSubmersible());
 
 
         //pickup specimen from wall

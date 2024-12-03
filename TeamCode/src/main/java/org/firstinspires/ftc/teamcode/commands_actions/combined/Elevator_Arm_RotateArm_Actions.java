@@ -17,7 +17,7 @@ public class Elevator_Arm_RotateArm_Actions {
     private final RotateArmSubsystem rotateArm;
     private final ElevatorSubsystem elevator;
     private CommandOpMode opmode;
-
+    private boolean initialized = false;
     public Elevator_Arm_RotateArm_Actions(ElevatorSubsystem elevetor, ExtendArmSubsystem arm, RotateArmSubsystem rotateArm, CommandOpMode opmode) {
         this.elevator = elevetor;
         this.arm = arm;
@@ -65,18 +65,31 @@ public class Elevator_Arm_RotateArm_Actions {
     public Action deliverSpecimenToLowerSubmersible() {
         return
                 new ParallelAction(
-                        elevator.elevatorToLowSubmersible(),
+                        elevator.elevatorToLowerSubmersible(),
                         new SequentialAction(
                                 new SleepAction(.5),
                                 elevator.openSpecimenClaw()));
     }
+
+    public Action deliverSpecimenToSubmersible() {
+        return
+                new ParallelAction(
+                        elevator.elevatorToNearestSubmersible(),
+                        new SequentialAction(
+                                new SleepAction(.5),
+                                elevator.openSpecimenClaw()));
+    }
+
+
 
     public Action deliverSampleToBucket() {
         return
                 new SequentialAction(
                         rotateArm.tiltBothClear(3),
                         arm.armToBucketAction(),
-                        rotateArm.openIntakeClaw());
+                        rotateArm.openIntakeClaw(),
+                        new SleepAction(1),
+                        elevator.elevatorToHome());
     }
 
     public Action cancelPickupSample() {
@@ -88,7 +101,7 @@ public class Elevator_Arm_RotateArm_Actions {
 
 
     //this may result in a sample or not - need to check
-    public Action pickupSample(double timeout_secs) {
+    public Action pickupSample() {
         return new SequentialAction(
                 arm.armToPickupAction(),
                 new ParallelAction(

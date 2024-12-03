@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 
 
 @Config
@@ -37,7 +38,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double lki = 0;
     public static double lkd = 0;
 
-
     public static double rkp = 0.2;
     public static double rki = 0;
     public static double rkd = 0;
@@ -46,16 +46,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public static double targetInches;
 
-
     public static double UPPER_POSITION_LIMIT = 36;
     public static int LOWER_POSITION_LIMIT = 0;
 
     public static double TRAJ_VEL = 10;
     public static double TRAJ_ACCEL = 10;
 
-
     public static double specimenClawOpenAngle = 0.0;
     public static double specimenClawClosedAngle = .3;
+
+    public static double bucketUprightAngle = 0;
+    public static double bucketTippedAngle = .4;
 
     public static double releaseDelay = .5;
 
@@ -204,12 +205,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenWallHeight);
     }
 
-    public Action elevatorToAboveLowSubmersible() {
+    public Action elevatorToAboveLowerSubmersible() {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenAboveLowPlaceHeight);
     }
 
-    public Action elevatorToLowSubmersible() {
+    public Action elevatorToLowerSubmersible() {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenLowPlaceHeight);
+    }
+
+    public Action elevatorToNearestSubmersible() {
+        return new ConditionalAction(elevatorToUpperSubmersible(), elevatorToLowerSubmersible(),
+                getLeftPositionInches() > Constants.ElevatorConstants.elevatorSpecimenAboveHighPlaceHeight);
     }
 
     public Action elevatorToAboveUpperSubmersible() {
@@ -266,17 +272,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
     public Action tipBucket() {
-        return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketTippedAngle));
-    }
-
-    public Action tipBucketDelayed(double time) {
-        return new SequentialAction(
-                new SleepAction(time),
-                new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketTippedAngle)));
+        return new InstantAction(() -> bucketServo.setPosition(bucketTippedAngle));
     }
 
     public Action levelBucket() {
-        return new InstantAction(() -> bucketServo.setPosition(Constants.ElevatorConstants.bucketUprightAngle));
+        return new InstantAction(() -> bucketServo.setPosition(bucketUprightAngle));
     }
 
     public Action cycleBucket(double timeoutsecs) {
@@ -317,7 +317,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 new SleepAction(1),
                 elevatorToClearWall());
     }
-
 
 
     @Override
