@@ -181,7 +181,7 @@ public class SpecimenSideAutoWithApproachOpmode extends CommandOpMode {
                     .strafeTo(fcs.sample2ObservationZonePickupPose.position,
                             approachVel, approachAccel).build());
 
-            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+            Actions.runBlocking(elevator.grabSpecimenAndClearWall());
 
             Actions.runBlocking(
                     new ParallelAction(
@@ -201,7 +201,7 @@ public class SpecimenSideAutoWithApproachOpmode extends CommandOpMode {
             Actions.runBlocking(drive.actionBuilder(drive.pose)
                     .strafeTo(fcs.specimenPickupPose.position,
                             approachVel, approachAccel).build());
-            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+            Actions.runBlocking(elevator.grabSpecimenAndClearWall());
 
 
             Actions.runBlocking(
@@ -222,7 +222,7 @@ public class SpecimenSideAutoWithApproachOpmode extends CommandOpMode {
             Actions.runBlocking(drive.actionBuilder(drive.pose)
                     .strafeTo(fcs.specimenPickupPose.position,
                             approachVel, approachAccel).build());
-            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+            Actions.runBlocking(elevator.grabSpecimenAndClearWall());
 
             Actions.runBlocking(
                     new ParallelAction(

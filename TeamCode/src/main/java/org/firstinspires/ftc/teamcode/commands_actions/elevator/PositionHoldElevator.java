@@ -11,8 +11,8 @@ public class PositionHoldElevator extends CommandBase {
     private double power;
 
 
-    public PositionHoldElevator(ElevatorSubsystem rotateArm) {
-        this.elevator = rotateArm;
+    public PositionHoldElevator(ElevatorSubsystem elevator) {
+        this.elevator = elevator;
         addRequirements(this.elevator);
     }
 

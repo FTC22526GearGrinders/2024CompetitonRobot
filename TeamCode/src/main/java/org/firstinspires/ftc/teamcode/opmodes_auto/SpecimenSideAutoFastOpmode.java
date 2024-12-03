@@ -192,7 +192,7 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
                             elevator.elevatorToHome()));
 
             Actions.runBlocking(secondSampleMoveToObservationZonePickup);
-            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+            Actions.runBlocking(elevator.grabSpecimenAndClearWall());
 
             Actions.runBlocking(
                     new ParallelAction(
@@ -204,7 +204,7 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
                     new ParallelAction(
                             thirdSpecimenPickupMove,
                             elevator.elevatorToHome()));
-            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+            Actions.runBlocking(elevator.grabSpecimenAndClearWall());
 
 
             Actions.runBlocking(
@@ -218,7 +218,7 @@ public class SpecimenSideAutoFastOpmode extends CommandOpMode {
                     new ParallelAction(
                             fourthSpecimenPickupMove,
                             elevator.elevatorToHome()));
-            Actions.runBlocking(ears.grabSpecimenAndClearWall());
+            Actions.runBlocking(elevator.grabSpecimenAndClearWall());
 
             Actions.runBlocking(
                     new ParallelAction(

@@ -5,7 +5,6 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 
 
@@ -48,10 +47,10 @@ public class JogArm extends CommandBase {
 
         boolean overrideLimits = gamepad.start;
 //check inside limits for each direction
-        if (overrideLimits || (ff > 0 && arm.getLeftPositionInches() < Constants.ExtendArmConstants.OUT_POSITION_LIMIT
-                && arm.getRightPositionInches() < Constants.ExtendArmConstants.OUT_POSITION_LIMIT
-                || ff < 0 && arm.getLeftPositionInches() > Constants.ExtendArmConstants.IN_POSITION_LIMIT
-                && arm.getRightPositionInches() > Constants.ExtendArmConstants.IN_POSITION_LIMIT)) {
+        if (overrideLimits || (ff > 0 && arm.getLeftPositionInches() < ExtendArmSubsystem.OUT_POSITION_LIMIT
+                && arm.getRightPositionInches() < ExtendArmSubsystem.OUT_POSITION_LIMIT
+                || ff < 0 && arm.getLeftPositionInches() > ExtendArmSubsystem.IN_POSITION_LIMIT
+                && arm.getRightPositionInches() > ExtendArmSubsystem.IN_POSITION_LIMIT)) {
             arm.setLeftPower(arm.power);
             arm.setRightPower(arm.power);
         } else {

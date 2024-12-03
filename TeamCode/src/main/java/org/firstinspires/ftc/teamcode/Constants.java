@@ -65,8 +65,7 @@ public final class Constants {
         public static double MAX_ACCEL = 40;
         public static double MAX_ANG_VEL = Math.toRadians(75);
         public static double MAX_ANG_ACCEL = Math.toRadians(120);
-        public static double TRAJ_VEL = 50;
-        public static double TRAJ_ACCEL = 50;
+
         public static double TRAJ_ANG_VEL = Math.toRadians(50);
         public static double TRAJ_ANG_ACCEL = Math.toRadians(50);
         public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(.1, 0, 0, 0);
@@ -119,12 +118,6 @@ public final class Constants {
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC / GEARING_RATIO;//50
 
         public static final double POSITION_TOLERANCE_INCHES = .5;
-        public static final double OUT_POSITION_LIMIT = 15.00;
-        public static final double IN_POSITION_LIMIT = .5;
-
-
-        public static final double TRAJ_VEL = 5;
-        public static final double TRAJ_ACCEL = 5;
 
 
         public static double homeDistance = 1;
@@ -147,10 +140,10 @@ public final class Constants {
 
     public static final class ElevatorConstants {
 
-        public static final double MAX_MOTOR_RPM = 6000;
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
+        public static final double MAX_MOTOR_RPM = 1150;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 145.1;
 
-        public static final double GEARING_RATIO = 15;
+        public static final double GEARING_RATIO = 1;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
         public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//50
 
@@ -168,9 +161,6 @@ public final class Constants {
         public static final double POSITION_TOLERANCE_INCHES = .1;
 
 
-        public static double TRAJ_VEL = 20;
-        public static double TRAJ_ACCEL = 20;
-
 
         public static double bucketUprightAngle = 0;
         public static double bucketTippedAngle = .4;
@@ -181,14 +171,15 @@ public final class Constants {
         public static double elevatorLowerBasketHeight = 28;
         public static double elevatorUpperBasketHeight = 45;
         public static double elevatorSpecimenWallHeight = 9;
-        public static double elevatorSpecimenAboveLowPlaceHeight = 19;
-        public static double elevatorSpecimenLowPlaceHeight = 10;
-        public static double elevatorSpecimenAboveHighPlaceHeight = 30;
-        public static double elevatorSpecimenAtHighPlaceHeight = 22;
 
 
-        public static double specimenClawOpenAngle = 0.0;
-        public static double specimenClawClosedAngle = .2;
+        public static double elevatorSpecimenAboveLowPlaceHeight = 3;
+        public static double elevatorSpecimenLowPlaceHeight = 1;
+
+        public static double elevatorSpecimenAboveHighPlaceHeight = 15;
+        public static double elevatorSpecimenAtHighPlaceHeight = 12.5;
+
+
 
         public static double homePosition = 1;
         public static double lowerBasketDeliverPosition = 24;
@@ -199,19 +190,19 @@ public final class Constants {
     public static final class ShowTelemtryConstants {
 
         public static final int minShowSelectCount = 0;
-        public static final int maxShowSelectCount = 11;
+        public static final int maxShowSelectCount = 10;
+
         public static final int showNone = 0;
         public static final int showDrive1 = 1;
         public static final int showDrive2 = 2;
         public static final int showElevatorCommon = 3;
-        public static final int showElevator1 = 4;
-        public static final int showElevator2 = 5;
+        public static final int showElevatorLeft = 4;
+        public static final int showElevatorRight = 5;
         public static final int showArmCommon = 6;
         public static final int showArm1 = 7;
         public static final int showArm2 = 8;
         public static final int showRotateArm1 = 9;
-        public static final int showRotateArm2 = 10;
-        public static final int showLimelight = 11;
+        public static final int showLimelight = 10;
 
     }
 

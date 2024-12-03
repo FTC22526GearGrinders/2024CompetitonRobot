@@ -28,23 +28,36 @@ import org.firstinspires.ftc.teamcode.Constants;
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
-    public static double eks = 0.08;//1% motor power
-    public static double ekg = 0.04;
-    public static double ekv = .2;//max ips = 16 so 12/16 (assume 50%) = .35 volts per ips
+    public static double eks = 0.15;//1% motor power
+    public static double ekg = 0.25;
+    public static double ekv = .08;//max ips = 16 so 12/16 (assume 50%) = .35 volts per ips
     public static double eka = 0;
 
-    public static double lkp = 0.05;
+    public static double lkp = 0.2;
     public static double lki = 0;
     public static double lkd = 0;
 
 
-    public static double rkp = 0.05;
+    public static double rkp = 0.2;
     public static double rki = 0;
     public static double rkd = 0;
 
     public static boolean TUNING = false;
 
     public static double targetInches;
+
+
+    public static double UPPER_POSITION_LIMIT = 36;
+    public static int LOWER_POSITION_LIMIT = 0;
+
+    public static double TRAJ_VEL = 10;
+    public static double TRAJ_ACCEL = 10;
+
+
+    public static double specimenClawOpenAngle = 0.0;
+    public static double specimenClawClosedAngle = .3;
+
+    public static double releaseDelay = .5;
 
 
     private final Telemetry telemetry;
@@ -93,10 +106,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         myOpmode = opMode;
 
-        constraints = new TrapezoidProfile.Constraints(Constants.ElevatorConstants.TRAJ_VEL, Constants.ElevatorConstants.TRAJ_ACCEL);
+        constraints = new TrapezoidProfile.Constraints(TRAJ_VEL, TRAJ_ACCEL);
 
 
-        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator");
+        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator", Motor.GoBILDA.RPM_1150);
         leftElevatorMotor.setInverted(true);
         leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
@@ -110,8 +123,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftPidController.reset();
 
 
-        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevator");
-        rightElevatorMotor.setInverted(true);
+        rightElevatorMotor = new Motor(opMode.hardwareMap, "rightElevator", Motor.GoBILDA.RPM_1150);
+        rightElevatorMotor.setInverted(false);
         rightElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
         rightElevatorEncoder = rightElevatorMotor.encoder;
@@ -274,11 +287,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Action closeSpecimenClaw() {
-        return new InstantAction(() -> specimenClawServo.setPosition(Constants.ElevatorConstants.specimenClawClosedAngle));//.5
+        return new InstantAction(() -> specimenClawServo.setPosition(specimenClawClosedAngle));//.5
     }
 
     public Action openSpecimenClaw() {
-        return new InstantAction(() -> specimenClawServo.setPosition(Constants.ElevatorConstants.specimenClawOpenAngle));//.3
+        return new InstantAction(() -> specimenClawServo.setPosition(specimenClawOpenAngle));//.3
     }
 
     public Action deliverToTopBasket() {
@@ -298,6 +311,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
+    public Action grabSpecimenAndClearWall() {
+        return new SequentialAction(
+                closeSpecimenClaw(),
+                new SleepAction(1),
+                elevatorToClearWall());
+    }
+
+
+
     @Override
 
     public void periodic() {
@@ -306,10 +328,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
 
-        if (showSelect == Constants.ShowTelemtryConstants.showElevator1) {
+        if (showSelect == Constants.ShowTelemtryConstants.showElevatorLeft) {
             showLeftTelemetry();
         }
-        if (showSelect == Constants.ShowTelemtryConstants.showElevator2) {
+        if (showSelect == Constants.ShowTelemtryConstants.showElevatorRight) {
             showRightTelemetry();
         }
 

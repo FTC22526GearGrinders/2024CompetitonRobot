@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
 import org.firstinspires.ftc.teamcode.commands_actions.drive.JogDrive;
 import org.firstinspires.ftc.teamcode.commands_actions.elevator.JogElevator;
+import org.firstinspires.ftc.teamcode.commands_actions.elevator.PositionHoldElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -71,6 +72,8 @@ public class TeleopOpMode extends CommandOpMode {
                 new JogElevator(elevator, gamepad2));
 
         arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
+
+        elevator.setDefaultCommand(new PositionHoldElevator(elevator));
 
     }
 
@@ -154,9 +157,9 @@ public class TeleopOpMode extends CommandOpMode {
         if (gamepad1.left_trigger > .75)
             runningActions.add(eara.deliverSpecimenToUpperSubmersible());
 
-        if (gamepad1.right_trigger > .75) runningActions.add(elevator.closeSpecimenClaw());
+        if (gamepad1.right_trigger > .75) runningActions.add(elevator.elevatorToClearWall());
 
-        if (gamepad1.a && !previousGamepad1.a) runningActions.add(eara.getSampleAutoBasket());
+        // if (gamepad1.a && !previousGamepad1.a)
 
 //        if (gamepad1.b)runningActions.add(
 //        if (gamepad1.x)runningActions.add(
@@ -168,9 +171,9 @@ public class TeleopOpMode extends CommandOpMode {
         if (gamepad1.dpad_down && !previousGamepad1.dpad_down)
             runningActions.add(elevator.elevatorToHome());
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right)
-            runningActions.add(elevator.elevatorToUpperSubmersible());
+            runningActions.add(elevator.elevatorToAboveLowSubmersible());
         if (gamepad1.dpad_left && !previousGamepad1.dpad_left)
-            runningActions.add(elevator.elevatorToUpperSubmersible());
+            runningActions.add(elevator.elevatorToAboveUpperSubmersible());
 
 
         //pickup specimen from wall
@@ -203,16 +206,16 @@ public class TeleopOpMode extends CommandOpMode {
     void doArmTestCoDriverButtons() {
 
         if (gamepad2.a && !previousGamepad2.a)
-            runningActions.add(rotateArm.runIntakeServos());
+            runningActions.add(rotateArm.openIntakeClaw());
 
         if (gamepad2.b && !previousGamepad2.b)
-            runningActions.add(rotateArm.stopIntakeServos());
+            runningActions.add(rotateArm.closeIntakeClaw());
 
-        if (gamepad2.x && !previousGamepad2.x)
-            runningActions.add(rotateArm.reverseIntakeServosTimed(3));
+        // if (gamepad2.x && !previousGamepad2.x)
 
-        if (gamepad2.y && !previousGamepad2.y)
-            runningActions.add(rotateArm.runUntilSampleOrTimeout(5));
+
+        //  if (gamepad2.y && !previousGamepad2.y)
+
 
         if (gamepad2.dpad_up && !previousGamepad2.dpad_up && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
             runningActions.add(rotateArm.tiltBothClear(1));

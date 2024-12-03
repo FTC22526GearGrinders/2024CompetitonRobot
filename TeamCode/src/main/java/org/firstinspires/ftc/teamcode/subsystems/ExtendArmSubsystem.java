@@ -33,6 +33,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double kd = 0;
     public static boolean TUNING = false;
     public double lastTargetInches;
+
+    public static double OUT_POSITION_LIMIT = 15.00;
+    public static double IN_POSITION_LIMIT = .5;
+
+
+    public static double TRAJ_VEL = 10;
+    public static double TRAJ_ACCEL = 10;
+
+
+
     public Motor leftArmMotor;
     public Motor rightArmMotor;
     public Motor.Encoder leftArmEncoder;
@@ -70,7 +80,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
-        constraints = new TrapezoidProfile.Constraints(Constants.ExtendArmConstants.TRAJ_VEL, Constants.ExtendArmConstants.TRAJ_ACCEL);
+        constraints = new TrapezoidProfile.Constraints(TRAJ_VEL, TRAJ_ACCEL);
 
         leftArmMotor = new Motor(opMode.hardwareMap, "leftArmMotor");
         rightArmMotor = new Motor(opMode.hardwareMap, "rightArmMotor");
