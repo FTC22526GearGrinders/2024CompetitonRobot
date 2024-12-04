@@ -10,9 +10,11 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
 
@@ -21,20 +23,25 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     public static double leftIntakeTiltClearAngle = 0.46;
     public static double leftIntakeTiltDownAngle = 1;
-    public static double leftIntakeBucketClearAngle = 0.25;
+
     public static double rightIntakeTiltClearAngle = .46;
     public static double rightIntakeTiltDownAngle = 1;
-    public static double rightIntakeBucketClearAngle = 0.25;
     public static double touchSubmersibleAngle = .3;
 
     public static double intakeClawOpenAngle = 0;
     public static double intakeClawClosedAngle = 1;
+
+    public static double baseRed = 50;
+    public static double baseGreen = 50;
+    public static double baseBlue = 50;
 
 
     public Servo intakeClawServo;
 
     public Servo leftTiltServo;
     public Servo rightTiltServo;
+
+    public RevColorSensorV3 intakeSensor;
     public int showSelect = 0;
 
     private Telemetry telemetry;
@@ -46,12 +53,14 @@ public class RotateArmSubsystem extends SubsystemBase {
         intakeClawServo = opMode.hardwareMap.get(Servo.class, "intakeClaw");
         intakeClawServo.setDirection(Servo.Direction.FORWARD);
 
-
-        leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");//.4
+        leftTiltServo = opMode.hardwareMap.get(Servo.class, "leftTiltServo");
         rightTiltServo = opMode.hardwareMap.get(Servo.class, "rightTiltServo");
 
         leftTiltServo.setDirection(Servo.Direction.FORWARD);
         rightTiltServo.setDirection(Servo.Direction.REVERSE);
+
+        intakeSensor = opMode.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
+
 
         FtcDashboard dashboard1 = FtcDashboard.getInstance();
 
@@ -66,8 +75,11 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (showSelect == Constants.ShowTelemtryConstants.showRotateArm1)
+        if (showSelect == Constants.ShowTelemetryConstants.showRotateArm1)
             showTelemetry();
+        if (showSelect == Constants.ShowTelemetryConstants.showColors)
+            showTelemetryColors();
+
     }
 
     public Action openIntakeClaw() {
@@ -78,6 +90,10 @@ public class RotateArmSubsystem extends SubsystemBase {
     public Action closeIntakeClaw() {
         return
                 new InstantAction(() -> intakeClawServo.setPosition(intakeClawClosedAngle));
+    }
+
+    public boolean intakeHasSample() {
+        return intakeSensor.red() > baseRed || intakeSensor.green() > baseGreen || intakeSensor.blue() > baseBlue;
     }
 
     public Action tiltBothDown() {
@@ -100,17 +116,8 @@ public class RotateArmSubsystem extends SubsystemBase {
                         new InstantAction(this::setTiltPositionClear));
     }
 
-    public Action tiltBothToBucket(double timeout) {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(leftIntakeBucketClearAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(rightIntakeBucketClearAngle))),
-                        new SleepAction(timeout),
-                        new InstantAction(this::setTiltPositionClear));
-    }
 
-    public Action tiltToSubmersibleAction() {
+    public Action tiltToTouchSubmersibleAction() {
         return new ParallelAction(
                 new InstantAction(() -> leftTiltServo.setPosition(touchSubmersibleAngle)),
                 new InstantAction(() -> rightTiltServo.setPosition(touchSubmersibleAngle)));
@@ -127,6 +134,16 @@ public class RotateArmSubsystem extends SubsystemBase {
 
 
     private void showTelemetry() {
+    }
+
+    public void showTelemetryColors() {
+        telemetry.addData("Intake HAs Sample", intakeHasSample());
+        telemetry.addData("Light", intakeSensor.getLightDetected());
+        telemetry.addData("Light", intakeSensor.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Red", intakeSensor.red());
+        telemetry.addData("Green", intakeSensor.green());
+        telemetry.addData("Blue", intakeSensor.blue());
+        telemetry.update();
     }
 }
 

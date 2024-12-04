@@ -158,11 +158,11 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (showSelect == Constants.ShowTelemtryConstants.showArmCommon)
+        if (showSelect == Constants.ShowTelemetryConstants.showArmCommon)
             showTelemetryCommon();
-        if (showSelect == Constants.ShowTelemtryConstants.showArm1)
+        if (showSelect == Constants.ShowTelemetryConstants.showArm1)
             showTelemetryLeft();
-        if (showSelect == Constants.ShowTelemtryConstants.showArm2)
+        if (showSelect == Constants.ShowTelemetryConstants.showArm2)
             showTelemetryRight();
 
 

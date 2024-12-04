@@ -175,10 +175,10 @@ public final class Constants {
 
     }
 
-    public static final class ShowTelemtryConstants {
+    public static final class ShowTelemetryConstants {
 
         public static final int minShowSelectCount = 0;
-        public static final int maxShowSelectCount = 10;
+        public static final int maxShowSelectCount = 11;
 
         public static final int showNone = 0;
         public static final int showDrive1 = 1;
@@ -190,7 +190,8 @@ public final class Constants {
         public static final int showArm1 = 7;
         public static final int showArm2 = 8;
         public static final int showRotateArm1 = 9;
-        public static final int showLimelight = 10;
+        public static final int showColors = 10;
+        public static final int showLimelight = 11;
 
     }
 

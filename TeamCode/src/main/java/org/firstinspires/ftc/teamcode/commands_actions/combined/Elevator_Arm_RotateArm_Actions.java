@@ -101,7 +101,7 @@ public class Elevator_Arm_RotateArm_Actions {
 
 
     //this may result in a sample or not - need to check
-    public Action pickupSample() {
+    public Action prepareToPickupSample() {
         return new SequentialAction(
                 arm.armToPickupAction(),
                 new ParallelAction(

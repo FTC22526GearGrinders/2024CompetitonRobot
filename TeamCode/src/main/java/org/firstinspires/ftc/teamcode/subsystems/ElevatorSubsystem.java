@@ -322,15 +322,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
 
     public void periodic() {
-        if (showSelect == Constants.ShowTelemtryConstants.showElevatorCommon) {
+        if (showSelect == Constants.ShowTelemetryConstants.showElevatorCommon) {
             showCommonTelemetry();
         }
 
 
-        if (showSelect == Constants.ShowTelemtryConstants.showElevatorLeft) {
+        if (showSelect == Constants.ShowTelemetryConstants.showElevatorLeft) {
             showLeftTelemetry();
         }
-        if (showSelect == Constants.ShowTelemtryConstants.showElevatorRight) {
+        if (showSelect == Constants.ShowTelemetryConstants.showElevatorRight) {
             showRightTelemetry();
         }
 

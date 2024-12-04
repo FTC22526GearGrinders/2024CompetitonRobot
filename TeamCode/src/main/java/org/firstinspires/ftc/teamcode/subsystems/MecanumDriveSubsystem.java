@@ -192,11 +192,11 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if (showSelect == Constants.ShowTelemtryConstants.showDrive1) {
+        if (showSelect == Constants.ShowTelemetryConstants.showDrive1) {
             showTelemetry1();
         }
 
-        if (showSelect == Constants.ShowTelemtryConstants.showDrive2) {
+        if (showSelect == Constants.ShowTelemetryConstants.showDrive2) {
             showTelemetry2();
         }
 

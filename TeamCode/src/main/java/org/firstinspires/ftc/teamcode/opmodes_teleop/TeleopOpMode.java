@@ -125,11 +125,11 @@ public class TeleopOpMode extends CommandOpMode {
 
             elevator.elevatorTest = gamepad2.right_trigger > .75;
 
-            if (!arm.armTest) // && !elevatorTest)
-                doCoDriveButtons();
-
             if (!elevator.elevatorTest)
                 doDriverButtons();
+
+            if (!arm.armTest) // && !elevatorTest)
+                doCoDriveButtons();
 
             if (arm.armTest)
                 doArmTestCoDriverButtons();
@@ -149,7 +149,7 @@ public class TeleopOpMode extends CommandOpMode {
     private void doDriverButtons() {
 
         if (gamepad1.left_bumper && !previousGamepad2.left_bumper)
-            runningActions.add(eara.pickupSample());
+            runningActions.add(eara.prepareToPickupSample());
 
         if (gamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
             runningActions.add(eara.deliverSampleToBucket());
@@ -165,8 +165,8 @@ public class TeleopOpMode extends CommandOpMode {
 
         if (gamepad1.b) runningActions.add(rotateArm.closeIntakeClaw());
 
-
         if (gamepad1.x) runningActions.add(elevator.openSpecimenClaw());
+
 //        if (gamepad1.y)runningActions.add(
 
 
@@ -180,27 +180,16 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(elevator.elevatorToAboveLowerSubmersible());
 
 
-        //pickup specimen from wall
-
-        //reset tilt and arm to clear and home
-
-        //  eara.deliverSampleToBucket();
-
-        // eara.deliverSampleToZone();
-
-        // eara.deliverSampleToBasket();
-
-        //deliver specimen to submersible
-
-
-        // drive.setSlowMode(true);
-
 
     }
 
     public void doCoDriveButtons() {
+        if (gamepad2.a && !previousGamepad2.a)
+            runningActions.add(rotateArm.openIntakeClaw());
 
-        //  if (gamepad2.a && !previousGamepad2.a)
+        if (gamepad2.b && !previousGamepad2.b)
+            runningActions.add(rotateArm.closeIntakeClaw());
+
 
         if (gamepad2.dpad_up && !previousGamepad2.dpad_up) incShowSelect();
         if (gamepad2.dpad_down && !previousGamepad2.dpad_down) decShowSelect();
@@ -269,15 +258,15 @@ public class TeleopOpMode extends CommandOpMode {
 
     void incShowSelect() {
         showSelect++;
-        if (showSelect > Constants.ShowTelemtryConstants.maxShowSelectCount)
-            showSelect = Constants.ShowTelemtryConstants.minShowSelectCount;
+        if (showSelect > Constants.ShowTelemetryConstants.maxShowSelectCount)
+            showSelect = Constants.ShowTelemetryConstants.minShowSelectCount;
         updateSubs();
     }
 
     void decShowSelect() {
         showSelect--;
-        if (showSelect < Constants.ShowTelemtryConstants.minShowSelectCount)
-            showSelect = Constants.ShowTelemtryConstants.maxShowSelectCount;
+        if (showSelect < Constants.ShowTelemetryConstants.minShowSelectCount)
+            showSelect = Constants.ShowTelemetryConstants.maxShowSelectCount;
         updateSubs();
     }
 
