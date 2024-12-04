@@ -294,19 +294,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> specimenClawServo.setPosition(specimenClawOpenAngle));//.3
     }
 
-    public Action deliverToTopBasket() {
+    public Action raiseDeliverToUpperBasketAndLowerAgain() {
         return new SequentialAction(
                 setTarget(Constants.ElevatorConstants.upperBasketDeliverPosition),
-                tipBucket(),
-                new SleepAction(1),
-                setTarget(Constants.ElevatorConstants.homePosition));
-    }
-
-    public Action deliverToLowerBasket() {
-        return new SequentialAction(
-                setTarget(Constants.ElevatorConstants.lowerBasketDeliverPosition),
-                tipBucket(),
-                new SleepAction(1),
+                cycleBucket(1),
                 setTarget(Constants.ElevatorConstants.homePosition));
     }
 

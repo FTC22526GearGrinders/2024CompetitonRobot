@@ -64,17 +64,17 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
     Action firstSpecimenDeliverMove;
     TrajectoryActionBuilder firstSampleMoveToObservationZone;
     TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach;
-    Action secondSampleApproachCloseout;
+    Action secondSampleApproachComplete;
     TrajectoryActionBuilder secondSpecimenDeliverMove;
-    Action secondSpecimenDeliverCloseOut;
+    Action secondSpecimenDeliverComplete;
     TrajectoryActionBuilder thirdSpecimenPickupMove;
-    Action thirdSpecimenPickupCloseout;
+    Action thirdSpecimenPickupComplete;
     TrajectoryActionBuilder thirdSpecimenDeliverMove;
-    Action thirdSpecimenDeliverCloseout;
+    Action thirdSpecimenDeliverComplete;
     TrajectoryActionBuilder fourthSpecimenPickupMove;
-    Action fourthSpecimenPickupCloseout;
+    Action fourthSpecimenPickupComplete;
     TrajectoryActionBuilder fourthSpecimenDeliverMove;
-    Action fourthSpecimenDeliverCloseout;
+    Action fourthSpecimenDeliverComplete;
     TrajectoryActionBuilder park;
 
     TranslationalVelConstraint approachVel;
@@ -120,7 +120,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                 .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle);
 
 
-        secondSampleApproachCloseout = secondSampleMoveToObservationZoneApproach.endTrajectory().fresh()
+        secondSampleApproachComplete = secondSampleMoveToObservationZoneApproach.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle,
                         approachVel, approachAccel).build();
 
@@ -129,7 +129,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle);
 
 
-        secondSpecimenDeliverCloseOut = secondSpecimenDeliverMove.endTrajectory().fresh()
+        secondSpecimenDeliverComplete = secondSpecimenDeliverMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle,
                         approachVel, approachAccel).build();
 
@@ -138,7 +138,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                 .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle);
 
 
-        thirdSpecimenPickupCloseout = thirdSpecimenPickupMove.endTrajectory().fresh()
+        thirdSpecimenPickupComplete = thirdSpecimenPickupMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
                         approachVel, approachAccel).build();
 
@@ -146,14 +146,14 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
         thirdSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose3, fcs.specimenPickupAngle);
 
-        thirdSpecimenDeliverCloseout = thirdSpecimenDeliverMove.endTrajectory().fresh()
+        thirdSpecimenDeliverComplete = thirdSpecimenDeliverMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle,
                         approachVel, approachAccel).build();
 
         fourthSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose3)
                 .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle);
 
-        fourthSpecimenPickupCloseout = fourthSpecimenPickupMove.endTrajectory().fresh()
+        fourthSpecimenPickupComplete = fourthSpecimenPickupMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
                         approachVel, approachAccel
                 ).build();
@@ -162,7 +162,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
         fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose4, fcs.specimenPickupAngle);
 
-        fourthSpecimenDeliverCloseout = fourthSpecimenDeliverMove.endTrajectory().fresh()
+        fourthSpecimenDeliverComplete = fourthSpecimenDeliverMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.specimenDeliverPose4.position, fcs.specimenDropAngle,
                         approachVel, approachAccel).build();
 
@@ -206,7 +206,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                                     firstSampleMoveToObservationZone.build(),
                                     elevator.elevatorToHome()),
                             secondSampleMoveToObservationZoneApproach.build(),
-                            secondSampleApproachCloseout,
+                            secondSampleApproachComplete,
                             elevator.grabSpecimenAndClearWall()));
 
             Actions.runBlocking(
@@ -214,7 +214,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                             new ParallelAction(
                                     secondSpecimenDeliverMove.build(),
                                     elevator.elevatorToAboveUpperSubmersible()),
-                            secondSpecimenDeliverCloseOut,
+                            secondSpecimenDeliverComplete,
                             ears.deliverSpecimenToUpperSubmersible()));
 
             Actions.runBlocking(
@@ -222,7 +222,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                             new ParallelAction(
                                     thirdSpecimenPickupMove.build(),
                                     elevator.elevatorToHome()),
-                            thirdSpecimenPickupCloseout,
+                            thirdSpecimenPickupComplete,
                             elevator.grabSpecimenAndClearWall()));
 
             Actions.runBlocking(
@@ -230,7 +230,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                             new ParallelAction(
                                     thirdSpecimenDeliverMove.build(),
                                     elevator.elevatorToAboveUpperSubmersible()),
-                            thirdSpecimenDeliverCloseout,
+                            thirdSpecimenDeliverComplete,
                             ears.deliverSpecimenToUpperSubmersible()));
 
             Actions.runBlocking(
@@ -238,7 +238,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                             new ParallelAction(
                                     fourthSpecimenPickupMove.build(),
                                     elevator.elevatorToHome()),
-                            fourthSpecimenPickupCloseout,
+                            fourthSpecimenPickupComplete,
                             elevator.grabSpecimenAndClearWall()));
 
             Actions.runBlocking(
@@ -246,7 +246,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
                             new ParallelAction(
                                     fourthSpecimenDeliverMove.build(),
                                     elevator.elevatorToAboveUpperSubmersible()),
-                            fourthSpecimenDeliverCloseout,
+                            fourthSpecimenDeliverComplete,
                             ears.deliverSpecimenToUpperSubmersible()));
 
             Actions.runBlocking(park.build());

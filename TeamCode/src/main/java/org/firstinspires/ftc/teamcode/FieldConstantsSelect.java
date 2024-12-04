@@ -12,8 +12,8 @@ public final class FieldConstantsSelect {
      *
      * */
     //basket
-    public double pickUpArmEX = 4;
-    public double driveTo = 4;
+    public double pickUpArmEX = 6;
+    public double driveTo = 6;
     public double specimenClawAdder = 3;
     public double sampleDropOffZoneFromWall = 8;
 
@@ -57,7 +57,7 @@ public final class FieldConstantsSelect {
 
     public FieldConstantsSelect() {
 
-        setBlue();
+        setRed();
 
     }
 
@@ -68,12 +68,13 @@ public final class FieldConstantsSelect {
 
 
         innerYellowPickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
-        midYellowPickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
+        innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX - driveTo, Math.toRadians(-90));
 
-        outerYellowApproachPose = new Pose2d(66 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
-        outerYellowPickupPose = new Pose2d(72 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
+        midYellowPickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
+        midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX - driveTo, Math.toRadians(-90));
+
+        outerYellowPickupPose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
+        outerYellowApproachPose = new Pose2d(Constants.RobotConstants.length / 2 - 1 - pickUpArmEX + driveTo, 25.5, Math.toRadians(0));
 
         ascentZoneParkPose = new Pose2d(24, -12, Math.toRadians(180));
         ascentZonePickupPose = new Pose2d(24, -12, Math.toRadians(180));

@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
+import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 
 public class Elevator_Arm_RotateArm_Actions {
 
@@ -18,6 +19,7 @@ public class Elevator_Arm_RotateArm_Actions {
     private final ElevatorSubsystem elevator;
     private CommandOpMode opmode;
     private boolean initialized = false;
+
     public Elevator_Arm_RotateArm_Actions(ElevatorSubsystem elevetor, ExtendArmSubsystem arm, RotateArmSubsystem rotateArm, CommandOpMode opmode) {
         this.elevator = elevetor;
         this.arm = arm;
@@ -38,19 +40,27 @@ public class Elevator_Arm_RotateArm_Actions {
      */
 
 
-    public Action deliverSampleToUpperBasket() {
+    public Action deliverSampleToBasketThenDown(boolean upper) {
         return
                 new SequentialAction(
-                        elevator.elevatorToUpperBasket(),
+                        new ConditionalAction(
+                                elevator.elevatorToUpperBasket(),
+                                elevator.elevatorToLowBasket(),
+                                upper),
                         elevator.cycleBucket(2),
                         elevator.elevatorToHome());
     }
 
+    public Action closeIntakeClawTimed(double timeout_secs) {
+        return new SequentialAction(
+                rotateArm.closeIntakeClaw(),
+                new SleepAction(timeout_secs));
+    }
 
-
-    public Action collectSpecimenFromWall() {
-        return
-                elevator.closeSpecimenClaw();
+    public Action openIntakeClawTimed(double timeout_secs) {
+        return new SequentialAction(
+                rotateArm.openIntakeClaw(),
+                new SleepAction(timeout_secs));
     }
 
     public Action deliverSpecimenToUpperSubmersible() {
@@ -62,14 +72,6 @@ public class Elevator_Arm_RotateArm_Actions {
                                 elevator.openSpecimenClaw()));
     }
 
-    public Action deliverSpecimenToLowerSubmersible() {
-        return
-                new ParallelAction(
-                        elevator.elevatorToLowerSubmersible(),
-                        new SequentialAction(
-                                new SleepAction(.5),
-                                elevator.openSpecimenClaw()));
-    }
 
     public Action deliverSpecimenToSubmersible() {
         return
@@ -81,16 +83,13 @@ public class Elevator_Arm_RotateArm_Actions {
     }
 
 
-
-    public Action deliverSampleToBucket() {
+    public Action tiltClearArmToBucket(double tilt_timeout_secs) {
         return
                 new SequentialAction(
-                        rotateArm.tiltBothClear(3),
-                        arm.armToBucketAction(),
-                        rotateArm.openIntakeClaw(),
-                        new SleepAction(1),
-                        elevator.elevatorToHome());
+                        rotateArm.tiltBothClear(tilt_timeout_secs),
+                        arm.armToBucketAction());
     }
+
 
     public Action cancelPickupSample() {
         return
@@ -101,7 +100,7 @@ public class Elevator_Arm_RotateArm_Actions {
 
 
     //this may result in a sample or not - need to check
-    public Action prepareToPickupSample() {
+    public Action armOutTiltDownOpenClaw() {
         return new SequentialAction(
                 arm.armToPickupAction(),
                 new ParallelAction(
@@ -109,7 +108,22 @@ public class Elevator_Arm_RotateArm_Actions {
                         rotateArm.openIntakeClaw()));
     }
 
+    public Action moveAndPickup(Action moveAction) {
+        return
+                new SequentialAction(
+                        moveAction,
+                        armOutTiltDownOpenClaw(),
 
+                        closeIntakeClawTimed(.5));
+    }
+
+    public Action moveAndDeliverToBasket(Action moveAction, boolean upper) {
+        return
+                new SequentialAction(
+                        tiltClearArmToBucket(2),
+                        moveAction,
+                        deliverSampleToBasketThenDown(upper));
+    }
 
 
 }

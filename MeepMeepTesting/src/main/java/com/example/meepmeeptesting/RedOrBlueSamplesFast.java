@@ -50,7 +50,7 @@ public class RedOrBlueSamplesFast {
 
         DriveShim drive = myBot.getDrive();
 
-        fcs.setRed();
+        //   fcs.setRed();
 
         firstSampleDeliverMoveAction = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
@@ -88,7 +88,6 @@ public class RedOrBlueSamplesFast {
                 .build();
 
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
-                //         .lineToX(fcs.outerYellowApproachPose.position.x)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//
 
@@ -115,6 +114,7 @@ public class RedOrBlueSamplesFast {
                 secondSampleDeliverMoveAction,
                 dropSampleAction,
                 new ParallelAction(
+                        thirdSamplePickupMoveAction,
                         thirdSamplePickupMoveAction,
                         pickupSampleAction),
                 thirdSampleDeliverMoveAction,

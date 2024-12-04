@@ -12,8 +12,8 @@ public final class FieldConstantsSelect {
      *
      * */
     //basket
-    public double pickUpArmEX = 4;
-    public double driveTo = 4;
+    public double pickUpArmEX = 8;
+    public double driveTo = 6;
     public double specimenClawAdder = 2;
     public double sampleDropOffZoneFromWall = 8;
 
@@ -71,6 +71,7 @@ public final class FieldConstantsSelect {
 
         innerYellowPickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
         innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
+
         midYellowPickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
         midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 

@@ -149,10 +149,10 @@ public class TeleopOpMode extends CommandOpMode {
     private void doDriverButtons() {
 
         if (gamepad1.left_bumper && !previousGamepad2.left_bumper)
-            runningActions.add(eara.prepareToPickupSample());
+            runningActions.add(eara.armOutTiltDownOpenClaw());
 
         if (gamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
-            runningActions.add(eara.deliverSampleToBucket());
+            runningActions.add(eara.tiltClearArmBackOpenClaw());
 
 
         if (gamepad1.right_bumper && !previousGamepad2.right_bumper)

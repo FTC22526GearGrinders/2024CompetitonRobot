@@ -162,7 +162,7 @@ public class BasketSideAutoWithApproachOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 secondSamplePickupMoveAction,
-                                ears.prepareToPickupSample()),
+                                ears.armOutTiltDownOpenClaw()),
                         rotate.closeIntakeClaw(),
 
                         //deliver second sample to basket
@@ -177,7 +177,7 @@ public class BasketSideAutoWithApproachOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 thirdSamplePickupMoveAction,
-                                ears.prepareToPickupSample()),
+                                ears.armOutTiltDownOpenClaw()),
                         rotate.closeIntakeClaw(),
 
                         //deliver third sample to basket
@@ -192,7 +192,7 @@ public class BasketSideAutoWithApproachOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 fourthSamplePickupMoveAction,
-                                ears.prepareToPickupSample()),
+                                ears.armOutTiltDownOpenClaw()),
                         rotate.closeIntakeClaw(),
 
                         //deliver third sample to basket
