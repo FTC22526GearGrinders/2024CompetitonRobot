@@ -23,7 +23,7 @@ public final class FieldConstantsSelect {
     public Pose2d innerYellowPrePickupPose;
     public Pose2d midYellowPickupPose;
     public Pose2d midYellowPrePickupPose;
-    public Pose2d outerYellowApproachPose;
+    public Pose2d outerYellowPrePose;
     public Pose2d outerYellowPickupPose;
     public Pose2d ascentZoneParkPose;
     public Pose2d ascentZonePickupPose;
@@ -51,13 +51,11 @@ public final class FieldConstantsSelect {
     public Pose2d specimenDeliverApproachPose4;
     public Pose2d specimenPickupPose;
     public Pose2d specimenPickupApproachPose;
-    //these will be compared to distance sensor readings and the deliver pose adjusted if sensor is too far off
-    public double specimenExpectedPickupDistance;
     public Pose2d specimenParkPose;
 
     public FieldConstantsSelect() {
 
-        setRed();
+        setBlue();
 
     }
 
@@ -68,13 +66,13 @@ public final class FieldConstantsSelect {
 
 
         innerYellowPickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX - driveTo, Math.toRadians(-90));
+        innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
         midYellowPickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX - driveTo, Math.toRadians(-90));
+        midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
-        outerYellowPickupPose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
-        outerYellowApproachPose = new Pose2d(Constants.RobotConstants.length / 2 - 1 - pickUpArmEX + driveTo, 25.5, Math.toRadians(0));
+        outerYellowPickupPose = new Pose2d(Constants.FieldConstants.length / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
+        outerYellowPrePose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
 
         ascentZoneParkPose = new Pose2d(24, -12, Math.toRadians(180));
         ascentZonePickupPose = new Pose2d(24, -12, Math.toRadians(180));
@@ -84,7 +82,7 @@ public final class FieldConstantsSelect {
         specimenPickupAngle = Math.toRadians(-90);
 
 
-        specimenSideStartPose = new Pose2d(-12, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenDropAngle);
+        specimenSideStartPose = new Pose2d(-9, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenDropAngle);
 
         sample1ObservationZoneDropPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, Math.toRadians(180));
         sample2ObservationZoneDropPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, specimenPickupAngle);
@@ -100,15 +98,15 @@ public final class FieldConstantsSelect {
         thirdStagePushMidVector = new Vector2d(-58, 10);
 
 
-        specimenDeliverPose1 = new Pose2d(-12, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
-        specimenDeliverPose2 = new Pose2d(-9, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
+        specimenDeliverPose1 = new Pose2d(-9, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
+        specimenDeliverPose2 = new Pose2d(-6, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
         specimenDeliverPose3 = new Pose2d(-3, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
-        specimenDeliverPose4 = new Pose2d(0, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
+        specimenDeliverPose4 = new Pose2d(-0, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
 
-        specimenDeliverApproachPose1 = new Pose2d(-12, 24 + Constants.RobotConstants.length / 2 + 6, specimenDropAngle);
-        specimenDeliverApproachPose2 = new Pose2d(-9, 24 + Constants.RobotConstants.length / 2 + 6, specimenDropAngle);
-        specimenDeliverApproachPose3 = new Pose2d(-3, 24 + Constants.RobotConstants.length / 2 + 6, specimenDropAngle);
-        specimenDeliverApproachPose4 = new Pose2d(0, 24 + Constants.RobotConstants.length / 2 + 6, specimenDropAngle);
+        specimenDeliverApproachPose1 = new Pose2d(-9, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
+        specimenDeliverApproachPose2 = new Pose2d(-6, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
+        specimenDeliverApproachPose3 = new Pose2d(-3, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
+        specimenDeliverApproachPose4 = new Pose2d(0, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
 
         specimenPickupPose = new Pose2d(-36, 72 - Constants.RobotConstants.width / 2 - specimenClawAdder, specimenPickupAngle);
         specimenPickupApproachPose = new Pose2d(-36, specimenPickupPose.position.y - 9, specimenPickupAngle);
@@ -116,6 +114,7 @@ public final class FieldConstantsSelect {
     }
 
     public void setRed() {
+
         basketSideStartPose = flipBlueToRedPose(basketSideStartPose);
         basketDeliverPose = flipBlueToRedPose(basketDeliverPose);
 
@@ -125,7 +124,7 @@ public final class FieldConstantsSelect {
         midYellowPickupPose = flipBlueToRedPose(midYellowPickupPose);
         midYellowPrePickupPose = flipBlueToRedPose(midYellowPrePickupPose);
 
-        outerYellowApproachPose = flipBlueToRedPose(outerYellowApproachPose);
+        outerYellowPrePose = flipBlueToRedPose(outerYellowPrePose);
         outerYellowPickupPose = flipBlueToRedPose(outerYellowPickupPose);
 
 

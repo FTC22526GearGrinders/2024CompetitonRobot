@@ -69,7 +69,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
         DriveShim drive = myBot.getDrive();
 
 
-        fcs.setRed();
+        // fcs.setRed();
 
         Action firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
                 .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)

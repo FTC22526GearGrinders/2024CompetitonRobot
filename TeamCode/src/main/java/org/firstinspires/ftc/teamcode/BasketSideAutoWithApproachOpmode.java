@@ -121,14 +121,13 @@ public class BasketSideAutoWithApproachOpmode extends CommandOpMode {
                 .build();//move to place first specimen
 
         fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading)
-                .waitSeconds(.1)
+                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading)
                 .lineToX(fcs.outerYellowPickupPose.position.x)
 
                 .build();
 
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
-                .lineToX(fcs.outerYellowApproachPose.position.x)
+                .lineToX(fcs.outerYellowPrePose.position.x)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//
 

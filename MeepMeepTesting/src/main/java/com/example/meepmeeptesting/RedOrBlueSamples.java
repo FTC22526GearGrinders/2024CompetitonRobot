@@ -75,11 +75,11 @@ public class RedOrBlueSamples {
                 .build();//move to place first specimen
 
         fourthSamplePickupMoveAction = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading)
+                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading)
                 .build();
 
         fourthSampleDeliverMoveAction = drive.actionBuilder(fcs.outerYellowPickupPose)
-                .lineToX(fcs.outerYellowApproachPose.position.x)
+                .lineToX(fcs.outerYellowPrePose.position.x)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//
 

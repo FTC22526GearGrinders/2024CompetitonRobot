@@ -152,7 +152,7 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(eara.armOutTiltDownOpenClaw());
 
         if (gamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
-            runningActions.add(eara.tiltClearArmBackOpenClaw());
+            runningActions.add(eara.tiltClearArmToBucket(1));
 
 
         if (gamepad1.right_bumper && !previousGamepad2.right_bumper)

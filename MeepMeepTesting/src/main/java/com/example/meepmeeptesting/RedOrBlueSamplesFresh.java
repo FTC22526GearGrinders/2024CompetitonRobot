@@ -94,7 +94,7 @@ public class RedOrBlueSamplesFresh {
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading);
 
         fourthSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.outerYellowApproachPose.position, fcs.outerYellowApproachPose.heading);
+                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading);
 
 
         fourthSamplePickupComplete = fourthSamplePickupMove.endTrajectory().fresh()
