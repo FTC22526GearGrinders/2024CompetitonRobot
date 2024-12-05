@@ -155,8 +155,7 @@ public class SpecimenSideAutoUsingFreshOpmode extends CommandOpMode {
 
         fourthSpecimenPickupComplete = fourthSpecimenPickupMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel
-                ).build();
+                        approachVel, approachAccel).build();
 
 
         fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)

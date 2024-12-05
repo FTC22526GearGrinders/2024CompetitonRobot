@@ -20,31 +20,12 @@ public class CompetitionRedOrBlueSpecimenFresh {
 
     public static void main(String[] args) {
 
-
-//        Action firstSpecimenDeliverMove;
-//        TrajectoryActionBuilder secondSpecimenDeliverMove;
-//        TrajectoryActionBuilder thirdSpecimenDeliverMove;
-//        TrajectoryActionBuilder fourthSpecimenDeliverMove;
-//
-//        TrajectoryActionBuilder secondSpecimenPickupMove;
-//        TrajectoryActionBuilder thirdSpecimenPickupMove;
-//        TrajectoryActionBuilder fourthSpecimenPickupMove;
-//
-//
-//        TrajectoryActionBuilder firstSampleMoveToObservationZone;
-//        TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach;
-//        TrajectoryActionBuilder secondSampleObservationZonePickup;
-//
-//        TrajectoryActionBuilder park;
-
         Action elevatorMove = new SleepAction(2);
 
         Action sequenceOne;
-        Action sequenceTwo;
 
-        // TrajectoryActionBuilder sequenceTwo;
+
         TrajectoryActionBuilder sequenceThree;
-        TrajectoryActionBuilder sequenceFour;
         TranslationalVelConstraint approachVel;
         ProfileAccelConstraint approachAccel;
 
@@ -136,7 +117,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
                         approachVel, approachAccel).build();
 
         TrajectoryActionBuilder park = drive.actionBuilder(fcs.specimenDeliverPose4)
-                .strafeToLinearHeading(fcs.specimenParkPose.position, fcs.specimenDropAngle);
+                .strafeTo(fcs.specimenParkPose.position);
 
 
         sequenceOne = new SequentialAction(
@@ -183,7 +164,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
                         fourthSpecimenDeliverMove.build(),
                         elevatorMove),
                 fourthSpecimenDeliverCloseout,
-                new SleepAction(1),
+                new SleepAction(10),
 
                 park.build());
 
