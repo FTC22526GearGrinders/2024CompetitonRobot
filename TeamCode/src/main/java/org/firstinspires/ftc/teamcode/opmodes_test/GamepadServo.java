@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.opmodes_test;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /*
@@ -51,9 +52,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 //@Disabled
 public class GamepadServo extends LinearOpMode {
 
+    Gamepad currentGamepad2 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
 
     // Define class members
-    Servo servo;
+
+    Servo servol;
+    Servo servor;
     double position = 0;
     boolean direction = false;
 
@@ -62,29 +67,83 @@ public class GamepadServo extends LinearOpMode {
 
         // Connect to servo (Assume Robot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        servo = hardwareMap.get(Servo.class, "rightTiltServo");
-        direction = gamepad1.left_bumper;
+        servor = hardwareMap.get(Servo.class, "rightTiltServo");
+        servol = hardwareMap.get(Servo.class, "leftTiltServo");
 
         waitForStart();
 
-        servo.setDirection(Servo.Direction.FORWARD);
+        servol.setDirection(Servo.Direction.FORWARD);
+        servor.setDirection(Servo.Direction.REVERSE);
 
-        if (direction)
-
-            servo.setDirection(Servo.Direction.REVERSE);
 
         // Scan servo till stop pressed.
         while (opModeIsActive()) {
 
-            if (gamepad1.left_bumper)
+            previousGamepad2.copy(currentGamepad2);
 
-                position = gamepad1.left_trigger;
+            currentGamepad2.copy(gamepad2);
 
-            servo.setPosition(position);
+//            if (gamepad2.left_bumper && !previousGamepad2.left_bumper)
+//                if (servor.getDirection() == Servo.Direction.FORWARD)
+//                    servor.setDirection(Servo.Direction.REVERSE);
+//                else servor.setDirection(Servo.Direction.FORWARD);
+
+            if (gamepad2.y && !previousGamepad2.y) {
+                position = .9;
+                servor.setPosition(position);
+                servol.setPosition(position);
+
+            }
+            if (gamepad2.a && !previousGamepad2.a) {
+                position = 0;
+                servor.setPosition(position);
+                servol.setPosition(position);
+
+            }
+
+            if (gamepad2.x && !previousGamepad2.x) {
+                position += .01;
+                if (position > 1) position = 1;
+                servor.setPosition(position);
+                servol.setPosition(position);
+
+            }
+            if (gamepad2.b && !previousGamepad2.b) {
+                position -= .01;
+                if (position < 0) position = 0;
+                servor.setPosition(position);
+                servol.setPosition(position);
+            }
+
+
+            if (gamepad2.dpad_up && !previousGamepad2.dpad_up) {
+                position = .5;
+                servor.setPosition(position);
+                servol.setPosition(position);
+            }
+            if (gamepad2.dpad_down && !previousGamepad2.dpad_down) {
+                position = 0;
+                servor.setPosition(position);
+                servol.setPosition(position);
+            }
+            if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
+                position = .25;
+                servor.setPosition(position);
+                servol.setPosition(position);
+            }
+            if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
+                position = .75;
+                servor.setPosition(position);
+                servol.setPosition(position);
+            }
+
+
 
             // Display the current value
             telemetry.addData("Servo Position", position);
-            telemetry.addData("Direction", direction);
+            telemetry.addData("Forward", servor.getDirection() == Servo.Direction.FORWARD);
+            telemetry.addData("Reverse", servor.getDirection() == Servo.Direction.REVERSE);
+
             telemetry.update();
 
             sleep(100);

@@ -55,13 +55,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double specimenClawOpenAngle = 0.0;
     public static double specimenClawClosedAngle = .3;
 
-    public static double bucketUprightAngle = 0;
-    public static double bucketTippedAngle = .4;
+    public static double bucketUprightAngle = .5;
+    public static double bucketTippedAngle = 0;
 
     public static double releaseDelay = .5;
 
-
+    public final double minimumHoldHeight = 2;
     private final Telemetry telemetry;
+    private final double lrdiffmaxinches = 3;
+    public ElapsedTime holdTime;
     public TrapezoidProfile.Constraints constraints;
     public Motor leftElevatorMotor;
     public Motor.Encoder leftElevatorEncoder;
@@ -79,13 +81,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Sensor specimenClawSwitch;
     public int holdCtr;
     public int showSelect = 0;
-
     public double currentSpecimenClawAngle;
     public int posrng;
     public double leftPower;
     public double rightPower;
-    public boolean elevatorTest;
-    ElapsedTime et;
+    public boolean openLoop;
+    public boolean shutDownElevatorPositioning;
+    public double leftTotalPower;
+    public double rightTotalPower;
     CommandOpMode myOpmode;
     double leftSetVel;
     double leftSetPos;
@@ -140,7 +143,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         bucketServo = opMode.hardwareMap.get(Servo.class, "bucketServo");
         specimenClawServo = opMode.hardwareMap.get(Servo.class, "specimenClawServo");
 
-        bucketServo.setDirection(Servo.Direction.REVERSE);
+        bucketServo.setDirection(Servo.Direction.FORWARD);
         specimenClawServo.setDirection(Servo.Direction.FORWARD);
 
         // specimenClawSwitch = new Sensor()
@@ -153,8 +156,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
 
-
-        et = new ElapsedTime();
+        holdTime = new ElapsedTime();
 
         levelBucket();
     }
@@ -317,7 +319,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             showCommonTelemetry();
         }
 
-
         if (showSelect == Constants.ShowTelemetryConstants.showElevatorLeft) {
             showLeftTelemetry();
         }
@@ -325,12 +326,16 @@ public class ElevatorSubsystem extends SubsystemBase {
             showRightTelemetry();
         }
 
+        holdCtr++;
 
-        if (holdCtr >= 100) {
-            scanTime = et.milliseconds() / holdCtr;
+        if (holdCtr >= 50) {
+            leftTotalPower += Math.abs(leftElevatorMotor.get());
+            rightTotalPower += Math.abs(rightElevatorMotor.get());
             holdCtr = 0;
-            et.reset();
         }
+
+        if (Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrdiffmaxinches)
+            shutDownElevatorPositioning = true;
 
         if (TUNING) {
             setTargetInches(targetInches);
@@ -466,6 +471,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("RightPositionInches", getRightPositionInches());
         telemetry.addData("LeftPower", getLeftPower());
         telemetry.addData("RightPower", getRightPower());
+        telemetry.addData("LeftTotalPower", leftTotalPower);
+        telemetry.addData("RightTotalPower", rightTotalPower);
 
         telemetry.update();
 

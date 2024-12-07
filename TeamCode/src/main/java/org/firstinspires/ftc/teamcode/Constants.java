@@ -129,7 +129,7 @@ public final class Constants {
 
     public static final class RotateArmConstants {
 
-        public static double armDistanceOKTilt = 10;
+        public static double armDistanceOKTilt = 5;
 
     }
 
@@ -139,15 +139,15 @@ public final class Constants {
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 145.1;
 
         public static final double GEARING_RATIO = 1;
-        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
-        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//50
+        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//19
+        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//15
 
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//5/15 appox .33
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28/.33 approx 85
+        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;// appox 5"
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx 150
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//16
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//75
 
 
         public static final double HOME_POSITION = 0;

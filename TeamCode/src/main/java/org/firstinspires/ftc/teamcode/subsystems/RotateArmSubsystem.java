@@ -21,11 +21,12 @@ import org.firstinspires.ftc.teamcode.Constants;
 @Config
 public class RotateArmSubsystem extends SubsystemBase {
 
-    public static double leftIntakeTiltClearAngle = 0.46;
-    public static double leftIntakeTiltDownAngle = 1;
+    public static double intakeTiltClearAngle = 0.3;
+    public static double intakeTiltDownAngle = .96;
+    public static double intakeTiltVerticalAngle = .5;
+    public static double intakeTiltHomeAngle = .1;
 
-    public static double rightIntakeTiltClearAngle = .46;
-    public static double rightIntakeTiltDownAngle = 1;
+
     public static double touchSubmersibleAngle = .3;
 
     public static double intakeClawOpenAngle = 0;
@@ -100,8 +101,8 @@ public class RotateArmSubsystem extends SubsystemBase {
         return
                 new SequentialAction(
                         new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(leftIntakeTiltDownAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(rightIntakeTiltDownAngle))),
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltDownAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltDownAngle))),
                         new SleepAction(1),
                         new InstantAction(this::setTiltPositionDown));
     }
@@ -110,10 +111,30 @@ public class RotateArmSubsystem extends SubsystemBase {
         return
                 new SequentialAction(
                         new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(leftIntakeTiltClearAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(rightIntakeTiltClearAngle))),
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltClearAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltClearAngle))),
                         new SleepAction(timeout),
                         new InstantAction(this::setTiltPositionClear));
+    }
+
+    public Action tiltBothVertical(double timeout) {
+        return
+                new SequentialAction(
+                        new ParallelAction(
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltVerticalAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltVerticalAngle)),
+                                new SleepAction(timeout)));
+
+    }
+
+    public Action tiltBothHome(double timeout) {
+        return
+                new SequentialAction(
+                        new ParallelAction(
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltHomeAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltHomeAngle)),
+                                new SleepAction(timeout),
+                                new InstantAction(this::setTiltPositionClear)));
     }
 
 

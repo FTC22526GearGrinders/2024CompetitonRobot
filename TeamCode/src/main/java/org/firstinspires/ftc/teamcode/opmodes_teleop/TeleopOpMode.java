@@ -114,32 +114,17 @@ public class TeleopOpMode extends CommandOpMode {
         initialize();
 
         waitForStart();
-        rotateArm.tiltBothClear(1).run(packet);
+        rotateArm.tiltBothHome(1).run(packet);
+        elevator.elevatorToHome();
         while (!isStopRequested() && opModeIsActive()) {
             run();
             actionLoop();
-
             copyGamepads();
 
-            arm.armTest = gamepad2.left_trigger > .75;
+            doDriverButtons();
 
-            elevator.elevatorTest = gamepad2.right_trigger > .75;
+            doCoDriverButtons();
 
-            if (!elevator.elevatorTest)
-                doDriverButtons();
-
-            if (!arm.armTest) // && !elevatorTest)
-                doCoDriveButtons();
-
-            if (arm.armTest)
-                doArmTestCoDriverButtons();
-
-            if (elevator.elevatorTest)
-                doElevatorTestCoDriverButtons();
-
-
-            //  telemetry.update();
-            //    showField();
 
         }
         reset();
@@ -148,105 +133,80 @@ public class TeleopOpMode extends CommandOpMode {
 
     private void doDriverButtons() {
 
-        if (gamepad1.left_bumper && !previousGamepad2.left_bumper)
+        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
             runningActions.add(eara.armOutTiltDownOpenClaw());
 
-        if (gamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
+        if (currentGamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
             runningActions.add(eara.tiltClearArmToBucket(1));
 
-
-        if (gamepad1.right_bumper && !previousGamepad2.right_bumper)
+        if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)
             runningActions.add(elevator.grabSpecimenAndClearWall());
 
-        if (gamepad1.right_trigger > .75 && !(previousGamepad1.right_trigger > .75))
-            runningActions.add(eara.deliverSpecimenToSubmersible());
+        if (currentGamepad1.right_trigger > .75 && !(previousGamepad1.right_trigger > .75))
+            runningActions.add(eara.deliverSpecimenToNearestSubmersible());
 
-        if (gamepad1.a && !previousGamepad1.a) runningActions.add(rotateArm.openIntakeClaw());
+        if (currentGamepad1.a && !previousGamepad1.a)
+            runningActions.add(rotateArm.openIntakeClaw());
 
-        if (gamepad1.b) runningActions.add(rotateArm.closeIntakeClaw());
+        if (currentGamepad1.b && !previousGamepad1.b)
+            runningActions.add(rotateArm.closeIntakeClaw());
 
-        if (gamepad1.x) runningActions.add(elevator.openSpecimenClaw());
+        if (currentGamepad1.x && !previousGamepad1.x)
+            runningActions.add(elevator.openSpecimenClaw());
 
-//        if (gamepad1.y)runningActions.add(
+        if (currentGamepad1.y && !previousGamepad1.y)
+            runningActions.add(elevator.cycleBucket(2));
 
+        //   if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
 
-        if (gamepad1.dpad_up && !previousGamepad1.dpad_up)
-            runningActions.add(elevator.elevatorToUpperBasket());
-        if (gamepad1.dpad_down && !previousGamepad1.dpad_down)
+        //   if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+
+        //   if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
+
+        //    if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
+
+    }
+
+    public void doCoDriverButtons() {
+
+        if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)
             runningActions.add(elevator.elevatorToHome());
-        if (gamepad1.dpad_right && !previousGamepad1.dpad_right)
+
+        if (currentGamepad2.left_trigger > .75 && !(previousGamepad2.left_trigger > .75))
+            runningActions.add(elevator.elevatorToUpperBasket());
+
+        if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper)
             runningActions.add(elevator.elevatorToAboveUpperSubmersible());
-        if (gamepad1.dpad_left && !previousGamepad1.dpad_left)
+
+        if (currentGamepad2.right_trigger > .75 && !(previousGamepad2.right_trigger > .75))
             runningActions.add(elevator.elevatorToAboveLowerSubmersible());
 
 
-
-    }
-
-    public void doCoDriveButtons() {
-        if (gamepad2.a && !previousGamepad2.a)
-            runningActions.add(rotateArm.openIntakeClaw());
-
-        if (gamepad2.b && !previousGamepad2.b)
-            runningActions.add(rotateArm.closeIntakeClaw());
-
-
-        if (gamepad2.dpad_up && !previousGamepad2.dpad_up) incShowSelect();
-        if (gamepad2.dpad_down && !previousGamepad2.dpad_down) decShowSelect();
-
-    }
-
-    void doArmTestCoDriverButtons() {
-
-        if (gamepad2.a && !previousGamepad2.a)
-            runningActions.add(rotateArm.openIntakeClaw());
-
-        if (gamepad2.b && !previousGamepad2.b)
-            runningActions.add(rotateArm.closeIntakeClaw());
-
-        // if (gamepad2.x && !previousGamepad2.x)
+//        if (currentGamepad2.a && !previousGamepad2.a)
+//
+//        if (currentGamepad2.b && !previousGamepad2.b)
+//            runningActions.add(elevator.elevatorToClearWall());
+//        if (currentGamepad2.x && !previousGamepad2.a)
+//
+//        if (currentGamepad2.y && !previousGamepad2.b)
+//
 
 
-        //  if (gamepad2.y && !previousGamepad2.y)
-
-
-        if (gamepad2.dpad_up && !previousGamepad2.dpad_up && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
-            runningActions.add(rotateArm.tiltBothClear(1));
-
-        if (gamepad2.dpad_down && !previousGamepad2.dpad_down && arm.getLeftPositionInches() > Constants.RotateArmConstants.armDistanceOKTilt)
-            runningActions.add(rotateArm.tiltBothDown());
-
-        if (gamepad2.dpad_left && !previousGamepad2.dpad_left)
-            runningActions.add(arm.armToBucketAction());
-
-        if (gamepad2.dpad_right && !previousGamepad2.dpad_right)
-            runningActions.add(arm.armToPickupAction());
-
-        if (gamepad2.right_bumper && !previousGamepad2.right_bumper)
-            runningActions.add(eara.deliverSpecimenToUpperSubmersible());
-
-
-    }
-
-
-    void doElevatorTestCoDriverButtons() {
-
-        if (gamepad2.a && !previousGamepad2.a) runningActions.add(elevator.openSpecimenClaw());
-        if (gamepad2.b && !previousGamepad2.b) runningActions.add(elevator.closeSpecimenClaw());
-        if (gamepad2.x && !previousGamepad2.x) runningActions.add(elevator.tipBucket());
-        if (gamepad2.y && !previousGamepad2.y) runningActions.add(elevator.levelBucket());
-
-        if (gamepad2.dpad_up && !previousGamepad2.dpad_up)
-            runningActions.add(elevator.elevatorToAboveUpperSubmersible());
-        if (gamepad2.dpad_down && !previousGamepad2.dpad_down)
-            runningActions.add(elevator.elevatorToUpperSubmersible());
-        if (gamepad2.dpad_left && !previousGamepad2.dpad_left)
-            runningActions.add(elevator.elevatorToHome());
-        if (gamepad2.dpad_right && !previousGamepad2.dpad_right)
+//elevator samples
+        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
             runningActions.add(elevator.elevatorToUpperBasket());
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+            runningActions.add(elevator.elevatorToHome());
+        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
+            runningActions.add(elevator.elevatorToLowBasket());
+        //  if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
 
+
+        if (currentGamepad2.back && !previousGamepad2.back) incShowSelect();
+        if (currentGamepad2.start && !previousGamepad2.start) decShowSelect();
 
     }
+
 
     void showField() {
         drive.updatePoseEstimate();

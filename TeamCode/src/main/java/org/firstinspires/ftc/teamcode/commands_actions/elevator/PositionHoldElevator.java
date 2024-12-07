@@ -8,9 +8,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 public class PositionHoldElevator extends CommandBase {
     private final ElevatorSubsystem elevator;
 
-    private double power;
-
-
     public PositionHoldElevator(ElevatorSubsystem elevator) {
         this.elevator = elevator;
         addRequirements(this.elevator);
@@ -26,10 +23,18 @@ public class PositionHoldElevator extends CommandBase {
 
     @Override
     public void execute() {
-        elevator.holdCtr++;
-        elevator.position();
-    }
 
+
+        if (!elevator.shutDownElevatorPositioning && elevator.getTargetInches() > elevator.minimumHoldHeight
+                && elevator.getLeftPositionInches() < elevator.minimumHoldHeight * 3)
+            elevator.position();
+        else {
+            elevator.leftElevatorMotor.set(0);
+            elevator.rightElevatorMotor.set(0);
+        }
+
+
+    }
 
     @Override
     public void end(boolean interrupted) {

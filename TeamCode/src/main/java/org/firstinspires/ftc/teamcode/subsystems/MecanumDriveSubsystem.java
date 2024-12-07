@@ -232,10 +232,10 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public PoseVelocity2d updatePoseEstimate() {
@@ -324,6 +324,19 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     }
 
     public void showTelemetry2() {
+
+        telemetry.addData("LFPower", leftFront.getPower());
+        telemetry.addData("LRPower", leftBack.getPower());
+        telemetry.addData("RFPower", rightFront.getPower());
+        telemetry.addData("RBPower", rightBack.getPower());
+        telemetry.addData("LFVel", leftFront.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("LBVel", leftBack.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("RFVel", rightFront.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("RBVel", rightBack.getVelocity(AngleUnit.DEGREES));
+
+
+        telemetry.update();
+
 
     }
 

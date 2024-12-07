@@ -73,7 +73,7 @@ public class Elevator_Arm_RotateArm_Actions {
     }
 
 
-    public Action deliverSpecimenToSubmersible() {
+    public Action deliverSpecimenToNearestSubmersible() {
         return
                 new ParallelAction(
                         elevator.elevatorToNearestSubmersible(),
@@ -87,7 +87,10 @@ public class Elevator_Arm_RotateArm_Actions {
         return
                 new SequentialAction(
                         rotateArm.tiltBothClear(tilt_timeout_secs),
-                        arm.armToBucketAction());
+                        arm.armToBucketAction(),
+                        rotateArm.openIntakeClaw(),
+                        new SleepAction(.5),
+                        rotateArm.tiltBothVertical(.2));
     }
 
 

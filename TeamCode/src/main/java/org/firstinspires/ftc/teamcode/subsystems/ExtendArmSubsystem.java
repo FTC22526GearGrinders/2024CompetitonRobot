@@ -59,7 +59,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public int holdCtr;
     public int showSelect = 0;
     public int tst;
-    public boolean armTest;
     ElapsedTime et;
     double leftSetVel;
     double leftSetPos;

@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 
 public class JogDrive extends CommandBase {
     private final MecanumDriveSubsystem drive;
-
+    private final double deadband = .05;
     private final Gamepad gamepad;
     private final double speedMultiplier = .25;
     double denominator;
@@ -36,6 +36,10 @@ public class JogDrive extends CommandBase {
         double y = -this.gamepad.left_stick_y;
         double x = this.gamepad.left_stick_x * 1.1;
         double rx = this.gamepad.right_stick_x;
+
+        if (Math.abs(y) < deadband) y = 0;
+        if (Math.abs(x) < deadband) x = 0;
+        if (Math.abs(rx) < deadband) rx = 0;
 
 
         if (drive.isSlowMode()) {
