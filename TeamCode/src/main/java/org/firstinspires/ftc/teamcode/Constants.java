@@ -153,12 +153,10 @@ public final class Constants {
         public static final double HOME_POSITION = 0;
         public static final double POSITION_TOLERANCE_INCHES = .1;
 
-        public static double elevatorDownHeight = 0;
         public static double elevatorClearOfWall = 4;
 
         public static double elevatorLowerBasketHeight = 28;
         public static double elevatorUpperBasketHeight = 45;
-        public static double elevatorSpecimenWallHeight = 9;
 
 
         public static double elevatorSpecimenAboveLowPlaceHeight = 3;
@@ -166,12 +164,6 @@ public final class Constants {
 
         public static double elevatorSpecimenAboveHighPlaceHeight = 15;
         public static double elevatorSpecimenAtHighPlaceHeight = 12.5;
-
-
-
-        public static double homePosition = 1;
-        public static double lowerBasketDeliverPosition = 24;
-        public static double upperBasketDeliverPosition = 44;
 
     }
 

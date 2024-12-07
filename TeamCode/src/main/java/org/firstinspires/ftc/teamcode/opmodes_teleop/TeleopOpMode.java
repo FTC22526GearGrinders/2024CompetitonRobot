@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
+import org.firstinspires.ftc.teamcode.utils.RumbleDefs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,6 +125,8 @@ public class TeleopOpMode extends CommandOpMode {
             doDriverButtons();
 
             doCoDriverButtons();
+
+            if (!elevator.checkOK()) gamepad2.runRumbleEffect(RumbleDefs.threeStepRumbleEffect);
 
 
         }

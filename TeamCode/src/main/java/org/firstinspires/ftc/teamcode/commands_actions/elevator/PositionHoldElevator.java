@@ -23,17 +23,13 @@ public class PositionHoldElevator extends CommandBase {
 
     @Override
     public void execute() {
-
-
-        if (!elevator.shutDownElevatorPositioning && elevator.getTargetInches() > elevator.minimumHoldHeight
-                && elevator.getLeftPositionInches() < elevator.minimumHoldHeight * 3)
+        if (!elevator.shutDownElevatorPositioning && (elevator.getTargetInches() > elevator.minimumHoldHeight
+                || elevator.getLeftPositionInches() > elevator.minimumHoldHeight / 2))
             elevator.position();
         else {
             elevator.leftElevatorMotor.set(0);
             elevator.rightElevatorMotor.set(0);
         }
-
-
     }
 
     @Override

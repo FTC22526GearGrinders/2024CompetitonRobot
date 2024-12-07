@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.hardware.Sensor;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -46,7 +44,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public static double targetInches;
 
-    public static double UPPER_POSITION_LIMIT = 36;
+    public static double UPPER_POSITION_LIMIT = 46;
     public static int LOWER_POSITION_LIMIT = 0;
 
     public static double TRAJ_VEL = 10;
@@ -62,7 +60,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public final double minimumHoldHeight = 2;
     private final Telemetry telemetry;
-    private final double lrdiffmaxinches = 3;
+    private final double lrDiffMaxInches = 3;
     public ElapsedTime holdTime;
     public TrapezoidProfile.Constraints constraints;
     public Motor leftElevatorMotor;
@@ -78,10 +76,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
     public Servo bucketServo;
     public Servo specimenClawServo;
-    public Sensor specimenClawSwitch;
     public int holdCtr;
     public int showSelect = 0;
-    public double currentSpecimenClawAngle;
     public int posrng;
     public double leftPower;
     public double rightPower;
@@ -102,8 +98,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double leftLastVel;
     private double rightAccel;
     private double rightLastVel;
-    private double scanTime;
-    private int targetSetCounter;
     private int inPositionCtr;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
@@ -203,10 +197,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-    public Action elevatorToSpecimenOnWall() {
-        return positionElevator(Constants.ElevatorConstants.elevatorSpecimenWallHeight);
-    }
-
     public Action elevatorToAboveLowerSubmersible() {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenAboveLowPlaceHeight);
     }
@@ -296,14 +286,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> specimenClawServo.setPosition(specimenClawOpenAngle));//.3
     }
 
-    public Action raiseDeliverToUpperBasketAndLowerAgain() {
-        return new SequentialAction(
-                setTarget(Constants.ElevatorConstants.upperBasketDeliverPosition),
-                cycleBucket(1),
-                setTarget(Constants.ElevatorConstants.homePosition));
-    }
-
-
     public Action grabSpecimenAndClearWall() {
         return new SequentialAction(
                 closeSpecimenClaw(),
@@ -318,7 +300,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (showSelect == Constants.ShowTelemetryConstants.showElevatorCommon) {
             showCommonTelemetry();
         }
-
         if (showSelect == Constants.ShowTelemetryConstants.showElevatorLeft) {
             showLeftTelemetry();
         }
@@ -334,8 +315,9 @@ public class ElevatorSubsystem extends SubsystemBase {
             holdCtr = 0;
         }
 
-        if (Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrdiffmaxinches)
+        if (Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches)
             shutDownElevatorPositioning = true;
+
 
         if (TUNING) {
             setTargetInches(targetInches);
@@ -344,8 +326,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
-    public double getLeftVoltsPerIPS() {
-        return (leftPower - .4) / getLeftVelocityInPerSec();
+    public boolean checkOK() {
+
+        return Math.abs(getLeftPositionInches() - getRightPositionInches()) < lrDiffMaxInches;
     }
 
     public void position() {

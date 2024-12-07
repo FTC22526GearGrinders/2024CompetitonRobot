@@ -59,7 +59,7 @@ public class JogElevator extends CommandBase {
         }
         boolean overrideLimits = gamepad.start;
 
-        if (overrideLimits || (elevator.leftPower > 0 && elevator.getLeftPositionInches() < elevator.UPPER_POSITION_LIMIT
+        if (overrideLimits || (elevator.leftPower > 0 && elevator.getLeftPositionInches() < ElevatorSubsystem.UPPER_POSITION_LIMIT
                 || elevator.leftPower < 0 && elevator.getLeftPositionInches() > ElevatorSubsystem.LOWER_POSITION_LIMIT)
                 || (elevator.rightPower > 0 && elevator.getRightPositionInches() < ElevatorSubsystem.UPPER_POSITION_LIMIT
                 || elevator.rightPower < 0 && elevator.getRightPositionInches() > ElevatorSubsystem.LOWER_POSITION_LIMIT)) {

@@ -61,11 +61,8 @@ public class BasketSideAutoMotionOnlyOpmode extends CommandOpMode {
     public TrajectoryActionBuilder firstSampleDeliverMove;
 
     TrajectoryActionBuilder secondSampleDeliverMove;
-    Action secondSampleDeliverComplete;
     TrajectoryActionBuilder thirdSampleDeliverMove;
-    Action thirdSampleDeliverComplete;
     TrajectoryActionBuilder fourthSampleDeliverMove;
-    Action fourthSampleDeliverComplete;
 
 
     TrajectoryActionBuilder secondSamplePickupMove;
@@ -153,7 +150,7 @@ public class BasketSideAutoMotionOnlyOpmode extends CommandOpMode {
                 new SequentialAction(
 
                         firstSampleDeliverMove.build(),
-                        //  ears.deliverSampleToBasketThenDown(true),
+                        ears.deliverSampleToBasketThenDown(true),
 
                         secondSamplePickupMove.build(),
                         ears.armOutTiltDownOpenClaw(),
@@ -164,7 +161,7 @@ public class BasketSideAutoMotionOnlyOpmode extends CommandOpMode {
                         ears.openIntakeClawTimed(1),
 
                         secondSampleDeliverMove.build(),
-                        //   ears.deliverSampleToBasketThenDown(true),
+                        ears.deliverSampleToBasketThenDown(true),
 
                         thirdSamplePickupMove.build(),
                         ears.armOutTiltDownOpenClaw(),
@@ -175,7 +172,7 @@ public class BasketSideAutoMotionOnlyOpmode extends CommandOpMode {
                         ears.openIntakeClawTimed(1),
 
                         thirdSampleDeliverMove.build(),
-                        //  ears.deliverSampleToBasketThenDown(true),
+                        ears.deliverSampleToBasketThenDown(true),
 
                         fourthSamplePickupMove.build(),
                         ears.armOutTiltDownOpenClaw(),
@@ -185,9 +182,8 @@ public class BasketSideAutoMotionOnlyOpmode extends CommandOpMode {
                         ears.tiltClearArmToBucket(1),
                         ears.openIntakeClawTimed(1),
 
-
                         fourthSampleDeliverMove.build(),
-                        // ears.deliverSampleToBasketThenDown(true),
+                        ears.deliverSampleToBasketThenDown(true),
 
                         parkAction);
 
