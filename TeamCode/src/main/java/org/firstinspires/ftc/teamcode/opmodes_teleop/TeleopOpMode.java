@@ -31,8 +31,8 @@ import java.util.List;
 @TeleOp
 public class TeleopOpMode extends CommandOpMode {
 
-    private final Trigger gp2lb = new Trigger(() -> gamepad2.left_bumper);
-    private final Trigger gp2rb = new Trigger(() -> gamepad2.right_bumper);
+    private final Trigger gp2lb = new Trigger(() -> gamepad2.a);
+    private final Trigger gp2rb = new Trigger(() -> gamepad2.b);
     public int showSelect;
     protected MecanumDriveSubsystem drive;
     protected ExtendArmSubsystem arm;
@@ -117,6 +117,7 @@ public class TeleopOpMode extends CommandOpMode {
         waitForStart();
         rotateArm.tiltBothHome(1).run(packet);
         elevator.elevatorToHome();
+        elevator.levelBucket();
         while (!isStopRequested() && opModeIsActive()) {
             run();
             actionLoop();
@@ -158,9 +159,11 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(elevator.openSpecimenClaw());
 
         if (currentGamepad1.y && !previousGamepad1.y)
-            runningActions.add(elevator.cycleBucket(2));
+            runningActions.add(elevator.closeSpecimenClaw());
 
-        //   if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
+
+        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
+            runningActions.add(elevator.cycleBucket(2));
 
         //   if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
 
@@ -185,10 +188,7 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(elevator.elevatorToAboveLowerSubmersible());
 
 
-//        if (currentGamepad2.a && !previousGamepad2.a)
-//
-//        if (currentGamepad2.b && !previousGamepad2.b)
-//            runningActions.add(elevator.elevatorToClearWall());
+        // a snd b used for JOG DO NOT USE
 //        if (currentGamepad2.x && !previousGamepad2.a)
 //
 //        if (currentGamepad2.y && !previousGamepad2.b)

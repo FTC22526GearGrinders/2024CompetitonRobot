@@ -13,7 +13,7 @@ public class JogElevator extends CommandBase {
     private final Gamepad gamepad;
     private final ElevatorSubsystem elevator;
     public SimpleMotorFeedforward armFF = new SimpleMotorFeedforward(ElevatorSubsystem.eks, ElevatorSubsystem.ekv, ElevatorSubsystem.eka);
-    private double deadband = .05;
+    private double deadband = .01;
     private double ipsec = 5;//ips
     private double ff;
 
@@ -35,7 +35,7 @@ public class JogElevator extends CommandBase {
     @Override
     public void execute() {
 
-        double stickValue = -gamepad.right_stick_y / 2;
+        double stickValue = -gamepad.right_stick_y;
 
 
         double speedips = -gamepad.right_stick_y * ipsec;
@@ -59,10 +59,10 @@ public class JogElevator extends CommandBase {
         }
         boolean overrideLimits = gamepad.start;
 
-        if (overrideLimits || (elevator.leftPower > 0 && elevator.getLeftPositionInches() < ElevatorSubsystem.UPPER_POSITION_LIMIT
-                || elevator.leftPower < 0 && elevator.getLeftPositionInches() > ElevatorSubsystem.LOWER_POSITION_LIMIT)
-                || (elevator.rightPower > 0 && elevator.getRightPositionInches() < ElevatorSubsystem.UPPER_POSITION_LIMIT
-                || elevator.rightPower < 0 && elevator.getRightPositionInches() > ElevatorSubsystem.LOWER_POSITION_LIMIT)) {
+        if (overrideLimits || (elevator.leftPower > 0 && elevator.getLeftPositionInches() < elevator.UPPER_POSITION_LIMIT
+                || elevator.leftPower < 0 && elevator.getLeftPositionInches() > elevator.LOWER_POSITION_LIMIT)
+                || (elevator.rightPower > 0 && elevator.getRightPositionInches() < elevator.UPPER_POSITION_LIMIT
+                || elevator.rightPower < 0 && elevator.getRightPositionInches() > elevator.LOWER_POSITION_LIMIT)) {
             elevator.setLeftMotorPower(elevator.leftPower);
             elevator.setRightMotorPower(elevator.rightPower);
         } else {

@@ -26,9 +26,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public static double targetInches;
     public static double ks = .12;//1% motor power
-    public static double kv = .02;//max ips = 50 so 12/50 (assume 50%) = .06 volts per ips
+    public static double kv = .044;//max ips = 50 so 12/50 (assume 50%) = .06 volts per ips
     public static double ka = 0;
-    public static double kp = 0.2;
+    public static double kp = 0.025;
     public static double ki = 0;
     public static double kd = 0;
     public static boolean TUNING = false;
@@ -372,6 +372,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
         telemetry.addData("ArmRightInches", getRightPositionInches());
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
+
+
+        telemetry.update();
     }
 
     public void showTelemetryLeft() {

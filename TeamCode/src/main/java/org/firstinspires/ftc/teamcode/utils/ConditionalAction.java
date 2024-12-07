@@ -25,7 +25,7 @@ public class ConditionalAction implements Action {
             initialized = true;
         }
 
-        if (!latchCondition) {
+        if (latchCondition) {
             return firstAction.run(telemetryPacket);
         } else return secondAction.run(telemetryPacket);
     }

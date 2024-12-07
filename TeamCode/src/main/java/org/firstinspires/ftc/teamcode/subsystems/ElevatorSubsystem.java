@@ -44,21 +44,21 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public static double targetInches;
 
-    public static double UPPER_POSITION_LIMIT = 46;
-    public static int LOWER_POSITION_LIMIT = 0;
+    public double UPPER_POSITION_LIMIT = 28;
+    public int LOWER_POSITION_LIMIT = 0;
 
-    public static double TRAJ_VEL = 10;
-    public static double TRAJ_ACCEL = 10;
+    public static double TRAJ_VEL = 15;
+    public static double TRAJ_ACCEL = 15;
 
-    public static double specimenClawOpenAngle = 0.0;
-    public static double specimenClawClosedAngle = .3;
+    public double specimenClawOpenAngle = 0.0;
+    public double specimenClawClosedAngle = .3;
 
-    public static double bucketUprightAngle = .5;
-    public static double bucketTippedAngle = 0;
+    public double bucketUprightAngle = .5;
+    public double bucketTravelAngle = .4;
+    public double bucketTippedAngle = 0;
+    public double releaseDelay = .5;
 
-    public static double releaseDelay = .5;
-
-    public final double minimumHoldHeight = 2;
+    public final double minimumHoldHeight = 1.2;
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 3;
     public ElapsedTime holdTime;
@@ -207,7 +207,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Action elevatorToNearestSubmersible() {
         return new ConditionalAction(elevatorToUpperSubmersible(), elevatorToLowerSubmersible(),
-                getLeftPositionInches() > Constants.ElevatorConstants.elevatorSpecimenAboveHighPlaceHeight);
+                getLeftPositionInches() > Constants.ElevatorConstants.elevatorSpecimenAboveDecisionHeight);
     }
 
     public Action elevatorToAboveUpperSubmersible() {
@@ -265,6 +265,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Action tipBucket() {
         return new InstantAction(() -> bucketServo.setPosition(bucketTippedAngle));
+    }
+
+    public Action travelBucket() {
+        return new InstantAction(() -> bucketServo.setPosition(bucketTravelAngle));
     }
 
     public Action levelBucket() {
@@ -335,6 +339,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         posrng++;
 
         if (inPositionCtr != 3) inPositionCtr++;
+
+//        double izonel = 1;
+//
+//        if (Math.abs(leftPidController.getGoal().position - getLeftPositionInches()) < izonel)
+//            leftPidController.setI(.0001);
+//        else leftPidController.setI(0);
+
         leftPidout = leftPidController.calculate(getLeftPositionInches());
         leftSetpoint = leftPidController.getSetpoint();
         leftSetVel = leftSetpoint.velocity;
@@ -345,6 +356,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftLastVel = leftSetVel;
 
         rightPidout = rightPidController.calculate(getRightPositionInches());
+
+//        double izoner = 1;
+//
+//        if (Math.abs(rightPidController.getGoal().position - getRightPositionInches()) < izoner)
+//            rightPidController.setI(.0001);
+//        else rightPidController.setI(0);
+
+
         rightSetpoint = rightPidController.getSetpoint();
         rightSetVel = rightSetpoint.velocity;
         rightSetPos = rightSetpoint.position;
@@ -456,7 +475,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("RightPower", getRightPower());
         telemetry.addData("LeftTotalPower", leftTotalPower);
         telemetry.addData("RightTotalPower", rightTotalPower);
-
+        telemetry.addData("Shutdown", shutDownElevatorPositioning);
         telemetry.update();
 
     }

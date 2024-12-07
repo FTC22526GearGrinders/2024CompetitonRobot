@@ -68,7 +68,7 @@ public class Elevator_Arm_RotateArm_Actions {
                 new ParallelAction(
                         elevator.elevatorToUpperSubmersible(),
                         new SequentialAction(
-                                new SleepAction(ElevatorSubsystem.releaseDelay),
+                                new SleepAction(elevator.releaseDelay),
                                 elevator.openSpecimenClaw()));
     }
 
@@ -90,6 +90,7 @@ public class Elevator_Arm_RotateArm_Actions {
                         arm.armToBucketAction(),
                         rotateArm.openIntakeClaw(),
                         new SleepAction(.5),
+                        elevator.travelBucket(),
                         rotateArm.tiltBothVertical(.2));
     }
 

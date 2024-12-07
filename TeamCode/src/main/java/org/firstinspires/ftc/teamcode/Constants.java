@@ -25,9 +25,6 @@ public final class Constants {
 
         static final double length = 144;
         static final double width = 144;
-        static final double tileSize = 24;
-        static final double tileTeeth = .75;
-        static final double distanceBetwwenSpikeMarks = 10;
     }
 
     public static final class SpecimenConstants {
@@ -56,18 +53,7 @@ public final class Constants {
 
         public static final double MAX_IPS = MAX_IPM / 60;//57 IPS
         public static double MAX_VEL = MAX_IPS * .9;//51
-        public static final double POSITION_TOLERANCE_INCHES = .25;
-        public static final double AT_BACKBOARD_ANGLE_DISTANCE = 6;
-        public static final double POSN_VEL = 4;
-        public static final double POSN_ACCEL = 4;
-        public static final double FORWARD_GAIN = .032;
-        public static final double BATTERY_VOLTS = 12;
-        public static double MAX_ACCEL = 40;
-        public static double MAX_ANG_VEL = Math.toRadians(75);
-        public static double MAX_ANG_ACCEL = Math.toRadians(120);
 
-        public static double TRAJ_ANG_VEL = Math.toRadians(50);
-        public static double TRAJ_ANG_ACCEL = Math.toRadians(50);
         public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(.1, 0, 0, 0);
 
         public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
@@ -117,7 +103,7 @@ public final class Constants {
 
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC / GEARING_RATIO;//50
 
-        public static final double POSITION_TOLERANCE_INCHES = .5;
+        public static final double POSITION_TOLERANCE_INCHES = 1;
 
 
         public static double homeDistance = 1;
@@ -151,19 +137,21 @@ public final class Constants {
 
 
         public static final double HOME_POSITION = 0;
-        public static final double POSITION_TOLERANCE_INCHES = .1;
+        public static final double POSITION_TOLERANCE_INCHES = .5;
 
-        public static double elevatorClearOfWall = 4;
+        public static final double elevatorClearOfWall = 4;
 
-        public static double elevatorLowerBasketHeight = 28;
-        public static double elevatorUpperBasketHeight = 45;
+        public static double elevatorLowerBasketHeight = 10;
+        public static double elevatorUpperBasketHeight = 28;
 
+        public static double elevatorSpecimenLowPlaceHeight = 2;
+        public static double elevatorSpecimenAboveLowPlaceHeight = 5;
 
-        public static double elevatorSpecimenAboveLowPlaceHeight = 3;
-        public static double elevatorSpecimenLowPlaceHeight = 1;
+        public static double elevatorSpecimenAboveDecisionHeight = 10;
 
-        public static double elevatorSpecimenAboveHighPlaceHeight = 15;
-        public static double elevatorSpecimenAtHighPlaceHeight = 12.5;
+        public static double elevatorSpecimenAtHighPlaceHeight = 16;
+        public static double elevatorSpecimenAboveHighPlaceHeight = 19;
+
 
     }
 
