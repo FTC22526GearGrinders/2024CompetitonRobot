@@ -20,21 +20,19 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class RotateArmSubsystem extends SubsystemBase {
-
-    public static double intakeTiltClearAngle = 0.3;
-    public static double intakeTiltDownAngle = .96;
-    public static double intakeTiltVerticalAngle = .5;
     public static double intakeTiltHomeAngle = .1;
+    public static double intakeTiltClearAngle = 0.3;
+    public static double intakeTiltVerticalAngle = .5;
+    public static double touchSubmersibleAngle = .6;
+    public static double intakeTiltClearSubmersibleAngle = .85;
+    public static double intakeTiltAboveSampleAngle = .9;
+    public static double intakeTiltPickupAngle = .96;
 
-
-    public static double touchSubmersibleAngle = .3;
 
     public static double intakeClawOpenAngle = 0;
     public static double intakeClawClosedAngle = 1;
 
-    public static double baseRed = 50;
-    public static double baseGreen = 50;
-    public static double baseBlue = 50;
+    private static double intakeClawTime = .5;
 
 
     public Servo intakeClawServo;
@@ -85,25 +83,45 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     public Action openIntakeClaw() {
         return
-                new InstantAction(() -> intakeClawServo.setPosition(intakeClawOpenAngle));
+                new SequentialAction(
+                        new InstantAction(() -> intakeClawServo.setPosition(intakeClawOpenAngle)),
+                        new SleepAction(intakeClawTime));
     }
 
     public Action closeIntakeClaw() {
         return
-                new InstantAction(() -> intakeClawServo.setPosition(intakeClawClosedAngle));
+                new SequentialAction(
+                        new InstantAction(() -> intakeClawServo.setPosition(intakeClawClosedAngle)),
+                        new SleepAction(intakeClawTime));
     }
 
-    public boolean intakeHasSample() {
-        return intakeSensor.red() > baseRed || intakeSensor.green() > baseGreen || intakeSensor.blue() > baseBlue;
-    }
-
-    public Action tiltBothDown() {
+    public Action tiltBothAboveFloor() {
         return
                 new SequentialAction(
                         new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltDownAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltDownAngle))),
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltClearSubmersibleAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltClearSubmersibleAngle))),
                         new SleepAction(1),
+                        new InstantAction(this::setTiltPositionDown));
+    }
+
+
+    public Action tiltToPickup() {
+        return
+                new SequentialAction(
+                        new ParallelAction(
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltPickupAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltPickupAngle))),
+                        new InstantAction(this::setTiltPositionDown));
+    }
+
+    public Action tiltBothAboveSamples(double timeout_secs) {
+        return
+                new SequentialAction(
+                        new ParallelAction(
+                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltPickupAngle)),
+                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltPickupAngle))),
+                        new SleepAction(timeout_secs),
                         new InstantAction(this::setTiltPositionDown));
     }
 
@@ -158,13 +176,19 @@ public class RotateArmSubsystem extends SubsystemBase {
     }
 
     public void showTelemetryColors() {
-        telemetry.addData("Intake HAs Sample", intakeHasSample());
         telemetry.addData("Light", intakeSensor.getLightDetected());
         telemetry.addData("Light", intakeSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Red", intakeSensor.red());
         telemetry.addData("Green", intakeSensor.green());
         telemetry.addData("Blue", intakeSensor.blue());
         telemetry.update();
+    }
+
+    public Action tiltToPickupThenCloseIntakeClaw(double timeout_secs) {
+        return new SequentialAction(
+                tiltToPickup(),
+                new SleepAction(timeout_secs),
+                closeIntakeClaw());
     }
 }
 

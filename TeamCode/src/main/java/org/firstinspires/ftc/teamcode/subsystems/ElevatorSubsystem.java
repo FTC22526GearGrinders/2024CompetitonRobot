@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -57,6 +58,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double bucketTravelAngle = .4;
     public double bucketTippedAngle = 0;
     public double releaseDelay = .5;
+    private double bucketCycleTime = .75;
 
     public final double minimumHoldHeight = 1.2;
     private final Telemetry telemetry;
@@ -205,7 +207,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenLowPlaceHeight);
     }
 
-    public Action elevatorToNearestSubmersible() {
+    public Action elevatorToNearestChamber() {
         return new ConditionalAction(elevatorToUpperSubmersible(), elevatorToLowerSubmersible(),
                 getLeftPositionInches() > Constants.ElevatorConstants.elevatorSpecimenAboveDecisionHeight);
     }
@@ -275,10 +277,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> bucketServo.setPosition(bucketUprightAngle));
     }
 
-    public Action cycleBucket(double timeoutsecs) {
+    public Action cycleBucket() {
         return new SequentialAction(
                 tipBucket(),
-                new SleepAction(timeoutsecs),
+                new SleepAction(bucketCycleTime),
                 levelBucket());
     }
 
@@ -296,6 +298,16 @@ public class ElevatorSubsystem extends SubsystemBase {
                 new SleepAction(1),
                 elevatorToClearWall());
     }
+
+    public Action deliverSpecimenToNearestChamber() {
+        return
+                new ParallelAction(
+                        elevatorToNearestChamber(),
+                        new SequentialAction(
+                                new SleepAction(.5),
+                                openSpecimenClaw()));
+    }
+
 
 
     @Override

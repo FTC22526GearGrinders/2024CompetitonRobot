@@ -10,7 +10,6 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
-import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 
 public class Elevator_Arm_RotateArm_Actions {
 
@@ -40,28 +39,17 @@ public class Elevator_Arm_RotateArm_Actions {
      */
 
 
-    public Action deliverSampleToBasketThenDown(boolean upper) {
-        return
-                new SequentialAction(
-                        new ConditionalAction(
-                                elevator.elevatorToUpperBasket(),
-                                elevator.elevatorToLowBasket(),
-                                upper),
-                        elevator.cycleBucket(2),
-                        elevator.elevatorToHome());
-    }
+//    public Action deliverSampleToBasketThenHome(boolean upper) {
+//        return
+//                new SequentialAction(
+//                        new ConditionalAction(
+//                                elevator.elevatorToUpperBasket(),
+//                                elevator.elevatorToLowBasket(),
+//                                upper),
+//                        elevator.cycleBucket(2),
+//                        elevator.elevatorToHome());
+//    }
 
-    public Action closeIntakeClawTimed(double timeout_secs) {
-        return new SequentialAction(
-                rotateArm.closeIntakeClaw(),
-                new SleepAction(timeout_secs));
-    }
-
-    public Action openIntakeClawTimed(double timeout_secs) {
-        return new SequentialAction(
-                rotateArm.openIntakeClaw(),
-                new SleepAction(timeout_secs));
-    }
 
     public Action deliverSpecimenToUpperSubmersible() {
         return
@@ -69,16 +57,6 @@ public class Elevator_Arm_RotateArm_Actions {
                         elevator.elevatorToUpperSubmersible(),
                         new SequentialAction(
                                 new SleepAction(elevator.releaseDelay),
-                                elevator.openSpecimenClaw()));
-    }
-
-
-    public Action deliverSpecimenToNearestSubmersible() {
-        return
-                new ParallelAction(
-                        elevator.elevatorToNearestSubmersible(),
-                        new SequentialAction(
-                                new SleepAction(.5),
                                 elevator.openSpecimenClaw()));
     }
 
@@ -104,29 +82,21 @@ public class Elevator_Arm_RotateArm_Actions {
 
 
     //this may result in a sample or not - need to check
-    public Action armOutTiltDownOpenClaw() {
+    public Action armOutTiltToPickupOpenClaw() {
         return new SequentialAction(
                 arm.armToPickupAction(),
                 new ParallelAction(
-                        rotateArm.tiltBothDown(),
+                        rotateArm.tiltToPickup(),
                         rotateArm.openIntakeClaw()));
     }
 
-    public Action moveAndPickup(Action moveAction) {
-        return
-                new SequentialAction(
-                        moveAction,
-                        armOutTiltDownOpenClaw(),
 
-                        closeIntakeClawTimed(.5));
-    }
-
-    public Action moveAndDeliverToBasket(Action moveAction, boolean upper) {
-        return
-                new SequentialAction(
-                        tiltClearArmToBucket(2),
-                        moveAction,
-                        deliverSampleToBasketThenDown(upper));
+    public Action armOutTiltAboveSamplesOpenClaw(double timeout_secs) {
+        return new SequentialAction(
+                arm.armToPickupAction(),
+                new ParallelAction(
+                        rotateArm.tiltBothAboveSamples(timeout_secs),
+                        rotateArm.openIntakeClaw()));
     }
 
 

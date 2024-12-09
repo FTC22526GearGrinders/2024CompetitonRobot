@@ -32,17 +32,11 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double ki = 0;
     public static double kd = 0;
     public static boolean TUNING = false;
-    public double lastTargetInches;
-
     public static double OUT_POSITION_LIMIT = 15.00;
     public static double IN_POSITION_LIMIT = .5;
-
-
     public static double TRAJ_VEL = 10;
     public static double TRAJ_ACCEL = 10;
-
-
-
+    public double lastTargetInches;
     public Motor leftArmMotor;
     public Motor rightArmMotor;
     public Motor.Encoder leftArmEncoder;
@@ -76,6 +70,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double lastRightVel;
     private double lastLeftVel;
     private int targetSetCounter;
+    private double izonel = 5;
+    private double izoner = 5;
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
@@ -94,6 +90,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
         leftArmController = new ProfiledPIDController(kp, ki, kd, constraints);
         leftArmController.setTolerance(Constants.ExtendArmConstants.POSITION_TOLERANCE_INCHES);
         leftArmController.reset(0);
+
 
         rightArmMotor.setInverted(true);
         rightArmMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -208,6 +205,15 @@ public class ExtendArmSubsystem extends SubsystemBase {
         // Retrieve the profiled setpoint for the next timestep. This setpoint moves
 
         leftpidout = leftArmController.calculate(getLeftPositionInches());
+
+//
+//        if (Math.abs(leftArmController.getGoal().position - getLeftPositionInches()) < izonel)
+//            leftArmController.setI(.0001);
+//        else {
+//            leftArmController.setI(0);
+//        }
+
+
         leftArmSetpoint = leftArmController.getSetpoint();
         leftSetVel = leftArmSetpoint.velocity;
         leftSetPos = leftArmSetpoint.position;
@@ -218,6 +224,14 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         //right
         rightpidout = rightArmController.calculate(getRightPositionInches());
+
+//        if (Math.abs(rightArmController.getGoal().position - getRightPositionInches()) < izonel)
+//            rightArmController.setI(.0001);
+//        else {
+//            rightArmController.setI(0);
+//        }
+
+
         rightArmSetpoint = rightArmController.getSetpoint();
         rightSetVel = rightArmSetpoint.velocity;
         rightSetPos = rightArmSetpoint.position;
@@ -256,7 +270,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public double getRightInchesPerSec() {
         return round2dp(rightArmEncoder.getRate(), 2);
     }
-
 
 
     public boolean leftInPosition() {

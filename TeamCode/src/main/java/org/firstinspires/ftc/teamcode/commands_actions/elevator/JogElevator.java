@@ -12,8 +12,8 @@ public class JogElevator extends CommandBase {
 
     private final Gamepad gamepad;
     private final ElevatorSubsystem elevator;
+    private final double deadband = .01;
     public SimpleMotorFeedforward armFF = new SimpleMotorFeedforward(ElevatorSubsystem.eks, ElevatorSubsystem.ekv, ElevatorSubsystem.eka);
-    private double deadband = .01;
     private double ipsec = 5;//ips
     private double ff;
 
@@ -35,10 +35,10 @@ public class JogElevator extends CommandBase {
     @Override
     public void execute() {
 
-        double stickValue = -gamepad.right_stick_y;
+        double stickValue = -gamepad.left_stick_y;
 
 
-        double speedips = -gamepad.right_stick_y * ipsec;
+        double speedips = -gamepad.left_stick_y * ipsec;
 
         if (Math.abs(stickValue) < deadband) stickValue = 0;
 

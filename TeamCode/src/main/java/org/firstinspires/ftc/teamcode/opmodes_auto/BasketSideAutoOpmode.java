@@ -33,6 +33,7 @@ package org.firstinspires.ftc.teamcode.opmodes_auto;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -52,7 +53,7 @@ import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Basket", group = "Auto")
+@Autonomous(name = "Basket Motion", group = "Auto")
 //@Disabled
 public class BasketSideAutoOpmode extends CommandOpMode {
 
@@ -61,19 +62,16 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     public TrajectoryActionBuilder firstSampleDeliverMove;
 
     TrajectoryActionBuilder secondSampleDeliverMove;
-    Action secondSampleDeliverComplete;
     TrajectoryActionBuilder thirdSampleDeliverMove;
-    Action thirdSampleDeliverComplete;
     TrajectoryActionBuilder fourthSampleDeliverMove;
-    Action fourthSampleDeliverComplete;
 
 
     TrajectoryActionBuilder secondSamplePickupMove;
-    Action secondSamplePickupComplete;
+    Action secondSamplePickupFinalMove;
     TrajectoryActionBuilder thirdSamplePickupMove;
-    Action thirdSamplePickupComplete;
+    Action thirdSamplePickupFinalMove;
     TrajectoryActionBuilder fourthSamplePickupMove;
-    Action fourthSamplePickupComplete;
+    Action fourthSamplePickupFinalMove;
     Action parkAction;
 
     TranslationalVelConstraint approachVel;
@@ -93,10 +91,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     @Override
     public void initialize() {
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
-        elevator = new ElevatorSubsystem(this);
-        arm = new ExtendArmSubsystem(this);
-        rotate = new RotateArmSubsystem(this);
-        ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
+//        elevator = new ElevatorSubsystem(this);
+//        arm = new ExtendArmSubsystem(this);
+//        rotate = new RotateArmSubsystem(this);
+        //  ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
         //   limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
@@ -112,7 +110,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading);
 
-        secondSamplePickupComplete = secondSamplePickupMove.endTrajectory().fresh()
+        secondSamplePickupFinalMove = secondSamplePickupMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading,
                         approachVel, approachAccel).build();
 
@@ -123,7 +121,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading);
 
-        thirdSamplePickupComplete = thirdSamplePickupMove.endTrajectory().fresh()
+        thirdSamplePickupFinalMove = thirdSamplePickupMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading,
                         approachVel, approachAccel).build();
 
@@ -133,7 +131,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         fourthSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading);
 
-        fourthSamplePickupComplete = fourthSamplePickupMove.endTrajectory().fresh()
+        fourthSamplePickupFinalMove = fourthSamplePickupMove.endTrajectory().fresh()
                 .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading,
                         approachVel, approachAccel).build();
 
@@ -152,44 +150,67 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         return
                 new SequentialAction(
 
-                        firstSampleDeliverMove.build(),
-                        ears.deliverSampleToBasketThenDown(true),
+                        new ParallelAction(
+                                firstSampleDeliverMove.build(),
+                                elevator.elevatorToUpperBasket()),
+                        elevator.cycleBucket(),
 
-                        secondSamplePickupMove.build(),
-                        ears.armOutTiltDownOpenClaw(),
-                        secondSamplePickupComplete,
-                        ears.closeIntakeClawTimed(2),
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                secondSamplePickupMove.build(),
+                                ears.armOutTiltAboveSamplesOpenClaw(1)),
 
-                        ears.tiltClearArmToBucket(1),
-                        ears.openIntakeClawTimed(1),
+                        secondSamplePickupFinalMove,
+                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
+                        rotate.tiltBothAboveSamples(.5),
 
-                        secondSampleDeliverMove.build(),
-                        ears.deliverSampleToBasketThenDown(true),
-
-                        thirdSamplePickupMove.build(),
-                        ears.armOutTiltDownOpenClaw(),
-                        thirdSamplePickupComplete,
-                        ears.closeIntakeClawTimed(2),
-
-                        ears.tiltClearArmToBucket(1),
-                        ears.openIntakeClawTimed(1),
-
-                        thirdSampleDeliverMove.build(),
-                        ears.deliverSampleToBasketThenDown(true),
-
-                        fourthSamplePickupMove.build(),
-                        ears.armOutTiltDownOpenClaw(),
-                        fourthSamplePickupComplete,
-                        ears.closeIntakeClawTimed(2),
-
-                        ears.tiltClearArmToBucket(1),
-                        ears.openIntakeClawTimed(1),
+                        new ParallelAction(
+                                secondSampleDeliverMove.build(),
+                                new SequentialAction(
+                                        ears.tiltClearArmToBucket(1),
+                                        rotate.openIntakeClaw())),
+                        elevator.elevatorToUpperBasket(),
+                        elevator.cycleBucket(),
 
 
-                        fourthSampleDeliverMove.build(),
-                        ears.deliverSampleToBasketThenDown(true),
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                thirdSamplePickupMove.build(),
+                                ears.armOutTiltAboveSamplesOpenClaw(1)),
 
-                        parkAction);
+                        thirdSamplePickupFinalMove,
+                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
+                        rotate.tiltBothAboveSamples(.5),
+
+                        new ParallelAction(
+                                thirdSampleDeliverMove.build(),
+                                new SequentialAction(
+                                        ears.tiltClearArmToBucket(1),
+                                        rotate.openIntakeClaw())),
+                        elevator.elevatorToUpperBasket(),
+                        elevator.cycleBucket(),
+
+
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                fourthSamplePickupMove.build(),
+                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+
+                        fourthSamplePickupFinalMove,
+                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
+                        rotate.tiltBothAboveSamples(.5),
+
+                        new ParallelAction(
+                                fourthSampleDeliverMove.build(),
+                                new SequentialAction(
+                                        ears.tiltClearArmToBucket(1),
+                                        rotate.openIntakeClaw())),
+                        elevator.elevatorToUpperBasket(),
+                        elevator.cycleBucket(),
+
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                parkAction));
 
 
     }
