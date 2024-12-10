@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
+import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 import org.firstinspires.ftc.teamcode.utils.RumbleDefs;
 
 import java.util.ArrayList;
@@ -130,8 +131,15 @@ public class TeleopOpMode extends CommandOpMode {
     private void doDriverButtons() {
 
 
+//        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
+//            runningActions.add(eara.armOutTiltAboveSamplesOpenClaw(1));
+
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
-            runningActions.add(eara.armOutTiltAboveSamplesOpenClaw(1));
+            runningActions.add(
+                    new ConditionalAction(rotateArm.pickupSample(),
+                            eara.armOutTiltAboveSamplesOpenClaw(1),
+                            rotateArm.currentTilt == rotateArm.intakeTiltAboveSampleAngle));
+
 
         if (currentGamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
             runningActions.add(eara.tiltClearArmToBucket(1));

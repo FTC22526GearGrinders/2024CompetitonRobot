@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes_auto;
+package org.firstinspires.ftc.teamcode.opmodes_test;
 
 
 /* Copyright (c) 2017 FIRST. All rights reserved.
@@ -33,7 +33,6 @@ package org.firstinspires.ftc.teamcode.opmodes_auto;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -42,6 +41,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
@@ -55,7 +55,7 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 @Autonomous(name = "Basket Motion", group = "Auto")
 //@Disabled
-public class BasketSideAutoOpmode extends CommandOpMode {
+public class BasketSideMotionOpmode extends CommandOpMode {
 
     public String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public int TEAM_NUMBER = 22526; //Enter team Number
@@ -79,6 +79,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
     SequentialAction deliverFourSamples;
     double samplePickupTimeout = 3;
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
     private MecanumDriveSubsystem drive;
     private ElevatorSubsystem elevator;
     private ExtendArmSubsystem arm;
@@ -91,11 +95,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     @Override
     public void initialize() {
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
-        elevator = new ElevatorSubsystem(this);
-        arm = new ExtendArmSubsystem(this);
-        rotate = new RotateArmSubsystem(this);
-        ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
-        //   limelight = new LimelightSubsystem(this);
+        ;
         packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
     }
@@ -145,75 +145,75 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     }
 
 
-    private SequentialAction createMotionSequence() {
-
-        return
-                new SequentialAction(
-
-                        new ParallelAction(
-                                firstSampleDeliverMove.build(),
-                                elevator.elevatorToUpperBasket()),
-                        elevator.cycleBucket(),
-
-                        new ParallelAction(
-                                elevator.elevatorToHome(),
-                                secondSamplePickupMove.build(),
-                                ears.armOutTiltAboveSamplesOpenClaw(1)),
-
-                        secondSamplePickupFinalMove,
-                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
-                        rotate.tiltBothAboveSamples(.5),
-
-                        new ParallelAction(
-                                secondSampleDeliverMove.build(),
-                                new SequentialAction(
-                                        ears.tiltClearArmToBucket(1),
-                                        rotate.openIntakeClaw())),
-                        elevator.elevatorToUpperBasket(),
-                        elevator.cycleBucket(),
-
-
-                        new ParallelAction(
-                                elevator.elevatorToHome(),
-                                thirdSamplePickupMove.build(),
-                                ears.armOutTiltAboveSamplesOpenClaw(1)),
-
-                        thirdSamplePickupFinalMove,
-                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
-                        rotate.tiltBothAboveSamples(.5),
-
-                        new ParallelAction(
-                                thirdSampleDeliverMove.build(),
-                                new SequentialAction(
-                                        ears.tiltClearArmToBucket(1),
-                                        rotate.openIntakeClaw())),
-                        elevator.elevatorToUpperBasket(),
-                        elevator.cycleBucket(),
-
-
-                        new ParallelAction(
-                                elevator.elevatorToHome(),
-                                fourthSamplePickupMove.build(),
-                                ears.armOutTiltAboveSamplesOpenClaw(1)),
-
-                        fourthSamplePickupFinalMove,
-                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
-                        rotate.tiltBothAboveSamples(.5),
-
-                        new ParallelAction(
-                                fourthSampleDeliverMove.build(),
-                                new SequentialAction(
-                                        ears.tiltClearArmToBucket(1),
-                                        rotate.openIntakeClaw())),
-                        elevator.elevatorToUpperBasket(),
-                        elevator.cycleBucket(),
-
-                        new ParallelAction(
-                                elevator.elevatorToHome(),
-                                parkAction));
-
-
-    }
+//    private SequentialAction createMotionSequence() {
+//
+//        return
+//                new SequentialAction(
+//
+//                        new ParallelAction(
+//                                firstSampleDeliverMove.build(),
+//                                elevator.elevatorToUpperBasket()),
+//                        elevator.cycleBucket(),
+//
+//                        new ParallelAction(
+//                                elevator.elevatorToHome(),
+//                                secondSamplePickupMove.build(),
+//                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+//
+//                        secondSamplePickupFinalMove,
+//                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
+//                        rotate.tiltBothAboveSamples(.5),
+//
+//                        new ParallelAction(
+//                                secondSampleDeliverMove.build(),
+//                                new SequentialAction(
+//                                        ears.tiltClearArmToBucket(1),
+//                                        rotate.openIntakeClaw())),
+//                        elevator.elevatorToUpperBasket(),
+//                        elevator.cycleBucket(),
+//
+//
+//                        new ParallelAction(
+//                                elevator.elevatorToHome(),
+//                                thirdSamplePickupMove.build(),
+//                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+//
+//                        thirdSamplePickupFinalMove,
+//                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
+//                        rotate.tiltBothAboveSamples(.5),
+//
+//                        new ParallelAction(
+//                                thirdSampleDeliverMove.build(),
+//                                new SequentialAction(
+//                                        ears.tiltClearArmToBucket(1),
+//                                        rotate.openIntakeClaw())),
+//                        elevator.elevatorToUpperBasket(),
+//                        elevator.cycleBucket(),
+//
+//
+//                        new ParallelAction(
+//                                elevator.elevatorToHome(),
+//                                fourthSamplePickupMove.build(),
+//                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+//
+//                        fourthSamplePickupFinalMove,
+//                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
+//                        rotate.tiltBothAboveSamples(.5),
+//
+//                        new ParallelAction(
+//                                fourthSampleDeliverMove.build(),
+//                                new SequentialAction(
+//                                        ears.tiltClearArmToBucket(1),
+//                                        rotate.openIntakeClaw())),
+//                        elevator.elevatorToUpperBasket(),
+//                        elevator.cycleBucket(),
+//
+//                        new ParallelAction(
+//                                elevator.elevatorToHome(),
+//                                parkAction));
+//
+//
+//    }
 
 
     @Override
@@ -223,7 +223,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         selectStartingPosition();
 
-        deliverFourSamples = createMotionSequence();
+        //  deliverFourSamples = createMotionSequence();
 
         waitForStart();
 
@@ -231,9 +231,43 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
             run();
 
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
+                Actions.runBlocking(firstSampleDeliverMove.build());
+
+            if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)
+                Actions.runBlocking(new SequentialAction(
+                        secondSamplePickupMove.build(),
+                        secondSamplePickupFinalMove)
+                );
+
+            if (currentGamepad1.a && !previousGamepad1.a)
+                Actions.runBlocking(secondSampleDeliverMove.build());
+
+            if (currentGamepad1.b && !previousGamepad1.b)
+                Actions.runBlocking(new SequentialAction(
+                        thirdSamplePickupMove.build(),
+                        thirdSamplePickupFinalMove)
+                );
+
+            if (currentGamepad1.x && !previousGamepad1.x)
+                Actions.runBlocking(thirdSampleDeliverMove.build());
+
+            if (currentGamepad1.y && !previousGamepad1.y)
+                Actions.runBlocking(new SequentialAction(
+                        fourthSamplePickupMove.build(),
+                        fourthSamplePickupFinalMove)
+                );
+
+            if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
+                Actions.runBlocking(fourthSampleDeliverMove.build());
+
+
+            if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
+                Actions.runBlocking(parkAction);
+
+
             telemetry.update();
 
-            Actions.runBlocking(deliverFourSamples);
         }
 
         PoseStorage.currentPose = drive.pose;

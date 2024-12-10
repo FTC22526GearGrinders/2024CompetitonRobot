@@ -65,7 +65,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
                 .strafeToLinearHeading(fcs.sample1ObservationZoneDropPose.position, Math.toRadians(180));
 
         TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.secondStagePushInnerVector, fcs.specimenPickupAngle)
+                .strafeToLinearHeading(fcs.secondStagePushMidVector, fcs.specimenPickupAngle)
                 .strafeToLinearHeading(fcs.thirdStagePushMidVector, fcs.specimenPickupAngle)
                 .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle);
 

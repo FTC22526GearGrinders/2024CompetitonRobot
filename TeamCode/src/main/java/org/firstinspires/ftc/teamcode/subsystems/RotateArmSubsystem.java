@@ -20,21 +20,17 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class RotateArmSubsystem extends SubsystemBase {
-    public static double intakeTiltHomeAngle = .1;
-    public static double intakeTiltClearAngle = 0.3;
-    public static double intakeTiltVerticalAngle = .5;
-    public static double touchSubmersibleAngle = .6;
-    public static double intakeTiltClearSubmersibleAngle = .85;
-    public static double intakeTiltAboveSampleAngle = .9;
-    public static double intakeTiltPickupAngle = .96;
-
-
-    public static double intakeClawOpenAngle = 0;
-    public static double intakeClawClosedAngle = 1;
-
-    private static double intakeClawTime = .5;
-
-
+    public double intakeTiltHomeAngle = .1;
+    public double intakeTiltClearAngle = 0.3;
+    public double intakeTiltVerticalAngle = .5;
+    public double touchSubmersibleAngle = .6;
+    public double intakeTiltClearSubmersibleAngle = .85;
+    public double intakeTiltAboveSampleAngle = .9;
+    public double intakeTiltPickupAngle = .96;
+    public double intakeClawOpenAngle = 0;
+    public double intakeClawClosedAngle = 1;
+    private double intakeClawTime = .5;
+    public double currentTilt;
     public Servo intakeClawServo;
 
     public Servo leftTiltServo;
@@ -95,71 +91,38 @@ public class RotateArmSubsystem extends SubsystemBase {
                         new SleepAction(intakeClawTime));
     }
 
-    public Action tiltBothAboveFloor() {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltClearSubmersibleAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltClearSubmersibleAngle))),
-                        new SleepAction(1),
-                        new InstantAction(this::setTiltPositionDown));
+    public Action setTiltAngle(double angle) {
+        return new ParallelAction(
+                new InstantAction(() -> leftTiltServo.setPosition(angle)),
+                new InstantAction(() -> rightTiltServo.setPosition(angle)),
+                new InstantAction(() -> currentTilt = angle));
     }
 
 
     public Action tiltToPickup() {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltPickupAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltPickupAngle))),
-                        new InstantAction(this::setTiltPositionDown));
+        return setTiltAngle(intakeTiltPickupAngle);
     }
 
     public Action tiltBothAboveSamples(double timeout_secs) {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltPickupAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltPickupAngle))),
-                        new SleepAction(timeout_secs),
-                        new InstantAction(this::setTiltPositionDown));
+        return setTiltAngle(intakeTiltAboveSampleAngle);
+
     }
 
     public Action tiltBothClear(double timeout) {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltClearAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltClearAngle))),
-                        new SleepAction(timeout),
-                        new InstantAction(this::setTiltPositionClear));
+        return setTiltAngle(intakeTiltClearAngle);
     }
 
     public Action tiltBothVertical(double timeout) {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltVerticalAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltVerticalAngle)),
-                                new SleepAction(timeout)));
-
+        return setTiltAngle(intakeTiltVerticalAngle);
     }
 
     public Action tiltBothHome(double timeout) {
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> leftTiltServo.setPosition(intakeTiltHomeAngle)),
-                                new InstantAction(() -> rightTiltServo.setPosition(intakeTiltHomeAngle)),
-                                new SleepAction(timeout),
-                                new InstantAction(this::setTiltPositionClear)));
+        return setTiltAngle(intakeTiltHomeAngle);
     }
 
 
     public Action tiltToTouchSubmersibleAction() {
-        return new ParallelAction(
-                new InstantAction(() -> leftTiltServo.setPosition(touchSubmersibleAngle)),
-                new InstantAction(() -> rightTiltServo.setPosition(touchSubmersibleAngle)));
+        return setTiltAngle(touchSubmersibleAngle);
     }
 
 
@@ -173,6 +136,8 @@ public class RotateArmSubsystem extends SubsystemBase {
 
 
     private void showTelemetry() {
+        telemetry.addData("TiltAngle", currentTilt);
+        telemetry.update();
     }
 
     public void showTelemetryColors() {
@@ -190,6 +155,15 @@ public class RotateArmSubsystem extends SubsystemBase {
                 new SleepAction(timeout_secs),
                 closeIntakeClaw());
     }
+
+    public Action pickupSample() {
+        return new SequentialAction(
+                tiltToPickup(),
+                new SleepAction(1),
+                closeIntakeClaw(),
+                tiltBothAboveSamples(1));
+    }
+
 }
 
 
