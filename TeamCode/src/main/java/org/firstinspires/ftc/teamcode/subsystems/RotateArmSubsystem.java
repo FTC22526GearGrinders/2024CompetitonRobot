@@ -24,8 +24,7 @@ public class RotateArmSubsystem extends SubsystemBase {
     public double intakeTiltClearAngle = 0.3;
     public double intakeTiltVerticalAngle = .5;
     public double touchSubmersibleAngle = .6;
-    public double intakeTiltClearSubmersibleAngle = .85;
-    public double intakeTiltAboveSampleAngle = .9;
+    public double intakeTiltAboveSampleAngle = .8;
     public double intakeTiltPickupAngle = .96;
     public double intakeClawOpenAngle = 0;
     public double intakeClawClosedAngle = 1;

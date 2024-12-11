@@ -75,7 +75,9 @@ public class JogElevator extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        elevator.setTargetInches(elevator.getLeftPositionInches());
         elevator.leftElevatorMotor.set(0);
+        elevator.rightElevatorMotor.set(0);
         gamepad.rumble(250);
     }
 

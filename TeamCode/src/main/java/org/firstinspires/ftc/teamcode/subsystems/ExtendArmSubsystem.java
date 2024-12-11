@@ -32,7 +32,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double ki = 0;
     public static double kd = 0;
     public static boolean TUNING = false;
-    public static double OUT_POSITION_LIMIT = 15.00;
+    public static double OUT_POSITION_LIMIT = 17.00;
     public static double IN_POSITION_LIMIT = .5;
     public static double TRAJ_VEL = 10;
     public static double TRAJ_ACCEL = 10;
@@ -128,9 +128,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
         return targetInches;
     }
 
-    public void setTargetInches(double target) {
-        targetInches = target;
-
+    public void setTargetInches(double targetInches) {
+        leftArmController.reset(getLeftPositionInches());
+        rightArmController.reset(getRightPositionInches());
         leftArmController.setGoal(targetInches);
         rightArmController.setGoal(targetInches);
     }
@@ -241,8 +241,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
         lastRightVel = rightSetVel;
 
         if (TUNING) {
-            if (getLeftPositionInches() < 0 || getLeftPositionInches() > 15
-                    || getRightPositionInches() < 0 || getRightPositionInches() > 15) {
+            if (getLeftPositionInches() < IN_POSITION_LIMIT || getLeftPositionInches() > OUT_POSITION_LIMIT
+                    || getRightPositionInches() < IN_POSITION_LIMIT || getRightPositionInches() > OUT_POSITION_LIMIT) {
                 leftArmMotor.set(0);
                 rightArmMotor.set(0);
             }

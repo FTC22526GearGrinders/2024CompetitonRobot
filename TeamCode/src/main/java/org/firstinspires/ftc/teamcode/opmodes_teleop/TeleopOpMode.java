@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.button.Trigger;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -46,6 +47,9 @@ public class TeleopOpMode extends CommandOpMode {
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
 
+    private final Trigger gp2lb = new Trigger(() -> gamepad2.left_stick_button);
+    private final Trigger gp2rb = new Trigger(() -> gamepad2.right_stick_button);
+
     // @Override
     public void initialize() {
 
@@ -68,6 +72,7 @@ public class TeleopOpMode extends CommandOpMode {
         arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
 
         elevator.setDefaultCommand(new PositionHoldElevator(elevator));
+
 
     }
 
@@ -115,6 +120,8 @@ public class TeleopOpMode extends CommandOpMode {
             run();
             actionLoop();
             copyGamepads();
+
+            showField();
 
             doDriverButtons();
 
@@ -165,8 +172,8 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
             runningActions.add(rotateArm.tiltToPickup());
 
-        //   if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
-
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+            drive.pose = new Pose2d(0, 0, 0);
         if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
             new SubmersibleJogArm(arm, .25);
 
@@ -176,11 +183,11 @@ public class TeleopOpMode extends CommandOpMode {
 
     public void doCoDriverButtons() {
 
-        if (gamepad2.right_stick_button)
-            new JogArm(arm, gamepad2);
+        gp2rb.whileActiveOnce(
+                new JogArm(arm, gamepad2));
 
-        if (gamepad2.left_stick_button)
-            new JogElevator(elevator, gamepad2);
+        gp2lb.whileActiveOnce(
+                new JogElevator(elevator, gamepad2));
 
 
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)

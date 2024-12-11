@@ -16,9 +16,7 @@ public class PositionHoldElevator extends CommandBase {
     @Override
     public void initialize() {
         double temp = elevator.getLeftPositionInches();
-        elevator.leftPidController.setGoal(temp);
-        temp = elevator.getRightPositionInches();
-        elevator.rightPidController.setGoal(temp);
+        elevator.setTargetInches(temp);
     }
 
     @Override

@@ -17,9 +17,7 @@ public class PositionHoldArm extends CommandBase {
     @Override
     public void initialize() {
         double temp = arm.getLeftPositionInches();
-        arm.leftArmController.setGoal(temp);
-        temp = arm.getRightPositionInches();
-        arm.rightArmController.setGoal(temp);
+        arm.setTargetInches(temp);
     }
 
     @Override

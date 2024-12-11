@@ -47,9 +47,9 @@ public class JogArm extends CommandBase {
 
         boolean overrideLimits = gamepad.start;
 //check inside limits for each direction
-        if (overrideLimits || (ff > 0 && arm.getLeftPositionInches() < ExtendArmSubsystem.OUT_POSITION_LIMIT
+        if (overrideLimits || (arm.power > 0 && arm.getLeftPositionInches() < ExtendArmSubsystem.OUT_POSITION_LIMIT
                 && arm.getRightPositionInches() < ExtendArmSubsystem.OUT_POSITION_LIMIT
-                || ff < 0 && arm.getLeftPositionInches() > ExtendArmSubsystem.IN_POSITION_LIMIT
+                || arm.power < 0 && arm.getLeftPositionInches() > ExtendArmSubsystem.IN_POSITION_LIMIT
                 && arm.getRightPositionInches() > ExtendArmSubsystem.IN_POSITION_LIMIT)) {
             arm.setLeftPower(arm.power);
             arm.setRightPower(arm.power);
@@ -63,6 +63,7 @@ public class JogArm extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        arm.setTargetInches(arm.getLeftPositionInches());
         arm.power = 0;
         arm.setLeftPower(0);
         arm.setRightPower(0);

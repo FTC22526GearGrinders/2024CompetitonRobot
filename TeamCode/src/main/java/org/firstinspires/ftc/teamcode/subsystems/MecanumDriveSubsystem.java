@@ -301,7 +301,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
     }
 
     public double getYawDegs() {
-        return Math.toDegrees(pose.heading.toDouble());
+        return lazyImu.get().getRobotYawPitchRollAngles().getYaw();
     }
 
 
@@ -312,13 +312,15 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         telemetry.addData("MecanumDrive 1", showSelect);
 
         telemetry.addData("TMPY", tempy);
-        // telemetry.addData("FrontLeftTicks", leftFront.getCurrentPosition());
-        telemetry.addData("FrontRightTicks P0", rightFront.getCurrentPosition());
-        telemetry.addData("BackLeftTicks P1", leftBack.getCurrentPosition());
+        telemetry.addData("FrontLeftTicks P0", leftFront.getCurrentPosition());
+        telemetry.addData("FrontRightTicks P1", rightFront.getCurrentPosition());
+        //  telemetry.addData("BackLeftTicks P1", leftBack.getCurrentPosition());
         telemetry.addData("BackRightTicks Perp", rightBack.getCurrentPosition());
         telemetry.addData("X", pose.position.x);
         telemetry.addData("Y", pose.position.y);
-        telemetry.addData("H", pose.heading);
+        telemetry.addData("H", pose.heading.toDouble());
+        telemetry.addData("yAW", getYawDegs());
+
         telemetry.addData("FieldCentric", fieldCentric);
         telemetry.update();
     }
@@ -348,7 +350,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
         // drive model parameters
         public double inPerTick = .00197;//

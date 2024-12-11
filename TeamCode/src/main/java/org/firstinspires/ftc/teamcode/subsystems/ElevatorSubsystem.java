@@ -52,7 +52,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double TRAJ_ACCEL = 15;
 
     public double specimenClawOpenAngle = 0.0;
-    public double specimenClawClosedAngle = .3;
+    public double specimenClawClosedAngle = .4;
 
     public double bucketUprightAngle = .5;
     public double bucketTravelAngle = .4;
@@ -167,9 +167,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return targetInches;
     }
 
-    public void setTargetInches(double inches) {
-        targetInches = inches;
+    public void setTargetInches(double targetInches) {
+        leftPidController.reset(getLeftPositionInches());
         leftPidController.setGoal(targetInches);
+        rightPidController.reset(getRightPositionInches());
         rightPidController.setGoal(targetInches);
     }
 
