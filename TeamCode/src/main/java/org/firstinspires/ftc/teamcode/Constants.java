@@ -103,21 +103,17 @@ public final class Constants {
 
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC / GEARING_RATIO;//50
 
-        public static final double POSITION_TOLERANCE_INCHES = 1;
+        public static final double POSITION_TOLERANCE_INCHES = 2;
 
-
-        public static double homeDistance = 1;
-
-        public static double pickupDistance = 12;
 
         public static double bucketDistance = 0;
+        public static double pickupDistance = 12;
+        public static double firstExtendDistance = 14;
+        public static double secondExtendDistance = 16;
+
+
     }
 
-    public static final class RotateArmConstants {
-
-        public static double armDistanceOKTilt = 5;
-
-    }
 
     public static final class ElevatorConstants {
 
@@ -135,9 +131,9 @@ public final class Constants {
 
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//75
 
-
+        //distances are amount elevator travels from its home position
         public static final double HOME_POSITION = 0;
-        public static final double POSITION_TOLERANCE_INCHES = .5;
+
 
         public static final double elevatorClearOfWall = 4;
 
@@ -152,13 +148,13 @@ public final class Constants {
         public static double elevatorSpecimenAtHighPlaceHeight = 16;
         public static double elevatorSpecimenAboveHighPlaceHeight = 19;
 
-
+        public static final double POSITION_TOLERANCE_INCHES = 1;
     }
 
     public static final class ShowTelemetryConstants {
 
         public static final int minShowSelectCount = 0;
-        public static final int maxShowSelectCount = 11;
+        public static final int maxShowSelectCount = 9;
 
         public static final int showNone = 0;
         public static final int showDrive1 = 1;

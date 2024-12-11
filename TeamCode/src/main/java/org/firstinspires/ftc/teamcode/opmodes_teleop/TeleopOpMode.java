@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.opmodes_teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -14,7 +15,6 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.commands_actions.arm.JogArm;
 import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
-import org.firstinspires.ftc.teamcode.commands_actions.arm.SubmersibleJogArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
 import org.firstinspires.ftc.teamcode.commands_actions.drive.JogDrive;
 import org.firstinspires.ftc.teamcode.commands_actions.elevator.JogElevator;
@@ -33,6 +33,8 @@ import java.util.List;
 @TeleOp
 public class TeleopOpMode extends CommandOpMode {
 
+    private final Trigger gp2lsb = new Trigger(() -> gamepad2.left_stick_button);
+    private final Trigger gp2rsb = new Trigger(() -> gamepad2.right_stick_button);
     public int showSelect;
     protected MecanumDriveSubsystem drive;
     protected ExtendArmSubsystem arm;
@@ -46,9 +48,6 @@ public class TeleopOpMode extends CommandOpMode {
     Gamepad previousGamepad2 = new Gamepad();
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
-
-    private final Trigger gp2lb = new Trigger(() -> gamepad2.left_stick_button);
-    private final Trigger gp2rb = new Trigger(() -> gamepad2.right_stick_button);
 
     // @Override
     public void initialize() {
@@ -137,19 +136,15 @@ public class TeleopOpMode extends CommandOpMode {
 
     private void doDriverButtons() {
 
-
-//        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
-//            runningActions.add(eara.armOutTiltAboveSamplesOpenClaw(1));
-
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
             runningActions.add(
-                    new ConditionalAction(rotateArm.pickupSample(),
-                            eara.armOutTiltAboveSamplesOpenClaw(1),
-                            rotateArm.currentTilt == rotateArm.intakeTiltAboveSampleAngle));
-
+                    new ConditionalAction(
+                            eara.armOutTiltAboveSamplesOpenClaw(),
+                            eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
+                            rotateArm.currentTilt != rotateArm.intakeTiltAboveSampleAngle));
 
         if (currentGamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
-            runningActions.add(eara.tiltClearArmToBucket(1));
+            runningActions.add(eara.tiltAndArmMoveThenDeliverToBucket());
 
         if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)
             runningActions.add(elevator.grabSpecimenAndClearWall());
@@ -157,38 +152,39 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad1.right_trigger > .75 && !(previousGamepad1.right_trigger > .75))
             runningActions.add(elevator.deliverSpecimenToNearestChamber());
 
-        if (currentGamepad1.a && !previousGamepad1.a)
+        if (currentGamepad1.y && !previousGamepad1.y)
             runningActions.add(rotateArm.openIntakeClaw());
 
-        if (currentGamepad1.b && !previousGamepad1.b)
-            runningActions.add(rotateArm.tiltToPickup());
-
         if (currentGamepad1.x && !previousGamepad1.x)
+            runningActions.add(rotateArm.closeIntakeClaw());
+
+        if (currentGamepad1.a && !previousGamepad1.a)
             runningActions.add(elevator.openSpecimenClaw());
 
-        if (currentGamepad1.y && !previousGamepad1.y)
+        if (currentGamepad1.b && !previousGamepad1.b)
             runningActions.add(elevator.closeSpecimenClaw());
 
         if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
-            runningActions.add(rotateArm.tiltToPickup());
-
-        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
-            drive.pose = new Pose2d(0, 0, 0);
-        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
-            new SubmersibleJogArm(arm, .25);
+            runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.firstExtendDistance)));
 
         if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
-            new SubmersibleJogArm(arm, -.25);
+            runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.secondExtendDistance)));
+
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+            runningActions.add(elevator.cycleBucket());
+
+        //  if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
+
+
     }
 
     public void doCoDriverButtons() {
 
-        gp2rb.whileActiveOnce(
-                new JogArm(arm, gamepad2));
+        gp2rsb.whileActiveOnce(
+                new JogArm(arm, gamepad2));//speed is right stick x
 
-        gp2lb.whileActiveOnce(
-                new JogElevator(elevator, gamepad2));
-
+        gp2lsb.whileActiveOnce(
+                new JogElevator(elevator, gamepad2));//speed is left stick y
 
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)
             runningActions.add(elevator.elevatorToHome());
@@ -202,24 +198,24 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad2.right_trigger > .75 && !(previousGamepad2.right_trigger > .75))
             runningActions.add(elevator.elevatorToAboveLowerSubmersible());
 
+        if (currentGamepad2.y && !previousGamepad2.y)
+            runningActions.add(elevator.elevatorToLowBasket());
+
         if (currentGamepad2.x && !previousGamepad2.x)
             runningActions.add(elevator.cycleBucket());
 
-//        if (currentGamepad2.y && !previousGamepad2.y)
-//
-        //        if (currentGamepad2.a && !previousGamepad2.a)
-//
+        if (currentGamepad2.a && !previousGamepad2.a)
+            runningActions.add(elevator.deliverSpecimenToNearestChamber());
+
 //        if (currentGamepad2.b && !previousGamepad2.b)
 //
 
+        //  if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
 
-//elevator samples
-        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
-            runningActions.add(elevator.elevatorToUpperBasket());
-        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
-            runningActions.add(elevator.elevatorToHome());
-        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
-            runningActions.add(elevator.elevatorToLowBasket());
+        //   if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+
+        //     if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
+
         //  if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
 
 

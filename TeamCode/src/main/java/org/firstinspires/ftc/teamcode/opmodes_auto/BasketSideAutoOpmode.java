@@ -158,16 +158,15 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 secondSamplePickupMove.build(),
-                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+                                ears.armOutTiltAboveSamplesOpenClaw()),
 
                         secondSamplePickupFinalMove,
-                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
-                        rotate.tiltBothAboveSamples(.5),
+                        ears.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
 
                         new ParallelAction(
                                 secondSampleDeliverMove.build(),
                                 new SequentialAction(
-                                        ears.tiltClearArmToBucket(1),
+                                        ears.tiltAndArmMoveThenDeliverToBucket(),
                                         rotate.openIntakeClaw())),
                         elevator.elevatorToUpperBasket(),
                         elevator.cycleBucket(),
@@ -176,16 +175,15 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 thirdSamplePickupMove.build(),
-                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+                                ears.armOutTiltAboveSamplesOpenClaw()),
 
                         thirdSamplePickupFinalMove,
-                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
-                        rotate.tiltBothAboveSamples(.5),
+                        ears.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
 
                         new ParallelAction(
                                 thirdSampleDeliverMove.build(),
                                 new SequentialAction(
-                                        ears.tiltClearArmToBucket(1),
+                                        ears.tiltAndArmMoveThenDeliverToBucket(),
                                         rotate.openIntakeClaw())),
                         elevator.elevatorToUpperBasket(),
                         elevator.cycleBucket(),
@@ -194,16 +192,15 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 fourthSamplePickupMove.build(),
-                                ears.armOutTiltAboveSamplesOpenClaw(1)),
+                                ears.armOutTiltAboveSamplesOpenClaw()),
 
                         fourthSamplePickupFinalMove,
-                        rotate.tiltToPickupThenCloseIntakeClaw(.5),
-                        rotate.tiltBothAboveSamples(.5),
+                        ears.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
 
                         new ParallelAction(
                                 fourthSampleDeliverMove.build(),
                                 new SequentialAction(
-                                        ears.tiltClearArmToBucket(1),
+                                        ears.tiltAndArmMoveThenDeliverToBucket(),
                                         rotate.openIntakeClaw())),
                         elevator.elevatorToUpperBasket(),
                         elevator.cycleBucket(),

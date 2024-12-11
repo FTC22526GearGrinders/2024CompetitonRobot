@@ -30,39 +30,33 @@ public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
     public static double eks = 0.15;//1% motor power
     public static double ekg = 0.25;
-    public static double ekv = .08;//max ips = 16 so 12/16 (assume 50%) = .35 volts per ips
-    public static double eka = 0;
+    public static double ekv = .08;//max ips = 16 so (12-4)/16 (assume 50%) = .5 volts per ips
+    public static double eka = 0.01;
 
-    public static double lkp = 0.2;
-    public static double lki = 0;
-    public static double lkd = 0;
+    public static double ekp = 0.2;
+    public static double eki = 0;
+    public static double ekd = 0;
 
-    public static double rkp = 0.2;
-    public static double rki = 0;
-    public static double rkd = 0;
+
+    public static double releaseDelay = .5;
 
     public static boolean TUNING = false;
 
     public static double targetInches;
 
-    public double UPPER_POSITION_LIMIT = 28;
-    public int LOWER_POSITION_LIMIT = 0;
+    public final double UPPER_POSITION_LIMIT = 28;
+    public final double LOWER_POSITION_LIMIT = 0;
 
-    public static double TRAJ_VEL = 15;
-    public static double TRAJ_ACCEL = 15;
-
-    public double specimenClawOpenAngle = 0.0;
-    public double specimenClawClosedAngle = .4;
-
-    public double bucketUprightAngle = .5;
-    public double bucketTravelAngle = .4;
-    public double bucketTippedAngle = 0;
-    public double releaseDelay = .5;
-    private double bucketCycleTime = .75;
-
+    public final double TRAJ_VEL = 15;
+    public final double TRAJ_ACCEL = 10;
     public final double minimumHoldHeight = 1.2;
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 3;
+    public double specimenClawOpenAngle = 0.0;
+    public double specimenClawClosedAngle = .4;
+    public double bucketUprightAngle = .5;
+    public double bucketTravelAngle = .4;
+    public double bucketTippedAngle = 0;
     public ElapsedTime holdTime;
     public TrapezoidProfile.Constraints constraints;
     public Motor leftElevatorMotor;
@@ -96,6 +90,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     double rightSetPos;
     double rightFf;
     double rightPidout;
+    private double bucketCycleTime = .75;
     private double leftAccel;
     private double leftLastVel;
     private double rightAccel;
@@ -118,7 +113,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
 
         elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
-        leftPidController = new ProfiledPIDController(lkp, lki, lkd, constraints);
+        leftPidController = new ProfiledPIDController(ekp, eki, ekd, constraints);
         leftPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         leftPidController.reset();
 
@@ -131,7 +126,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightElevatorEncoder.setDirection(Motor.Direction.FORWARD);
         rightElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
 
-        rightPidController = new ProfiledPIDController(rkp, rki, rkd, constraints);
+        rightPidController = new ProfiledPIDController(ekp, eki, ekd, constraints);
         rightPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         rightPidController.reset();
 
@@ -305,10 +300,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 new ParallelAction(
                         elevatorToNearestChamber(),
                         new SequentialAction(
-                                new SleepAction(.5),
+                                new SleepAction(releaseDelay),
                                 openSpecimenClaw()));
     }
-
 
 
     @Override
@@ -386,52 +380,26 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightLastVel = rightSetVel;
     }
 
-    public void setLeftPositionKp() {
-        leftPidController.setP(lkp);
-    }
-
-    public void setLefPositionKi() {
-        leftPidController.setI(lki);
-    }
-
-    public void setLeftPositionKd() {
-        leftPidController.setD(lkd);
-    }
-
-    public void setRightPositionKp() {
-        rightPidController.setP(rkp);
-    }
-
-    public void setRightPositionKi() {
-        rightPidController.setI(rki);
-    }
-
-    public void setRightPositionKd() {
-        rightPidController.setD(rkd);
-    }
-
     public void setNewFFValues() {
         elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
-
     }
 
-    public boolean getSpecimenClawPressed() {
-        return true;
-    }
 
     public void setGains() {
-        if (lkp != leftPidController.getP())
-            setLeftPositionKp();
-        if (lki != leftPidController.getI())
-            setLefPositionKi();
-        if (lkd != leftPidController.getD())
-            setLeftPositionKd();
-        if (rkp != rightPidController.getP())
-            setRightPositionKp();
-        if (rki != rightPidController.getI())
-            setRightPositionKi();
-        if (rkd != rightPidController.getD())
-            setRightPositionKd();
+        if (ekp != leftPidController.getP()) {
+            leftPidController.setP(ekp);
+            rightPidController.setP(ekp);
+        }
+        if (eki != leftPidController.getI()) {
+            leftPidController.setP(eki);
+            rightPidController.setP(eki);
+        }
+
+        if (ekd != leftPidController.getD()) {
+            leftPidController.setP(ekd);
+            rightPidController.setP(ekd);
+        }
+
     }
 
     public void resetElevatorEncoders() {

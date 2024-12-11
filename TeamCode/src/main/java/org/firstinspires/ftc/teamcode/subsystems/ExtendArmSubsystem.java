@@ -27,15 +27,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double targetInches;
     public static double ks = .12;//1% motor power
     public static double kv = .044;//max ips = 50 so 12/50 (assume 50%) = .06 volts per ips
-    public static double ka = 0;
+    public static double ka = 0.005;
     public static double kp = 0.025;
     public static double ki = 0;
     public static double kd = 0;
+
     public static boolean TUNING = false;
-    public static double OUT_POSITION_LIMIT = 17.00;
-    public static double IN_POSITION_LIMIT = .5;
-    public static double TRAJ_VEL = 10;
-    public static double TRAJ_ACCEL = 10;
+    public final double OUT_POSITION_LIMIT = 17.00;
+    public final double INNER_POSITION_LIMIT = .5;
+    public double TRAJ_VEL = 10;
+    public double TRAJ_ACCEL = 7.5;
     public double lastTargetInches;
     public Motor leftArmMotor;
     public Motor rightArmMotor;
@@ -52,7 +53,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public int holdCtr;
     public int showSelect = 0;
-    public int tst;
     ElapsedTime et;
     double leftSetVel;
     double leftSetPos;
@@ -69,7 +69,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double rightAccel;
     private double lastRightVel;
     private double lastLeftVel;
-    private int targetSetCounter;
     private double izonel = 5;
     private double izoner = 5;
 
@@ -178,19 +177,19 @@ public class ExtendArmSubsystem extends SubsystemBase {
         if (armFF.kv != kv || armFF.ks != ks || armFF.ka != ka)
             setNewFFValues();
 
-        if (leftArmController.getP() != kp)
+        if (leftArmController.getP() != kp) {
             leftArmController.setP(kp);
-        if (leftArmController.getI() != ki)
-            leftArmController.setI(ki);
-        if (leftArmController.getD() != kd)
-            leftArmController.setD(kd);
-
-        if (rightArmController.getP() != kp)
             rightArmController.setP(kp);
-        if (rightArmController.getI() != ki)
+        }
+        if (leftArmController.getI() != ki) {
+            leftArmController.setI(ki);
             rightArmController.setI(ki);
-        if (rightArmController.getD() != kd)
+        }
+        if (leftArmController.getD() != kd) {
+            leftArmController.setD(kd);
             rightArmController.setD(kd);
+        }
+        
     }
 
     public void setNewFFValues() {
@@ -241,8 +240,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
         lastRightVel = rightSetVel;
 
         if (TUNING) {
-            if (getLeftPositionInches() < IN_POSITION_LIMIT || getLeftPositionInches() > OUT_POSITION_LIMIT
-                    || getRightPositionInches() < IN_POSITION_LIMIT || getRightPositionInches() > OUT_POSITION_LIMIT) {
+            if (getLeftPositionInches() < INNER_POSITION_LIMIT || getLeftPositionInches() > OUT_POSITION_LIMIT
+                    || getRightPositionInches() < INNER_POSITION_LIMIT || getRightPositionInches() > OUT_POSITION_LIMIT) {
                 leftArmMotor.set(0);
                 rightArmMotor.set(0);
             }
@@ -272,85 +271,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
 
-    public boolean leftInPosition() {
-        return leftArmController.atSetpoint();
-    }
-
-    public double getLeftGoalPosition() {
-        return leftArmController.getGoal().position;
-    }
-
-    public double getLeftPositionKp() {
-        return leftArmController.getP();
-    }
-
-    public void setLeftPositionKp(double kp) {
-        leftArmController.setP(kp);
-    }
-
-    public double getLeftPositionKi() {
-        return leftArmController.getD();
-    }
-
-    public void setLeftPositionKi(double ki) {
-        leftArmController.setI(ki);
-    }
-
-    public double getLeftPositionKd() {
-        return leftArmController.getD();
-    }
-
-    public void setLeftPositionKd(double kd) {
-        leftArmController.setD(kd);
-    }
-
-    public boolean rightInPosition() {
-        return rightArmController.atSetpoint();
-    }
-
-    public double getRightGoalPosition() {
-        return rightArmController.getGoal().position;
-    }
-
-    public double getRightPositionKp() {
-        return rightArmController.getP();
-    }
-
-    public void setRightPositionKp(double kp) {
-        rightArmController.setP(kp);
-    }
-
-    public double getRightPositionKi() {
-        return rightArmController.getD();
-    }
-
-    public void setRightPositionKi(double ki) {
-        rightArmController.setI(ki);
-    }
-
-    public double getRightPositionKd() {
-        return rightArmController.getD();
-    }
-
-    public void setRightPositionKd(double kd) {
-        rightArmController.setD(kd);
-    }
-
-    public void setTrapConstraints(double vel, double acc) {
-        leftArmController.setConstraints(new TrapezoidProfile.Constraints(vel, acc));
-        rightArmController.setConstraints(new TrapezoidProfile.Constraints(vel, acc));
-    }
-
-    public double getLeftPower() {
-        return leftArmMotor.get();
-    }
 
     public void setLeftPower(double power) {
         leftArmMotor.set(power);
-    }
-
-    public double getRightPower() {
-        return rightArmMotor.get();
     }
 
     public void setRightPower(double power) {
@@ -385,7 +308,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
         telemetry.addData("ArmRightInches", getRightPositionInches());
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
-
 
         telemetry.update();
     }

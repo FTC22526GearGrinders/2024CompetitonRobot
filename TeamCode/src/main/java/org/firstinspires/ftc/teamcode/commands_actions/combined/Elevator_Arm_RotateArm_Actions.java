@@ -61,41 +61,41 @@ public class Elevator_Arm_RotateArm_Actions {
     }
 
 
-    public Action tiltClearArmToBucket(double tilt_timeout_secs) {
+    public Action tiltAndArmMoveThenDeliverToBucket() {
         return
                 new SequentialAction(
-                        rotateArm.tiltBothClear(tilt_timeout_secs),
+                        rotateArm.tiltToBucketDeliver(),
                         arm.armToBucketAction(),
                         rotateArm.openIntakeClaw(),
                         new SleepAction(.5),
                         elevator.travelBucket(),
-                        rotateArm.tiltBothVertical(.2));
+                        rotateArm.tiltBothVertical());
     }
 
 
     public Action cancelPickupSample() {
         return
                 new SequentialAction(
-                        rotateArm.tiltBothClear(3),
+                        rotateArm.tiltToBucketDeliver(),
                         arm.armToBucketAction());
     }
 
 
     //this may result in a sample or not - need to check
-    public Action armOutTiltToPickupOpenClaw() {
+    public Action tiltToPickupCloseClawRaiseTiltAboveSubmersible() {
         return new SequentialAction(
-                arm.armToPickupAction(),
-                new ParallelAction(
-                        rotateArm.tiltToPickup(),
-                        rotateArm.openIntakeClaw()));
+                // arm.armToPickupAction(),
+                rotateArm.tiltToPickup(),
+                rotateArm.closeIntakeClaw(),
+                rotateArm.tiltAboveSubmersible());
     }
 
 
-    public Action armOutTiltAboveSamplesOpenClaw(double timeout_secs) {
+    public Action armOutTiltAboveSamplesOpenClaw() {
         return new SequentialAction(
                 arm.armToPickupAction(),
                 new ParallelAction(
-                        rotateArm.tiltBothAboveSamples(timeout_secs),
+                        rotateArm.tiltAboveSamples(),
                         rotateArm.openIntakeClaw()));
     }
 

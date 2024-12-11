@@ -24,22 +24,26 @@ public class RotateArmSubsystem extends SubsystemBase {
     public double intakeTiltClearAngle = 0.3;
     public double intakeTiltVerticalAngle = .5;
     public double touchSubmersibleAngle = .6;
+    public double intakeTiltAboveSubmersibleAngle = .7;
     public double intakeTiltAboveSampleAngle = .8;
     public double intakeTiltPickupAngle = .96;
+    public double currentTilt;
+    public double tiltChangeTime;
+    public double tiltTimeMultiplier = 1.5;
+
     public double intakeClawOpenAngle = 0;
     public double intakeClawClosedAngle = 1;
-    private double intakeClawTime = .5;
-    public double currentTilt;
-    public Servo intakeClawServo;
+    private final double intakeClawTime = .5;
 
+    public Servo intakeClawServo;
+    public double currentClaw;
     public Servo leftTiltServo;
     public Servo rightTiltServo;
-
     public RevColorSensorV3 intakeSensor;
     public int showSelect = 0;
 
     private Telemetry telemetry;
-    private boolean tiltPositionClear;
+
 
 
     public RotateArmSubsystem(CommandOpMode opMode) {
@@ -80,6 +84,7 @@ public class RotateArmSubsystem extends SubsystemBase {
         return
                 new SequentialAction(
                         new InstantAction(() -> intakeClawServo.setPosition(intakeClawOpenAngle)),
+                        new InstantAction(() -> currentClaw = intakeClawOpenAngle),
                         new SleepAction(intakeClawTime));
     }
 
@@ -87,6 +92,7 @@ public class RotateArmSubsystem extends SubsystemBase {
         return
                 new SequentialAction(
                         new InstantAction(() -> intakeClawServo.setPosition(intakeClawClosedAngle)),
+                        new InstantAction(() -> currentClaw = intakeClawClosedAngle),
                         new SleepAction(intakeClawTime));
     }
 
@@ -94,7 +100,9 @@ public class RotateArmSubsystem extends SubsystemBase {
         return new ParallelAction(
                 new InstantAction(() -> leftTiltServo.setPosition(angle)),
                 new InstantAction(() -> rightTiltServo.setPosition(angle)),
-                new InstantAction(() -> currentTilt = angle));
+                new InstantAction(() -> tiltChangeTime = Math.abs(angle - currentTilt) * tiltTimeMultiplier),//
+                new InstantAction(() -> currentTilt = angle),
+                new SleepAction(tiltChangeTime));
     }
 
 
@@ -102,16 +110,21 @@ public class RotateArmSubsystem extends SubsystemBase {
         return setTiltAngle(intakeTiltPickupAngle);
     }
 
-    public Action tiltBothAboveSamples(double timeout_secs) {
+    public Action tiltAboveSamples() {
         return setTiltAngle(intakeTiltAboveSampleAngle);
 
     }
 
-    public Action tiltBothClear(double timeout) {
+    public Action tiltAboveSubmersible() {
+        return setTiltAngle(intakeTiltAboveSubmersibleAngle);
+
+    }
+
+    public Action tiltToBucketDeliver() {
         return setTiltAngle(intakeTiltClearAngle);
     }
 
-    public Action tiltBothVertical(double timeout) {
+    public Action tiltBothVertical() {
         return setTiltAngle(intakeTiltVerticalAngle);
     }
 
@@ -122,15 +135,6 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     public Action tiltToTouchSubmersibleAction() {
         return setTiltAngle(touchSubmersibleAngle);
-    }
-
-
-    public void setTiltPositionClear() {
-        tiltPositionClear = true;
-    }
-
-    public void setTiltPositionDown() {
-        tiltPositionClear = false;
     }
 
 
@@ -148,20 +152,6 @@ public class RotateArmSubsystem extends SubsystemBase {
         telemetry.update();
     }
 
-    public Action tiltToPickupThenCloseIntakeClaw(double timeout_secs) {
-        return new SequentialAction(
-                tiltToPickup(),
-                new SleepAction(timeout_secs),
-                closeIntakeClaw());
-    }
-
-    public Action pickupSample() {
-        return new SequentialAction(
-                tiltToPickup(),
-                new SleepAction(1),
-                closeIntakeClaw(),
-                tiltBothAboveSamples(1));
-    }
 
 }
 
