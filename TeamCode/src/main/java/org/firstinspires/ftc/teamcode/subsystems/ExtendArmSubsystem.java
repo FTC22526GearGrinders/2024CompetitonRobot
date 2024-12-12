@@ -45,11 +45,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
      *
      *
      * */
-
-    public double TRAJ_VEL = 20;
-    public double TRAJ_ACCEL = 10;
-
-
+    private final double lrDiffMaxInches = 4;
+    public double TRAJECTORY_VEL = 20;
+    public double TRAJECTORY_ACCEL = 10;
     public double lastTargetInches;
     public Motor leftArmMotor;
     public Motor rightArmMotor;
@@ -58,15 +56,12 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public double power;
     public ProfiledPIDController leftArmController;
     public ProfiledPIDController rightArmController;
-    public TrapezoidProfile.State leftArmSetpoint = new TrapezoidProfile.State();
-    public TrapezoidProfile.State rightArmSetpoint = new TrapezoidProfile.State();
-
+    public TrapezoidProfile.State leftArmSetPoint = new TrapezoidProfile.State();
+    public TrapezoidProfile.State rightArmSetPoint = new TrapezoidProfile.State();
     public TrapezoidProfile.Constraints constraints;
     public SimpleMotorFeedforward armFF;
-
     public int holdCtr;
     public int showSelect = 0;
-    private ElapsedTime et;
     double leftSetVel;
     double leftSetPos;
     double leftFF;
@@ -75,6 +70,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     double rightSetPos;
     double rightFF;
     double rightPidOut;
+    private ElapsedTime et;
     private int inPositionCtr;
     private Telemetry telemetry;
     private double scanTime;
@@ -82,10 +78,11 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double rightAccel;
     private double lastRightVel;
     private double lastLeftVel;
+    public boolean shutDownArmPositioning;
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
-        constraints = new TrapezoidProfile.Constraints(TRAJ_VEL, TRAJ_ACCEL);
+        constraints = new TrapezoidProfile.Constraints(TRAJECTORY_VEL, TRAJECTORY_ACCEL);
 
         leftArmMotor = new Motor(opMode.hardwareMap, "leftArmMotor");
         rightArmMotor = new Motor(opMode.hardwareMap, "rightArmMotor");
@@ -162,6 +159,11 @@ public class ExtendArmSubsystem extends SubsystemBase {
         };
     }
 
+    public boolean checkOK() {
+        shutDownArmPositioning = Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches;
+        return !shutDownArmPositioning;
+    }
+
     @Override
     public void periodic() {
         if (showSelect == Constants.ShowTelemetryConstants.showArmCommon)
@@ -170,6 +172,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
             showTelemetryLeft();
         if (showSelect == Constants.ShowTelemetryConstants.showArm2)
             showTelemetryRight();
+
+        shutDownArmPositioning = Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches;
 
 
         if (holdCtr >= 100) {
@@ -218,28 +222,29 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
 
         leftPidOut = leftArmController.calculate(getLeftPositionInches());
-        leftArmSetpoint = leftArmController.getSetpoint();
-        leftSetVel = leftArmSetpoint.velocity;
-        leftSetPos = leftArmSetpoint.position;
+        leftArmSetPoint = leftArmController.getSetpoint();
+        leftSetVel = leftArmSetPoint.velocity;
+        leftSetPos = leftArmSetPoint.position;
         leftAccel = (lastLeftVel - leftSetVel) * 50;
         leftFF = armFF.calculate(leftSetVel, leftAccel);
         lastLeftVel = leftSetVel;
 
         double leftPowerVal = leftFF + leftPidOut;
-        if (leftPowerVal > 0 && !armOutLimit || leftPowerVal < 0 && !armInLimit)
+        if (!shutDownArmPositioning && (leftPowerVal > 0 && !armOutLimit || leftPowerVal < 0 && !armInLimit))
             leftArmMotor.set(leftPowerVal);
         else leftArmMotor.set(0);
 
         //right
         rightPidOut = rightArmController.calculate(getRightPositionInches());
-        rightArmSetpoint = rightArmController.getSetpoint();
-        rightSetVel = rightArmSetpoint.velocity;
-        rightSetPos = rightArmSetpoint.position;
+        rightArmSetPoint = rightArmController.getSetpoint();
+        rightSetVel = rightArmSetPoint.velocity;
+        rightSetPos = rightArmSetPoint.position;
         rightAccel = (lastRightVel - rightSetVel) * 50;
         rightFF = armFF.calculate(rightSetVel, rightAccel);
         lastRightVel = rightSetVel;
         double rightPowerVal = rightFF + rightPidOut;
-        if (rightPowerVal > 0 && !armOutLimit || rightPowerVal < 0 && !armInLimit)
+
+        if (!shutDownArmPositioning && (rightPowerVal > 0 && !armOutLimit || rightPowerVal < 0 && !armInLimit))
             rightArmMotor.set(rightPowerVal);
         else rightArmMotor.set(0);
     }
@@ -302,6 +307,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
         telemetry.addData("ArmRightInches", round2dp(getRightPositionInches(), 2));
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
+        telemetry.addData("ArmShutdownPositioning", shutDownArmPositioning);
+
 
         telemetry.update();
     }
@@ -312,8 +319,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("Arm FF", round2dp(leftFF, 2));
         telemetry.addData("ArmLeftTargetInches", TARGET);
         telemetry.addData("ArmLeftInches", round2dp(getLeftPositionInches(), 2));
-        telemetry.addData("ArmLeftSetPointPos", round2dp(leftArmSetpoint.position, 2));
-        telemetry.addData("ArmLeftSetPointVel", round2dp(leftArmSetpoint.velocity, 2));
+        telemetry.addData("ArmLeftSetPointPos", round2dp(leftArmSetPoint.position, 2));
+        telemetry.addData("ArmLeftSetPointVel", round2dp(leftArmSetPoint.velocity, 2));
         telemetry.addData("ArmLeftPosError", round2dp(leftArmController.getPositionError(), 2));
         telemetry.addData("ArmLeftVelError", round2dp(leftArmController.getVelocityError(), 2));
         telemetry.addData("ArmLeftVel", round2dp(getLeftInchesPerSec(), 2));
@@ -330,8 +337,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("Arm Right at Goal", atRightGoal());
         telemetry.addData("ArmRightTargetInches", TARGET);
         telemetry.addData("ArmRightInches", round2dp(getRightPositionInches(), 2));
-        telemetry.addData("ArmRightSetPointPos", round2dp(rightArmSetpoint.position, 2));
-        telemetry.addData("ArmRightSetPointV", round2dp(rightArmSetpoint.velocity, 2));
+        telemetry.addData("ArmRightSetPointPos", round2dp(rightArmSetPoint.position, 2));
+        telemetry.addData("ArmRightSetPointV", round2dp(rightArmSetPoint.velocity, 2));
         telemetry.addData("ArmRightPosError", round2dp(rightArmController.getPositionError(), 2));
         telemetry.addData("ArmRightVelError", round2dp(rightArmController.getVelocityError(), 2));
         telemetry.addData("ArmRightVel", round2dp(getRightInchesPerSec(), 2));

@@ -126,8 +126,8 @@ public class TeleopOpMode extends CommandOpMode {
 
             doCoDriverButtons();
 
-            if (!elevator.checkOK()) gamepad2.runRumbleEffect(RumbleDefs.threeStepRumbleEffect);
-
+            if (!elevator.checkOK()) gamepad1.runRumbleEffect(RumbleDefs.fourStepRumbleEffect);
+            if (!arm.checkOK()) gamepad1.runRumbleEffect(RumbleDefs.threeStepRumbleEffect);
 
         }
         reset();

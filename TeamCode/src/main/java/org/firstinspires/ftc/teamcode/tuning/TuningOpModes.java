@@ -24,7 +24,6 @@ import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.firstinspires.ftc.teamcode.TankDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +50,7 @@ public final class TuningOpModes {
         if (DISABLED) return;
 
         DriveViewFactory dvf;
-        if (DRIVE_CLASS.equals(MecanumDriveSubsystem.class)) {
+        if (DRIVE_CLASS.equals(MecanumDriveT.class)) {
             dvf = hardwareMap -> {
                 MecanumDriveT md = new MecanumDriveT(hardwareMap, new Pose2d(0, 0, 0));
 

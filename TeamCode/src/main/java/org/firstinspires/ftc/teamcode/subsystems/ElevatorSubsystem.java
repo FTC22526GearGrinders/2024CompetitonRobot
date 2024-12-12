@@ -33,13 +33,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double ekv = .011;//1/95
     public static double eka = 0;
 
+
     public static double ekp = 0.2;
     public static double eki = 0;
     public static double ekd = 0;
     public static boolean TUNE = false;
     public static double TARGET;
-
-
     public final double UPPER_POSITION_LIMIT = 28;
     public final double LOWER_POSITION_LIMIT = 0;
     public final double TRAJECTORY_VEL = 15;
@@ -47,6 +46,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public final double minimumHoldHeight = 1.2;
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 5;
+    private final double bucketCycleTime = .75;
     public double releaseDelay = .5;
     public double specimenClawOpenAngle = 0.0;
     public double specimenClawClosedAngle = .4;
@@ -86,7 +86,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     double rightSetPos;
     double rightFf;
     double rightPidOut;
-    private final double bucketCycleTime = .75;
+    private double lastKs;
+    private double lastKg;
+    private double lastKv;
+    private double lastKa;
     private double leftAccel;
     private double leftLastVel;
     private double rightAccel;
@@ -319,8 +322,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             holdCtr = 0;
         }
 
-        shutDownElevatorPositioning = Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches;
-
 
         if (TUNE) {
             if (TARGET > UPPER_POSITION_LIMIT) TARGET = UPPER_POSITION_LIMIT;
@@ -332,8 +333,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public boolean checkOK() {
-
-        return Math.abs(getLeftPositionInches() - getRightPositionInches()) < lrDiffMaxInches;
+        shutDownElevatorPositioning = Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches;
+        return !shutDownElevatorPositioning;
     }
 
     public void position() {
@@ -355,7 +356,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         double leftPowerVal = leftFf + leftPidOut;
 
-
         if (!shutDownElevatorPositioning && (leftPowerVal > 0 && !elevatorHigh || leftPowerVal < 0 && !elevatorLow))
             leftElevatorMotor.set(leftPowerVal);
         else leftElevatorMotor.set(0);
@@ -371,13 +371,18 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         double rightPowerVal = rightFf + rightPidOut;
 
-        if (rightPowerVal > 0 && !elevatorHigh || rightPowerVal < 0 && !elevatorLow)
+        if (!shutDownElevatorPositioning && (rightPowerVal > 0 && !elevatorHigh || rightPowerVal < 0 && !elevatorLow))
             rightElevatorMotor.set(rightPowerVal);
         else rightElevatorMotor.set(0);
     }
 
     public void setNewFFValues() {
-        elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
+        if (eks != lastKs || ekg != lastKg || ekv != lastKv || eka != lastKa)
+            elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
+        lastKs = eks;
+        lastKg = ekg;
+        lastKv = ekv;
+        lastKa = eka;
     }
 
     public void setGains() {
