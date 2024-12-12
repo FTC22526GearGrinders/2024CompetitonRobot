@@ -95,13 +95,12 @@ public final class Constants {
 
         public static final double GEARING_RATIO = 5;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//100
-        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//80
-        public static final double PULLEY_TEETH = 60;//60;
+        public static final double PULLEY_TEETH = 60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
         public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//approx 28
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//80
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//100
 
         public static final double POSITION_TOLERANCE_INCHES = 2;
 
@@ -122,14 +121,14 @@ public final class Constants {
 
         public static final double GEARING_RATIO = 1;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//19
-        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//15
+
 
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
         public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;// appox 5"
         public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx 150
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//75
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//5 *19= 95
 
         //distances are amount elevator travels from its home position
         public static final double HOME_POSITION = 0;

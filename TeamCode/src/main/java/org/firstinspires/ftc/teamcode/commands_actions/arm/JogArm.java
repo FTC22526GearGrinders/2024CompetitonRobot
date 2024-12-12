@@ -36,8 +36,8 @@ public class JogArm extends CommandBase {
 //check inside limits for each direction
         if (overrideLimits || (arm.power > 0 && arm.getLeftPositionInches() < arm.OUT_POSITION_LIMIT
                 && arm.getRightPositionInches() < arm.OUT_POSITION_LIMIT
-                || arm.power < 0 && arm.getLeftPositionInches() > arm.INNER_POSITION_LIMIT
-                && arm.getRightPositionInches() > arm.INNER_POSITION_LIMIT)) {
+                || arm.power < 0 && arm.getLeftPositionInches() > arm.IN_POSITION_LIMIT
+                && arm.getRightPositionInches() > arm.IN_POSITION_LIMIT)) {
             arm.setLeftPower(arm.power);
             arm.setRightPower(arm.power);
         } else {

@@ -24,19 +24,32 @@ import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 public class ExtendArmSubsystem extends SubsystemBase {
 
 
-    public static double targetInches;
+    public static double TARGET;
     public static double ks = .12;//1% motor power
-    public static double kv = .01;//max ips = 80 so .8/80 (assume 80%) = .01 volts per ips
+    public static double kv = .01;//max ips = 100 so 1/100 starting estimate
     public static double ka = 0;
-    public static double kp = 0.001;
+    public static double kp = 0.0001;
     public static double ki = 0;
     public static double kd = 0;
 
-    public static boolean TUNING = false;
+    public static boolean TUNE = false;
+
+
     public final double OUT_POSITION_LIMIT = 17.00;
-    public final double INNER_POSITION_LIMIT = .5;
-    public double TRAJ_VEL = 10;
-    public double TRAJ_ACCEL = 7.5;
+    public final double IN_POSITION_LIMIT = .5;
+
+    /*
+     * Motion is 12 inches in say 1 second
+     * 1/3 time each in acc, constant speed and dec gives 1/2 distance = 6" in 1/3 sec or 18 IPs
+     * accel is 0 to 18 in 1/3 = 54 ipsps
+     *
+     *
+     * */
+
+    public double TRAJ_VEL = 20;
+    public double TRAJ_ACCEL = 10;
+
+
     public double lastTargetInches;
     public Motor leftArmMotor;
     public Motor rightArmMotor;
@@ -53,15 +66,15 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public int holdCtr;
     public int showSelect = 0;
-    ElapsedTime et;
+    private ElapsedTime et;
     double leftSetVel;
     double leftSetPos;
-    double leftff;
-    double leftpidout;
+    double leftFF;
+    double leftPidOut;
     double rightSetVel;
     double rightSetPos;
-    double rightff;
-    double rightpidout;
+    double rightFF;
+    double rightPidOut;
     private int inPositionCtr;
     private Telemetry telemetry;
     private double scanTime;
@@ -69,8 +82,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double rightAccel;
     private double lastRightVel;
     private double lastLeftVel;
-    private double izonel = 5;
-    private double izoner = 5;
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
@@ -124,7 +135,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
     public double getTargetInches() {
-        return targetInches;
+        return TARGET;
     }
 
     public void setTargetInches(double targetInches) {
@@ -166,13 +177,13 @@ public class ExtendArmSubsystem extends SubsystemBase {
             holdCtr = 0;
             et.reset();
         }
-        if (TUNING) tuning();
+        if (TUNE) tuning();
     }
 
     public void tuning() {
-        if (lastTargetInches != targetInches) {
-            setTargetInches(targetInches);
-            lastTargetInches = targetInches;
+        if (lastTargetInches != TARGET) {
+            setTargetInches(TARGET);
+            lastTargetInches = TARGET;
         }
         if (armFF.kv != kv || armFF.ks != ks || armFF.ka != ka)
             setNewFFValues();
@@ -201,51 +212,36 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public void position() {
 
         if (inPositionCtr != 3) inPositionCtr++;
-        // Retrieve the profiled setpoint for the next timestep. This setpoint moves
 
-        leftpidout = leftArmController.calculate(getLeftPositionInches());
-
-//
-//        if (Math.abs(leftArmController.getGoal().position - getLeftPositionInches()) < izonel)
-//            leftArmController.setI(.0001);
-//        else {
-//            leftArmController.setI(0);
-//        }
+        boolean armOutLimit = getLeftPositionInches() >= OUT_POSITION_LIMIT || getRightPositionInches() >= OUT_POSITION_LIMIT;
+        boolean armInLimit = getLeftPositionInches() <= IN_POSITION_LIMIT || getRightPositionInches() >= OUT_POSITION_LIMIT;
 
 
+        leftPidOut = leftArmController.calculate(getLeftPositionInches());
         leftArmSetpoint = leftArmController.getSetpoint();
         leftSetVel = leftArmSetpoint.velocity;
         leftSetPos = leftArmSetpoint.position;
         leftAccel = (lastLeftVel - leftSetVel) * 50;
-        leftff = armFF.calculate(leftSetVel, leftAccel);
-        leftArmMotor.set(leftff + leftpidout);
+        leftFF = armFF.calculate(leftSetVel, leftAccel);
         lastLeftVel = leftSetVel;
 
+        double leftPowerVal = leftFF + leftPidOut;
+        if (leftPowerVal > 0 && !armOutLimit || leftPowerVal < 0 && !armInLimit)
+            leftArmMotor.set(leftPowerVal);
+        else leftArmMotor.set(0);
+
         //right
-        rightpidout = rightArmController.calculate(getRightPositionInches());
-
-//        if (Math.abs(rightArmController.getGoal().position - getRightPositionInches()) < izonel)
-//            rightArmController.setI(.0001);
-//        else {
-//            rightArmController.setI(0);
-//        }
-
-
+        rightPidOut = rightArmController.calculate(getRightPositionInches());
         rightArmSetpoint = rightArmController.getSetpoint();
         rightSetVel = rightArmSetpoint.velocity;
         rightSetPos = rightArmSetpoint.position;
         rightAccel = (lastRightVel - rightSetVel) * 50;
-        rightff = armFF.calculate(rightSetVel, rightAccel);
-        rightArmMotor.set(rightff + rightpidout);
+        rightFF = armFF.calculate(rightSetVel, rightAccel);
         lastRightVel = rightSetVel;
-
-        if (TUNING) {
-            if (getLeftPositionInches() < INNER_POSITION_LIMIT || getLeftPositionInches() > OUT_POSITION_LIMIT
-                    || getRightPositionInches() < INNER_POSITION_LIMIT || getRightPositionInches() > OUT_POSITION_LIMIT) {
-                leftArmMotor.set(0);
-                rightArmMotor.set(0);
-            }
-        }
+        double rightPowerVal = rightFF + rightPidOut;
+        if (rightPowerVal > 0 && !armOutLimit || rightPowerVal < 0 && !armInLimit)
+            rightArmMotor.set(rightPowerVal);
+        else rightArmMotor.set(0);
     }
 
     public void resetEncoders() {
@@ -255,22 +251,20 @@ public class ExtendArmSubsystem extends SubsystemBase {
     }
 
     public double getLeftPositionInches() {
-        return round2dp(leftArmEncoder.getDistance(), 2);
+        return leftArmEncoder.getDistance();
     }
 
     public double getRightPositionInches() {
-        return round2dp(rightArmEncoder.getDistance(), 2);
+        return rightArmEncoder.getDistance();
     }
 
     public double getLeftInchesPerSec() {
-        return round2dp(leftArmEncoder.getRate(), 2);
+        return leftArmEncoder.getRate();
     }
 
     public double getRightInchesPerSec() {
-        return round2dp(rightArmEncoder.getRate(), 2);
+        return rightArmEncoder.getRate();
     }
-
-
 
     public void setLeftPower(double power) {
         leftArmMotor.set(power);
@@ -303,10 +297,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public void showTelemetryCommon() {
         telemetry.addData("ArmCommon", showSelect);
-        telemetry.addData("ArmLeftInches", getLeftPositionInches());
-        telemetry.addData("ArmRightInches", getRightPositionInches());
+        telemetry.addData("ArmLeftInches", round2dp(getLeftPositionInches(), 2));
+        telemetry.addData("ArmRightInches", round2dp(getRightPositionInches(), 2));
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
-        telemetry.addData("ArmRightInches", getRightPositionInches());
+        telemetry.addData("ArmRightInches", round2dp(getRightPositionInches(), 2));
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
 
         telemetry.update();
@@ -314,16 +308,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public void showTelemetryLeft() {
         telemetry.addData("ArmLeft", showSelect);
-        telemetry.addData("Arm Tuning", atGoal());
-        telemetry.addData("Arm FF", leftff);
-        telemetry.addData("ArmLeftTargetInches", targetInches);
-        telemetry.addData("ArmLeftInches", getLeftPositionInches());
-        telemetry.addData("ArmLeftSetpointPos", round2dp(leftArmSetpoint.position, 2));
-        telemetry.addData("ArmLeftSetpointVel", round2dp(leftArmSetpoint.velocity, 2));
+        telemetry.addData("Arm Left at Goal", atLeftGoal());
+        telemetry.addData("Arm FF", round2dp(leftFF, 2));
+        telemetry.addData("ArmLeftTargetInches", TARGET);
+        telemetry.addData("ArmLeftInches", round2dp(getLeftPositionInches(), 2));
+        telemetry.addData("ArmLeftSetPointPos", round2dp(leftArmSetpoint.position, 2));
+        telemetry.addData("ArmLeftSetPointVel", round2dp(leftArmSetpoint.velocity, 2));
         telemetry.addData("ArmLeftPosError", round2dp(leftArmController.getPositionError(), 2));
         telemetry.addData("ArmLeftVelError", round2dp(leftArmController.getVelocityError(), 2));
         telemetry.addData("ArmLeftVel", round2dp(getLeftInchesPerSec(), 2));
-        telemetry.addData("ArmLeftPID", round2dp(leftpidout, 2));
+        telemetry.addData("ArmLeftPID", round2dp(leftPidOut, 2));
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
 
 
@@ -333,16 +327,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public void showTelemetryRight() {
         telemetry.addData("ArmRight", showSelect);
-        telemetry.addData("Arm Tuning", atGoal());
-        telemetry.addData("Arm FF", rightff);
-        telemetry.addData("ArmRightTargetInches", targetInches);
-        telemetry.addData("ArmRightInches", getRightPositionInches());
-        telemetry.addData("ArmRightSetpointPos", round2dp(rightArmSetpoint.position, 2));
-        telemetry.addData("ArmRightSetpointV", round2dp(rightArmSetpoint.velocity, 2));
+        telemetry.addData("Arm Right at Goal", atRightGoal());
+        telemetry.addData("ArmRightTargetInches", TARGET);
+        telemetry.addData("ArmRightInches", round2dp(getRightPositionInches(), 2));
+        telemetry.addData("ArmRightSetPointPos", round2dp(rightArmSetpoint.position, 2));
+        telemetry.addData("ArmRightSetPointV", round2dp(rightArmSetpoint.velocity, 2));
         telemetry.addData("ArmRightPosError", round2dp(rightArmController.getPositionError(), 2));
         telemetry.addData("ArmRightVelError", round2dp(rightArmController.getVelocityError(), 2));
         telemetry.addData("ArmRightVel", round2dp(getRightInchesPerSec(), 2));
-        telemetry.addData("ArmRightPID", round2dp(rightpidout, 2));
+        telemetry.addData("Arm Right FF", round2dp(rightFF, 2));
+        telemetry.addData("ArmRightPID", round2dp(rightPidOut, 2));
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
         telemetry.update();
 

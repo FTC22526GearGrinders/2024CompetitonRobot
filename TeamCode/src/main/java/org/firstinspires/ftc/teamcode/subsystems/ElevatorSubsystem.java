@@ -30,28 +30,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
     public static double eks = 0.15;//1% motor power
     public static double ekg = 0.25;
-    public static double ekv = .007;//max ips = 75 so assume kv provides .5 = .5/75 =.007
+    public static double ekv = .011;//1/95
     public static double eka = 0;
 
     public static double ekp = 0.2;
     public static double eki = 0;
     public static double ekd = 0;
+    public static boolean TUNE = false;
+    public static double TARGET;
 
-
-    public static double releaseDelay = .5;
-
-    public static boolean TUNING = false;
-
-    public static double targetInches;
 
     public final double UPPER_POSITION_LIMIT = 28;
     public final double LOWER_POSITION_LIMIT = 0;
-
-    public final double TRAJ_VEL = 15;
-    public final double TRAJ_ACCEL = 10;
+    public final double TRAJECTORY_VEL = 15;
+    public final double TRAJECTORY_ACCEL = 10;
     public final double minimumHoldHeight = 1.2;
     private final Telemetry telemetry;
-    private final double lrDiffMaxInches = 3;
+    private final double lrDiffMaxInches = 5;
+    public double releaseDelay = .5;
     public double specimenClawOpenAngle = 0.0;
     public double specimenClawClosedAngle = .4;
     public double bucketUprightAngle = .5;
@@ -85,12 +81,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     double leftSetVel;
     double leftSetPos;
     double leftFf;
-    double leftPidout;
+    double leftPidOut;
     double rightSetVel;
     double rightSetPos;
     double rightFf;
-    double rightPidout;
-    private double bucketCycleTime = .75;
+    double rightPidOut;
+    private final double bucketCycleTime = .75;
     private double leftAccel;
     private double leftLastVel;
     private double rightAccel;
@@ -101,7 +97,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         myOpmode = opMode;
 
-        constraints = new TrapezoidProfile.Constraints(TRAJ_VEL, TRAJ_ACCEL);
+        constraints = new TrapezoidProfile.Constraints(TRAJECTORY_VEL, TRAJECTORY_ACCEL);
 
 
         leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator", Motor.GoBILDA.RPM_1150);
@@ -159,7 +155,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getTargetInches() {
-        return targetInches;
+        return TARGET;
     }
 
     public void setTargetInches(double targetInches) {
@@ -225,10 +221,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-    public double getPositionInches() {
-        return leftElevatorEncoder.getPosition();
-    }
-
     public boolean atGoal() {
         return atLeftGoal() && atRightGoal();
     }
@@ -253,7 +245,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                     initialized = true;
                 }
                 packet.put("targetInches", getTargetInches());
-                packet.put("actualInches", getPositionInches());
+                packet.put("leftInches", getLeftPositionInches());
+                packet.put("rightInches", getRightPositionInches());
 
                 return atGoal();
             }
@@ -326,12 +319,13 @@ public class ElevatorSubsystem extends SubsystemBase {
             holdCtr = 0;
         }
 
-        if (Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches)
-            shutDownElevatorPositioning = true;
+        shutDownElevatorPositioning = Math.abs(getLeftPositionInches() - getRightPositionInches()) > lrDiffMaxInches;
 
 
-        if (TUNING) {
-            setTargetInches(targetInches);
+        if (TUNE) {
+            if (TARGET > UPPER_POSITION_LIMIT) TARGET = UPPER_POSITION_LIMIT;
+            if (TARGET < LOWER_POSITION_LIMIT) TARGET = LOWER_POSITION_LIMIT;
+            setTargetInches(TARGET);
             setNewFFValues();
             setGains();
         }
@@ -347,43 +341,44 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         if (inPositionCtr != 3) inPositionCtr++;
 
-//        double izonel = 1;
-//
-//        if (Math.abs(leftPidController.getGoal().position - getLeftPositionInches()) < izonel)
-//            leftPidController.setI(.0001);
-//        else leftPidController.setI(0);
+        boolean elevatorHigh = getLeftPositionInches() >= UPPER_POSITION_LIMIT || getRightPositionInches() >= UPPER_POSITION_LIMIT;
+        boolean elevatorLow = getRightPositionInches() <= LOWER_POSITION_LIMIT || getRightPositionInches() <= LOWER_POSITION_LIMIT;
 
-        leftPidout = leftPidController.calculate(getLeftPositionInches());
+
+        leftPidOut = leftPidController.calculate(getLeftPositionInches());
         leftSetpoint = leftPidController.getSetpoint();
         leftSetVel = leftSetpoint.velocity;
         leftSetPos = leftSetpoint.position;
         leftAccel = (leftSetVel - leftLastVel) * 50;
         leftFf = elevatorFeedForward.calculate(leftSetVel, leftAccel);
-        leftElevatorMotor.set(leftFf + leftPidout);
         leftLastVel = leftSetVel;
 
-        rightPidout = rightPidController.calculate(getRightPositionInches());
-
-//        double izoner = 1;
-//
-//        if (Math.abs(rightPidController.getGoal().position - getRightPositionInches()) < izoner)
-//            rightPidController.setI(.0001);
-//        else rightPidController.setI(0);
+        double leftPowerVal = leftFf + leftPidOut;
 
 
+        if (!shutDownElevatorPositioning && (leftPowerVal > 0 && !elevatorHigh || leftPowerVal < 0 && !elevatorLow))
+            leftElevatorMotor.set(leftPowerVal);
+        else leftElevatorMotor.set(0);
+
+
+        rightPidOut = rightPidController.calculate(getRightPositionInches());
         rightSetpoint = rightPidController.getSetpoint();
         rightSetVel = rightSetpoint.velocity;
         rightSetPos = rightSetpoint.position;
         rightAccel = (rightSetVel - rightLastVel) * 50;
         rightFf = elevatorFeedForward.calculate(rightSetVel, rightAccel);
-        rightElevatorMotor.set(rightFf + rightPidout);
         rightLastVel = rightSetVel;
+
+        double rightPowerVal = rightFf + rightPidOut;
+
+        if (rightPowerVal > 0 && !elevatorHigh || rightPowerVal < 0 && !elevatorLow)
+            rightElevatorMotor.set(rightPowerVal);
+        else rightElevatorMotor.set(0);
     }
 
     public void setNewFFValues() {
         elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
     }
-
 
     public void setGains() {
         if (ekp != leftPidController.getP()) {
@@ -408,19 +403,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getLeftPositionInches() {
-        return round2dp(leftElevatorEncoder.getDistance(), 2);
+        return leftElevatorEncoder.getDistance();
     }
 
     public double getLeftVelocityInPerSec() {
-        return round2dp(leftElevatorEncoder.getRate(), 2);
+        return leftElevatorEncoder.getRate();
     }
 
     public double getRightPositionInches() {
-        return round2dp(rightElevatorEncoder.getDistance(), 2);
+        return rightElevatorEncoder.getDistance();
     }
 
     public double getRightVelocityInPerSec() {
-        return round2dp(rightElevatorEncoder.getRate(), 2);
+        return rightElevatorEncoder.getRate();
     }
 
     public boolean leftInPosition() {
@@ -450,12 +445,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void showCommonTelemetry() {
         telemetry.addData("ElevatorCommon", showSelect);
-        telemetry.addData("LeftPositionInches", getLeftPositionInches());
-        telemetry.addData("RightPositionInches", getRightPositionInches());
-        telemetry.addData("LeftPower", getLeftPower());
-        telemetry.addData("RightPower", getRightPower());
-        telemetry.addData("LeftTotalPower", leftTotalPower);
-        telemetry.addData("RightTotalPower", rightTotalPower);
+        telemetry.addData("LeftPositionInches", round2dp(getLeftPositionInches(), 2));
+        telemetry.addData("RightPositionInches", round2dp(getRightPositionInches(), 2));
+        telemetry.addData("LeftPower", round2dp(getLeftPower(), 2));
+        telemetry.addData("RightPower", round2dp(getRightPower(), 2));
+        telemetry.addData("LeftTotalPower", round2dp(leftTotalPower, 2));
+        telemetry.addData("RightTotalPower", round2dp(rightTotalPower, 2));
         telemetry.addData("Shutdown", shutDownElevatorPositioning);
         telemetry.update();
 
@@ -466,16 +461,18 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("ElevatorLeft", showSelect);
 
         telemetry.addData("HoldRng", posrng);
+        telemetry.addData("ElevatorGoal", round2dp(leftPidController.getGoal().position, 2));
+        telemetry.addData("Left at Goal", atLeftGoal());
+        telemetry.addData("LeftPositionInches", round2dp(getLeftPositionInches(), 2));
+        telemetry.addData("LeftPower", round2dp(getLeftPower(), 2));
+        telemetry.addData("LeftVelErr", round2dp(leftPidController.getVelocityError(), 2));
+        telemetry.addData("LeftPosErr", round2dp(leftPidController.getPositionError(), 2));
+        telemetry.addData("LeftFF", round2dp(leftFf, 2));
+        telemetry.addData("LeftPIDOut", round2dp(leftPidOut, 2));
+        telemetry.addData("LeftSetVel", round2dp(leftSetVel, 2));
+        telemetry.addData("LeftSetPos", round2dp(leftSetPos, 2));
+        telemetry.addData("LeftAccel", round2dp(leftAccel, 2));
 
-        telemetry.addData("LeftPositionInches", getLeftPositionInches());
-        telemetry.addData("ElevatorGoal", leftPidController.getGoal().position);
-        telemetry.addData("LeftPower", getLeftPower());
-        telemetry.addData("LeftPosErr", leftPidController.getPositionError());
-        telemetry.addData("RightPosErr", rightPidController.getPositionError());
-        telemetry.addData("LeftFF", leftFf);
-        telemetry.addData("LeftPIDout", leftPidout);
-        telemetry.addData("LeftSetVel", leftSetVel);
-        telemetry.addData("LeftSetPos", leftSetPos);
 
         telemetry.update();
 
@@ -485,16 +482,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("ElevatorRight", showSelect);
 
         telemetry.addData("HoldRng", posrng);
-
-        telemetry.addData("RightPositionInches", getRightPositionInches());
-        telemetry.addData("LeftPositionInches", getLeftPositionInches());
         telemetry.addData("ElevatorGoal", rightPidController.getGoal().position);
+        telemetry.addData("Right at Goal", atRightGoal());
+        telemetry.addData("RightPositionInches", getRightPositionInches());
         telemetry.addData("RightPower", getRightPower());
+        telemetry.addData("RightVelErr", round2dp(rightPidController.getVelocityError(), 2));
         telemetry.addData("RightPosErr", rightPidController.getPositionError());
         telemetry.addData("RightFF", rightFf);
-        telemetry.addData("RightPIDout", rightPidout);
+        telemetry.addData("RightPIDOut", rightPidOut);
         telemetry.addData("RightSetVel", rightSetVel);
         telemetry.addData("RightSetPos", rightSetPos);
+        telemetry.addData("RightAccel", round2dp(rightAccel, 2));
 
         telemetry.update();
 
