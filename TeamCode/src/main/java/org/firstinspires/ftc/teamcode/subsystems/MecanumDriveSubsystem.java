@@ -319,8 +319,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         telemetry.addData("X", pose.position.x);
         telemetry.addData("Y", pose.position.y);
         telemetry.addData("H", pose.heading.toDouble());
-        telemetry.addData("yAW", getYawDegs());
-
+        telemetry.addData("IMUYawDeg", getYawDegs());
         telemetry.addData("FieldCentric", fieldCentric);
         telemetry.update();
     }

@@ -30,8 +30,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
     public static double eks = 0.15;//1% motor power
     public static double ekg = 0.25;
-    public static double ekv = .08;//max ips = 16 so (12-4)/16 (assume 50%) = .5 volts per ips
-    public static double eka = 0.01;
+    public static double ekv = .007;//max ips = 75 so assume kv provides .5 = .5/75 =.007
+    public static double eka = 0;
 
     public static double ekp = 0.2;
     public static double eki = 0;

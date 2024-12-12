@@ -94,19 +94,19 @@ public final class Constants {
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
 
         public static final double GEARING_RATIO = 5;
-        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;
-        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//50
+        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//100
+        public static final double MAX_USABLE_MOTOR_RPSEC = MAX_MOTOR_RPSEC * .8;//80
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
         public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
         public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//28
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC / GEARING_RATIO;//50
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_USABLE_MOTOR_RPSEC;//80
 
         public static final double POSITION_TOLERANCE_INCHES = 2;
 
 
-        public static double bucketDistance = 0;
+        public static double bucketDistance = 1;
         public static double pickupDistance = 12;
         public static double firstExtendDistance = 14;
         public static double secondExtendDistance = 16;

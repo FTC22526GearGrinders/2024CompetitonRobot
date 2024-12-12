@@ -24,8 +24,8 @@ public class RotateArmSubsystem extends SubsystemBase {
     public double intakeTiltClearAngle = 0.3;
     public double intakeTiltVerticalAngle = .5;
     public double touchSubmersibleAngle = .6;
-    public double intakeTiltAboveSubmersibleAngle = .7;
-    public double intakeTiltAboveSampleAngle = .8;
+    public double intakeTiltAboveSubmersibleAngle = .87;
+    public double intakeTiltAboveSampleAngle = .9;
     public double intakeTiltPickupAngle = .96;
     public double currentTilt;
     public double tiltChangeTime;
@@ -57,7 +57,7 @@ public class RotateArmSubsystem extends SubsystemBase {
         leftTiltServo.setDirection(Servo.Direction.FORWARD);
         rightTiltServo.setDirection(Servo.Direction.REVERSE);
 
-        intakeSensor = opMode.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
+        //  intakeSensor = opMode.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
 
 
         FtcDashboard dashboard1 = FtcDashboard.getInstance();

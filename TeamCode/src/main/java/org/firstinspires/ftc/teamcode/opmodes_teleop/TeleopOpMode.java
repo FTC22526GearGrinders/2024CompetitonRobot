@@ -219,8 +219,8 @@ public class TeleopOpMode extends CommandOpMode {
         //  if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
 
 
-        if (currentGamepad2.back && !previousGamepad2.back) incShowSelect();
-        if (currentGamepad2.start && !previousGamepad2.start) decShowSelect();
+        if (currentGamepad2.start && !previousGamepad2.start) incShowSelect();
+        if (currentGamepad2.back && !previousGamepad2.back) decShowSelect();
 
     }
 
