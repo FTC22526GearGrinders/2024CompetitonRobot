@@ -23,17 +23,15 @@ import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 @Config
 public class ExtendArmSubsystem extends SubsystemBase {
 
-
     public static double TARGET;
     public static double ks = .12;//1% motor power
     public static double kv = .01;//max ips = 100 so 1/100 starting estimate
     public static double ka = 0;
-    public static double kp = 0.0001;
+    public static double kp = 0;
     public static double ki = 0;
     public static double kd = 0;
 
     public static boolean TUNE = false;
-
 
     public final double OUT_POSITION_LIMIT = 17.00;
     public final double IN_POSITION_LIMIT = .5;

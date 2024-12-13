@@ -85,22 +85,24 @@ public final class Constants {
         public static double rpmToVelocity(double rpm) {
             return rpm * GEARBOX_RATIO * 2 * Math.PI * WHEEL_DIAMETER_INCH / 2 / 60.0;
         }
-
     }
 
     public static final class ExtendArmConstants {
 
         public static final double MAX_MOTOR_RPM = 6000;
         public static final double ENCODER_COUNTS_PER_MOTOR_REV = 28;
-
-        public static final double GEARING_RATIO = 5;
         public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//100
+        public static final double GEARING_RATIO = 5;
+        public static final double PULLEY_REV_PER_SEC = 100 / GEARING_RATIO;//= 20
         public static final double PULLEY_TEETH = 60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;//1"
+        public static final double DISTANCE_PER_PULLEY_REV = PULLEY_TEETH * BELT_PITCH; //approx 5"
+        public static final double DISTANCE_PER_MOTOR_REV = DISTANCE_PER_PULLEY_REV / GEARING_RATIO;//approx 1."
         public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;//approx 28
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//100
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//1.*100 = 100
+
+
 
         public static final double POSITION_TOLERANCE_INCHES = 2;
 
@@ -125,29 +127,27 @@ public final class Constants {
 
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
-        public static final double DISTANCE_PER_MOTOR_REV = PULLEY_TEETH * BELT_PITCH / GEARING_RATIO;// appox 5"
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// approx 150
+        public static final double INCHES_PER_PULLEY_REV = PULLEY_TEETH * BELT_PITCH; //approx 5""
+        public static final double DISTANCE_PER_MOTOR_REV = INCHES_PER_PULLEY_REV / GEARING_RATIO;// appox 5"/1 =5"
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// 145.1/5approx 29
 
         public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//5 *19= 95
+
+        //estimated kv = 1/max inches per second = 1/95 approx.011
 
         //distances are amount elevator travels from its home position
         public static final double HOME_POSITION = 0;
 
 
         public static final double elevatorClearOfWall = 4;
-
+        public static final double POSITION_TOLERANCE_INCHES = 1;
         public static double elevatorLowerBasketHeight = 10;
         public static double elevatorUpperBasketHeight = 28;
-
         public static double elevatorSpecimenLowPlaceHeight = 2;
         public static double elevatorSpecimenAboveLowPlaceHeight = 5;
-
         public static double elevatorSpecimenAboveDecisionHeight = 10;
-
         public static double elevatorSpecimenAtHighPlaceHeight = 16;
         public static double elevatorSpecimenAboveHighPlaceHeight = 19;
-
-        public static final double POSITION_TOLERANCE_INCHES = 1;
     }
 
     public static final class ShowTelemetryConstants {

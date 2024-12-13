@@ -16,9 +16,6 @@ public final class Constants {
 
         static final double length = 144;
         static final double width = 144;
-        static final double tileSize = 24;
-        static final double tileTeeth = .75;
-        static final double distanceBetwwenSpikeMarks = 10;
     }
 
 

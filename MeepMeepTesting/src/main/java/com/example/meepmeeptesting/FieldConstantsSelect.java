@@ -12,7 +12,7 @@ public final class FieldConstantsSelect {
      *
      * */
     //basket
-    public double pickUpArmEX = 8;
+    public double pickUpArmEX = 12;
     public double driveTo = 6;
     public double specimenClawAdder = 2;
     public double sampleDropOffZoneFromWall = 8;
