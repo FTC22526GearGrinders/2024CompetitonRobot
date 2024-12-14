@@ -55,6 +55,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -149,7 +150,7 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
         //localizer = new DriveLocalizer();
         // localizer= new TwoDeadWheelLocalizer(opMode.hardwareMap,lazyImu.get(),.001978);
-        localizer = new ThreeDeadWheelLocalizer(opMode.hardwareMap, .001978);
+        localizer = new ThreeDeadWheelLocalizer(opMode.hardwareMap, 0.00201456);
 
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
@@ -330,6 +331,12 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
         telemetry.addData("LRPower", leftBack.getPower());
         telemetry.addData("RFPower", rightFront.getPower());
         telemetry.addData("RBPower", rightBack.getPower());
+        telemetry.addData("LFAmps", leftFront.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("LRAmps", leftBack.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("RFAmps", rightFront.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("RBAmps", rightBack.getCurrent(CurrentUnit.AMPS));
+
+
         telemetry.addData("LFVel", leftFront.getVelocity(AngleUnit.DEGREES));
         telemetry.addData("LBVel", leftBack.getVelocity(AngleUnit.DEGREES));
         telemetry.addData("RFVel", rightFront.getVelocity(AngleUnit.DEGREES));
@@ -352,29 +359,29 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
                 RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
         // drive model parameters
-        public double inPerTick = .00197;//
-        public double lateralInPerTick = 0.0012150746393629322;// test
-        public double trackWidthTicks = 199.32943876445606;//estimate theroetical 16.25 ^ .023 =.3735
+        public double inPerTick = 0.00201456;//0.0020048;//.00197;// theoretical = pi * 5.5 /751.8 = .023 test = 5  ForwardTest = 0.00200848
+        public double lateralInPerTick = 0.00202015;//0.002;// test
+        public double trackWidthTicks = 13.54;//199.32943876445606;//estimate theoretical 16.25 ^ .023 =.3735
 
         // feedforward parameters (in tick units)
-        // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0.000396;
-        public double kA = 0.99338;
+        public double kS = 1.3102179224061892;//1.812477864914539;
+        public double kV = 0.0002894716798866975;//0.0002670882923109952;
+
+        public double kA = 0.00006;//0.99338;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
-        public double minProfileAccel = -30;
-        public double maxProfileAccel = 50;
+        public double minProfileAccel = -20;
+        public double maxProfileAccel = 25;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 6.0;
+        public double lateralGain = 5.0;
+        public double headingGain = 12.0; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;

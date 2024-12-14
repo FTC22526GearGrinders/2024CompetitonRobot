@@ -37,6 +37,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -54,7 +55,7 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 @Autonomous(name = "Specimen Fast With Approach", group = "Auto")
 //@Disabled
-public class SpecimenSideAutoOpmode extends CommandOpMode {
+public class SpecimenSideAutoOpmodeBlue2 extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
@@ -105,10 +106,8 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     void createMotionActions() {
         drive.pose = fcs.specimenSideStartPose;
         firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)
-                .strafeTo(fcs.specimenDeliverPose1.position,
-                        approachVel, approachAccel
-                ).build();
+                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle)
+                .build();
 
         firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
@@ -179,39 +178,39 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 new SequentialAction(
                         new ParallelAction(
                                 firstSpecimenDeliverMove,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
+                                new SleepAction(.5)),
+                        // ears.deliverSpecimenToUpperSubmersible(),
                         new ParallelAction(
                                 firstSampleMoveToObservationZone.build(),
-                                elevator.elevatorToHome()),
+                                new SleepAction(.5)),
                         secondSampleMoveToObservationZoneApproach.build(),
                         secondSampleApproachFinalMove,
-                        elevator.grabSpecimenAndClearWall(),
+                        //  elevator.grabSpecimenAndClearWall(),
                         new ParallelAction(
                                 secondSpecimenDeliverMove.build(),
-                                elevator.elevatorToAboveUpperSubmersible()),
+                                new SleepAction(.5)),
                         secondSpecimenDeliverFinalMove,
-                        ears.deliverSpecimenToUpperSubmersible(),
+                        new SleepAction(.5),
                         new ParallelAction(
                                 thirdSpecimenPickupMove.build(),
-                                elevator.elevatorToHome()),
+                                new SleepAction(.5)),
                         thirdSpecimenPickupFinalMove,
-                        elevator.grabSpecimenAndClearWall(),
+                        // elevator.grabSpecimenAndClearWall(),
                         new ParallelAction(
                                 thirdSpecimenDeliverMove.build(),
-                                elevator.elevatorToAboveUpperSubmersible()),
+                                new SleepAction(.5)),
                         thirdSpecimenDeliverFinalMove,
                         ears.deliverSpecimenToUpperSubmersible(),
                         new ParallelAction(
                                 fourthSpecimenPickupMove.build(),
-                                elevator.elevatorToHome()),
+                                new SleepAction(.5)),
                         fourthSpecimenPickupFinalMove,
-                        elevator.grabSpecimenAndClearWall(),
+                        // elevator.grabSpecimenAndClearWall(),
                         new ParallelAction(
                                 fourthSpecimenDeliverMove.build(),
-                                elevator.elevatorToAboveUpperSubmersible()),
+                                new SleepAction(.5)),
                         fourthSpecimenDeliverFinalMove,
-                        ears.deliverSpecimenToUpperSubmersible(),
+                        //  ears.deliverSpecimenToUpperSubmersible(),
                         park.build());
 
     }

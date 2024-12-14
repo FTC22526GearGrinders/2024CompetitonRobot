@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -24,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
-import org.firstinspires.ftc.teamcode.utils.RumbleDefs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,15 @@ public class TeleopOpMode extends CommandOpMode {
     Gamepad currentGamepad2 = new Gamepad();
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
+    TrajectoryActionBuilder tab1;
+    Action a1;
+    TrajectoryActionBuilder tab2;
+    Action a2;
+    TrajectoryActionBuilder tab3;
+    Action a3;
+    TrajectoryActionBuilder tab4;
+    Action a4;
+    Pose2d startPose;
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
 
@@ -64,13 +73,32 @@ public class TeleopOpMode extends CommandOpMode {
 
         packet = new TelemetryPacket();
 
-        register(drive, arm);
+        register(drive, arm, elevator);
 
         drive.setDefaultCommand(new JogDrive(this.drive, gamepad1, this));
 
         arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
 
         elevator.setDefaultCommand(new PositionHoldElevator(elevator));
+
+        startPose = new Pose2d(0, 0, 0);
+
+
+        tab1 = drive.actionBuilder(startPose)
+                .turn(Math.toRadians(90));
+        a1 = tab1.build();
+
+        tab2 = drive.actionBuilder(startPose)
+                .turn(Math.toRadians(180));
+        a2 = tab2.build();
+
+        tab3 = drive.actionBuilder(startPose)
+                .turn(Math.toRadians(-90));
+        a3 = tab1.build();
+
+        tab4 = drive.actionBuilder(startPose)
+                .turn(Math.toRadians(45));
+        a4 = tab4.build();
 
 
     }
@@ -126,8 +154,8 @@ public class TeleopOpMode extends CommandOpMode {
 
             doCoDriverButtons();
 
-            if (!elevator.checkOK()) gamepad1.runRumbleEffect(RumbleDefs.fourStepRumbleEffect);
-            if (!arm.checkOK()) gamepad1.runRumbleEffect(RumbleDefs.threeStepRumbleEffect);
+//            if (!elevator.checkOK()) gamepad1.runRumbleEffect(RumbleDefs.fourStepRumbleEffect);
+//            if (!arm.checkOK()) gamepad1.runRumbleEffect(RumbleDefs.threeStepRumbleEffect);
 
         }
         reset();
@@ -183,8 +211,8 @@ public class TeleopOpMode extends CommandOpMode {
         gp2rsb.whileActiveOnce(
                 new JogArm(arm, gamepad2));//speed is right stick x
 
-        gp2lsb.whileActiveOnce(
-                new JogElevator(elevator, gamepad2));//speed is left stick y
+        gp2lsb.whileActiveContinuous(
+                new JogElevator(elevator, gamepad2), false);//speed is left stick y
 
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)
             runningActions.add(elevator.elevatorToHome());
@@ -210,14 +238,16 @@ public class TeleopOpMode extends CommandOpMode {
 //        if (currentGamepad2.b && !previousGamepad2.b)
 //
 
-        //  if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
 
-        //   if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+        if (currentGamepad2.dpad_up && !previousGamepad1.dpad_up)
+            runningActions.add(a1);
 
-        //     if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
-
-        //  if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
-
+        if (currentGamepad2.dpad_down && !previousGamepad1.dpad_down)
+            runningActions.add(a2);
+        if (currentGamepad2.dpad_right && !previousGamepad1.dpad_right)
+            runningActions.add(a3);
+        if (currentGamepad2.dpad_left && !previousGamepad1.dpad_left)
+            runningActions.add(a4);
 
         if (currentGamepad2.start && !previousGamepad2.start) incShowSelect();
         if (currentGamepad2.back && !previousGamepad2.back) decShowSelect();

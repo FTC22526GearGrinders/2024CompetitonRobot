@@ -10,7 +10,7 @@ public final class FieldConstantsSelect {
     //basket
     public double pickUpArmEX = 8;
     public double driveTo = 6;
-    public double specimenClawAdder = 2;
+    public double specimenClawAdder = 0;
     public double sampleDropOffZoneFromWall = 8;
     public double specStartX = -9;
     public double specDiffX = 3;
@@ -98,7 +98,7 @@ public final class FieldConstantsSelect {
         thirdStagePushMidVector = new Vector2d(-58, 10);
 
 
-        specimenDeliverPose1 = new Pose2d(specStartX, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
+        specimenDeliverPose1 = new Pose2d(specStartX, 24 + Constants.RobotConstants.length / 2, specimenDropAngle);
         specimenDeliverPose2 = new Pose2d(specStartX + specDiffX, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
         specimenDeliverPose3 = new Pose2d(specStartX + 2 * specDiffX, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);
         specimenDeliverPose4 = new Pose2d(specStartX + 3 * specDiffX, 24 + Constants.RobotConstants.length / 2 + specimenClawAdder, specimenDropAngle);

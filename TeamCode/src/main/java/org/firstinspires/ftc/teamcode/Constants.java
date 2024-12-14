@@ -16,7 +16,7 @@ public final class Constants {
 
         public static final double length = 17.75;
         public static final double height = 13;
-        public static final double width = 17.75;
+        public static final double width = 17.5;
         public static final Vector2d manipulatorToRobotCenter = new Vector2d(12, 0);
 
     }
@@ -118,20 +118,20 @@ public final class Constants {
 
     public static final class ElevatorConstants {
 
-        public static final double MAX_MOTOR_RPM = 1150;
-        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 145.1;
+        public static final double MAX_MOTOR_RPM = 435;
+        public static final double ENCODER_COUNTS_PER_MOTOR_REV = 384.5;
 
         public static final double GEARING_RATIO = 1;
-        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//19
+        public static final double MAX_MOTOR_RPSEC = MAX_MOTOR_RPM / 60;//7
 
 
         public static final double PULLEY_TEETH = 60;//60;
         public static final double BELT_PITCH = 2 * .03937; //.07874
         public static final double INCHES_PER_PULLEY_REV = PULLEY_TEETH * BELT_PITCH; //approx 5""
         public static final double DISTANCE_PER_MOTOR_REV = INCHES_PER_PULLEY_REV / GEARING_RATIO;// appox 5"/1 =5"
-        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// 145.1/5approx 29
+        public static final double ENCODER_COUNTS_PER_INCH = ENCODER_COUNTS_PER_MOTOR_REV / DISTANCE_PER_MOTOR_REV;// 384.5/5approx 76
 
-        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//5 *19= 95
+        public static final double MAX_INCHES_PER_SECOND = DISTANCE_PER_MOTOR_REV * MAX_MOTOR_RPSEC;//5 *7= 35
 
         //estimated kv = 1/max inches per second = 1/95 approx.011
 

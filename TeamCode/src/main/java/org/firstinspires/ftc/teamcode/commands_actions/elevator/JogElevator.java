@@ -10,7 +10,7 @@ public class JogElevator extends CommandBase {
 
     private final Gamepad gamepad;
     private final ElevatorSubsystem elevator;
-    private final double deadband = .01;
+    private final double deadband = .00;
 
     public JogElevator(ElevatorSubsystem elevator, Gamepad gamepad) {
         this.elevator = elevator;
@@ -30,8 +30,8 @@ public class JogElevator extends CommandBase {
 
         if (Math.abs(stickValue) < deadband) stickValue = 0;
 
-        elevator.leftPower = stickValue;
-        elevator.rightPower = stickValue;
+        elevator.leftPower = stickValue / 2;
+        elevator.rightPower = stickValue / 2;
 
         boolean overrideLimits = gamepad.start;
 

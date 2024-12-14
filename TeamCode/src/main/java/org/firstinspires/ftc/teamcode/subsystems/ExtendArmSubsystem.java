@@ -25,9 +25,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public static double TARGET;
     public static double ks = .12;//1% motor power
-    public static double kv = .01;//max ips = 100 so 1/100 starting estimate
+    public static double kv = 0.018;//max ips = 100 so 1/100 starting estimate
     public static double ka = 0;
-    public static double kp = 0;
+    public static double kp = 0.002;
     public static double ki = 0;
     public static double kd = 0;
 

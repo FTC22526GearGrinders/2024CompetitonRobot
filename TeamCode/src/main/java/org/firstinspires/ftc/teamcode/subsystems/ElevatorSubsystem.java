@@ -28,22 +28,22 @@ import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
-    public static double eks = 0.15;//1% motor power
+    public static double eks = 0.2;//1% motor power
     public static double ekg = 0.25;
-    public static double ekv = .011;//1/95
-    public static double eka = 0;
+    public static double ekv = .033;//1/35
+    public static double eka = 0.005;
 
 
-    public static double ekp = 0.2;
+    public static double ekp = 0.35;
     public static double eki = 0;
-    public static double ekd = 0;
+    public static double ekd = 0.2;
     public static boolean TUNE = false;
     public static double TARGET;
     public final double UPPER_POSITION_LIMIT = 28;
     public final double LOWER_POSITION_LIMIT = 0;
     public final double TRAJECTORY_VEL = 15;
     public final double TRAJECTORY_ACCEL = 10;
-    public final double minimumHoldHeight = 1.2;
+    public final double minimumHoldHeight = 0;//1.2;
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 5;
     private final double bucketCycleTime = .75;
@@ -162,9 +162,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setTargetInches(double targetInches) {
-        leftPidController.reset(getLeftPositionInches());
+        //leftPidController.reset(getLeftPositionInches());
         leftPidController.setGoal(targetInches);
-        rightPidController.reset(getRightPositionInches());
+        //rightPidController.reset(getRightPositionInches());
         rightPidController.setGoal(targetInches);
     }
 
@@ -342,8 +342,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         if (inPositionCtr != 3) inPositionCtr++;
 
-        boolean elevatorHigh = getLeftPositionInches() >= UPPER_POSITION_LIMIT || getRightPositionInches() >= UPPER_POSITION_LIMIT;
-        boolean elevatorLow = getRightPositionInches() <= LOWER_POSITION_LIMIT || getRightPositionInches() <= LOWER_POSITION_LIMIT;
+        boolean elevatorHigh = false;// getLeftPositionInches() >= UPPER_POSITION_LIMIT || getRightPositionInches() >= UPPER_POSITION_LIMIT;
+        boolean elevatorLow = false;//getLeftPositionInches() <= LOWER_POSITION_LIMIT || getRightPositionInches() <= LOWER_POSITION_LIMIT;
 
 
         leftPidOut = leftPidController.calculate(getLeftPositionInches());
@@ -457,6 +457,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("LeftTotalPower", round2dp(leftTotalPower, 2));
         telemetry.addData("RightTotalPower", round2dp(rightTotalPower, 2));
         telemetry.addData("Shutdown", shutDownElevatorPositioning);
+        telemetry.addData("Target", TARGET);
         telemetry.update();
 
     }
@@ -477,7 +478,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("LeftSetVel", round2dp(leftSetVel, 2));
         telemetry.addData("LeftSetPos", round2dp(leftSetPos, 2));
         telemetry.addData("LeftAccel", round2dp(leftAccel, 2));
-
 
         telemetry.update();
 

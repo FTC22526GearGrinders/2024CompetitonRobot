@@ -59,6 +59,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
                 ).build();
 
         TrajectoryActionBuilder firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
+                //   .turn(Math.toRadians(90))
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, Math.toRadians(180))
                 .strafeToLinearHeading(fcs.thirdStagePushInnerVector, Math.toRadians(180))
