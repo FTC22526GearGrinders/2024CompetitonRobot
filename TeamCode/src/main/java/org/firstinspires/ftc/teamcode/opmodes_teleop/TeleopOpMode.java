@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -55,6 +56,7 @@ public class TeleopOpMode extends CommandOpMode {
     TrajectoryActionBuilder tab4;
     Action a4;
     Pose2d startPose;
+    Action ssp;
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
 
@@ -73,7 +75,7 @@ public class TeleopOpMode extends CommandOpMode {
 
         packet = new TelemetryPacket();
 
-        register(drive, arm, elevator);
+        register(drive, arm, elevator, rotateArm);
 
         drive.setDefaultCommand(new JogDrive(this.drive, gamepad1, this));
 
@@ -82,6 +84,8 @@ public class TeleopOpMode extends CommandOpMode {
         elevator.setDefaultCommand(new PositionHoldElevator(elevator));
 
         startPose = new Pose2d(0, 0, 0);
+
+        ssp = new InstantAction(() -> drive.pose = startPose);
 
 
         tab1 = drive.actionBuilder(startPose)
@@ -236,18 +240,20 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(elevator.deliverSpecimenToNearestChamber());
 
 //        if (currentGamepad2.b && !previousGamepad2.b)
-//
+
 
 
         if (currentGamepad2.dpad_up && !previousGamepad1.dpad_up)
-            runningActions.add(a1);
+            runningActions.add(new SequentialAction(ssp, a1));
 
         if (currentGamepad2.dpad_down && !previousGamepad1.dpad_down)
-            runningActions.add(a2);
+            runningActions.add(new SequentialAction(ssp, a2));
+
         if (currentGamepad2.dpad_right && !previousGamepad1.dpad_right)
-            runningActions.add(a3);
+            runningActions.add(new SequentialAction(ssp, a3));
+
         if (currentGamepad2.dpad_left && !previousGamepad1.dpad_left)
-            runningActions.add(a4);
+            runningActions.add(new SequentialAction(ssp, a4));
 
         if (currentGamepad2.start && !previousGamepad2.start) incShowSelect();
         if (currentGamepad2.back && !previousGamepad2.back) decShowSelect();
@@ -279,6 +285,7 @@ public class TeleopOpMode extends CommandOpMode {
 
     void updateSubs() {
         telemetry.clearAll();
+        dashboard.clearTelemetry();
         drive.showSelect = showSelect;
         arm.showSelect = showSelect;
         elevator.showSelect = showSelect;

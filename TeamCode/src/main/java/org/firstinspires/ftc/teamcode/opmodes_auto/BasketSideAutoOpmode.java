@@ -42,6 +42,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
@@ -79,6 +80,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
     SequentialAction deliverFourSamples;
     double samplePickupTimeout = 3;
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad previousGamepad1 = new Gamepad();
+    boolean red = false;
+    boolean blue = false;
     private MecanumDriveSubsystem drive;
     private ElevatorSubsystem elevator;
     private ExtendArmSubsystem arm;
@@ -100,7 +105,14 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         fcs = new FieldConstantsSelect();
     }
 
-    void createMotionActions() {
+    void createMotionActions(boolean red) {
+        fcs.setBlue();
+        PoseStorage.currentTeam = PoseStorage.Team.BLUE;
+
+        if (red) {
+            fcs.setRed();
+            PoseStorage.currentTeam = PoseStorage.Team.RED;
+        }
 
         drive.pose = fcs.basketSideStartPose;
 
@@ -145,7 +157,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     }
 
 
-    private SequentialAction createMotionSequence() {
+    private SequentialAction buildMotionSequence() {
 
         return
                 new SequentialAction(
@@ -220,7 +232,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         selectStartingPosition();
 
-        deliverFourSamples = createMotionSequence();
+        deliverFourSamples = buildMotionSequence();
 
         waitForStart();
 
@@ -240,52 +252,52 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         reset();
     }
 
-
     //Method to select starting position using X, Y, A, B buttons on gamepad
     public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
-        while (!isStopRequested()) {
+        previousGamepad1.copy(currentGamepad1);
+        currentGamepad1.copy(gamepad1);
+        red = false;
+        blue = false;
+        //******select start pose*****
+        while (!isStopRequested() && !blue && !red) {
             telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstayion) on gamepad 1:", "");
+            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
             telemetry.addData("    Red All Specimen   ", "(A / O)");
 
             telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
+            red = false;
+            blue = false;
 
-            if (gamepad1.a) {
+            if (currentGamepad1.a && !previousGamepad1.a) {
 
                 telemetry.clearAll();
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-                PoseStorage.currentTeam = PoseStorage.Team.RED;
-                fcs.setRed();
-                drive.pose = fcs.basketSideStartPose;
-                drive.startRadians = fcs.basketSideStartPose.heading.toDouble();
-                createMotionActions();
+                blue = false;
 
+                red = true;
 
             }
+            if (currentGamepad1.x && !previousGamepad1.x) {
 
-            if (gamepad1.x) {
                 telemetry.clearAll();
                 telemetry.addData("BLUE ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-                PoseStorage.currentTeam = PoseStorage.Team.BLUE;
+                red = false;
 
-                fcs.setBlue();
+                blue = true;
 
-                drive.pose = fcs.basketSideStartPose;
-                drive.startRadians = fcs.basketSideStartPose.heading.toDouble();
-                createMotionActions();
             }
 
-
-            telemetry.update();
         }
+        telemetry.update();
+    }
 
 
 //        public void safeWaitSeconds ( double time){
@@ -295,7 +307,5 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 //            }
 //        }
 
-
-    }
 
 }

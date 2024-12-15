@@ -35,6 +35,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
@@ -44,6 +45,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
  * FTC WIRES Autonomous Example for only vision detection using tensorflow and park
  */
 @Autonomous(name = "FTC Wires Autonomous Mode", group = "00-Autonomous", preselectTeleOp = "FTC Wires TeleOp")
+@Disabled
 public class FTCWiresAutonomous extends CommandOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera

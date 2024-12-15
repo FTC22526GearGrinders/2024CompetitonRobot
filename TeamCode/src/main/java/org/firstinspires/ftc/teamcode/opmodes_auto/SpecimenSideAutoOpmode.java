@@ -42,6 +42,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
@@ -79,14 +80,16 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
     TranslationalVelConstraint approachVel;
     ProfileAccelConstraint approachAccel;
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad previousGamepad1 = new Gamepad();
+    boolean red = false;
+    boolean blue = false;
     private MecanumDriveSubsystem drive;
     private ElevatorSubsystem elevator;
     private ExtendArmSubsystem arm;
     private RotateArmSubsystem rotate;
     private Elevator_Arm_RotateArm_Actions ears;
-
     private TelemetryPacket packet;
-
     private SequentialAction doSpecimens;
 
     @Override
@@ -102,8 +105,19 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         packet = new TelemetryPacket();
     }
 
-    void createMotionActions() {
+
+    void createMotionActions(boolean red) {
+        fcs.setBlue();
+
+        PoseStorage.currentTeam = PoseStorage.Team.BLUE;
+        if (red) {
+            fcs.setRed();
+            PoseStorage.currentTeam = PoseStorage.Team.RED;
+        }
+
         drive.pose = fcs.specimenSideStartPose;
+        drive.startRadians = drive.pose.heading.toDouble();
+
         firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
                 .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)
                 .strafeTo(fcs.specimenDeliverPose1.position,
@@ -173,7 +187,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
     }
 
-    private SequentialAction createMotionSequence() {
+    private SequentialAction buildMotionSequence() {
 
         return
                 new SequentialAction(
@@ -221,12 +235,11 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
         initialize();
 
-        fcs.setBlue();
+        selectStartingPosition();
 
-        //    selectStartingPosition();
-        createMotionActions();
+        createMotionActions(red);
 
-        doSpecimens = createMotionSequence();
+        doSpecimens = buildMotionSequence();
 
         waitForStart();
 
@@ -237,7 +250,6 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             Actions.runBlocking(doSpecimens);
 
             telemetry.update();
-
 
         }
 
@@ -250,8 +262,12 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
+        previousGamepad1.copy(currentGamepad1);
+        currentGamepad1.copy(gamepad1);
+        red = false;
+        blue = false;
         //******select start pose*****
-        while (!isStopRequested()) {
+        while (!isStopRequested() && !blue && !red) {
             telemetry.addData("Initializing Autonomous for Team:",
                     TEAM_NAME, " ", TEAM_NUMBER);
             telemetry.addData("---------------------------------------", "");
@@ -259,41 +275,30 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
             telemetry.addData("    Red All Specimen   ", "(A / O)");
 
             telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
+            red = false;
+            blue = false;
 
-
-            if (gamepad1.a) {
+            if (currentGamepad1.a && !previousGamepad1.a) {
 
                 telemetry.clearAll();
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-                PoseStorage.currentTeam = PoseStorage.Team.RED;
 
-                fcs.setRed();
-                drive.pose = fcs.specimenSideStartPose;
-                drive.startRadians = fcs.specimenSideStartPose.heading.toDouble();
+                blue = false;
 
-                //       doSpecimens = createMotionActions();
-
-
-                break;
+                red = true;
 
             }
-            if (true) {
+            if (currentGamepad1.x && !previousGamepad1.x) {
 
                 telemetry.clearAll();
                 telemetry.addData("BLUE ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-                PoseStorage.currentTeam = PoseStorage.Team.BLUE;
+                red = false;
 
-                fcs.setBlue();
-
-                drive.pose = fcs.specimenSideStartPose;
-                drive.startRadians = fcs.specimenSideStartPose.heading.toDouble();
-                doSpecimens = createMotionSequence();
-
-                break;
+                blue = true;
             }
 
         }
