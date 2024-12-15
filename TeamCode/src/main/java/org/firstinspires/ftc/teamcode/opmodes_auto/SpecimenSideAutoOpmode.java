@@ -45,7 +45,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
+import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
+import org.firstinspires.ftc.teamcode.commands_actions.elevator.PositionHoldElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -103,6 +105,10 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         approachVel = new TranslationalVelConstraint(10.0);
         approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
         packet = new TelemetryPacket();
+
+        arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
+
+        elevator.setDefaultCommand(new PositionHoldElevator(elevator));
     }
 
 
@@ -119,10 +125,8 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         drive.startRadians = drive.pose.heading.toDouble();
 
         firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)
-                .strafeTo(fcs.specimenDeliverPose1.position,
-                        approachVel, approachAccel
-                ).build();
+                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle)
+                .build();
 
         firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
@@ -191,9 +195,9 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
         return
                 new SequentialAction(
-                        new ParallelAction(
-                                firstSpecimenDeliverMove,
-                                elevator.elevatorToAboveUpperSubmersible()),
+                        //   new ParallelAction(
+                        firstSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible(),
                         ears.deliverSpecimenToUpperSubmersible(),
                         new ParallelAction(
                                 firstSampleMoveToObservationZone.build(),
@@ -267,18 +271,23 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
         red = false;
         blue = false;
         //******select start pose*****
+
+        telemetry.addData("Initializing Autonomous for Team:",
+                TEAM_NAME, " ", TEAM_NUMBER);
+        telemetry.addData("---------------------------------------", "");
+        telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
+        telemetry.addData("    Red All Specimen   ", "(A / O)");
+
+        telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
+
+        telemetry.addData("Blue", blue);
+        telemetry.addData("Red", red);
+
+        red = false;
+        blue = false;
         while (!isStopRequested() && !blue && !red) {
-            telemetry.addData("Initializing Autonomous for Team:",
-                    TEAM_NAME, " ", TEAM_NUMBER);
-            telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
-            telemetry.addData("    Red All Specimen   ", "(A / O)");
 
-            telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
-            red = false;
-            blue = false;
-
-            if (currentGamepad1.a && !previousGamepad1.a) {
+            if (gamepad1.a) {
 
                 telemetry.clearAll();
                 telemetry.addData("RED ", "Chosen");
@@ -290,7 +299,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
                 red = true;
 
             }
-            if (currentGamepad1.x && !previousGamepad1.x) {
+            if (gamepad1.x) {
 
                 telemetry.clearAll();
                 telemetry.addData("BLUE ", "Chosen");
@@ -300,9 +309,9 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
                 blue = true;
             }
-
+            telemetry.update();
         }
-        telemetry.update();
+
     }
 
 

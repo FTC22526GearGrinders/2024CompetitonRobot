@@ -54,7 +54,7 @@ import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Specimen Fast With Approach", group = "Auto")
+@Autonomous(name = "Specimen Fast With Approach 2", group = "Auto")
 //@Disabled
 public class SpecimenSideAutoOpmodeBlue2 extends CommandOpMode {
 

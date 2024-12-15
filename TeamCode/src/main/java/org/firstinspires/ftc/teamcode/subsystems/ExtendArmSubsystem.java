@@ -17,7 +17,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 
 
 @Config
@@ -27,7 +26,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double ks = .12;//1% motor power
     public static double kv = 0.018;//max ips = 100 so 1/100 starting estimate
     public static double ka = 0;
-    public static double kp = 0.002;
+    public static double kp = 0.8;
     public static double ki = 0;
     public static double kd = 0;
 
@@ -119,7 +118,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         et = new ElapsedTime();
 
-        setDefaultCommand(new PositionHoldArm(this));
+
 
     }
 
@@ -224,7 +223,8 @@ public class ExtendArmSubsystem extends SubsystemBase {
         leftSetVel = leftArmSetPoint.velocity;
         leftSetPos = leftArmSetPoint.position;
         leftAccel = (lastLeftVel - leftSetVel) * 50;
-        leftFF = armFF.calculate(leftSetVel, leftAccel);
+        leftFF = 0;
+        armFF.calculate(leftSetVel, leftAccel);
         lastLeftVel = leftSetVel;
 
         double leftPowerVal = leftFF + leftPidOut;
@@ -238,7 +238,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
         rightSetVel = rightArmSetPoint.velocity;
         rightSetPos = rightArmSetPoint.position;
         rightAccel = (lastRightVel - rightSetVel) * 50;
-        rightFF = armFF.calculate(rightSetVel, rightAccel);
+        rightFF = 0;// armFF.calculate(rightSetVel, rightAccel);
         lastRightVel = rightSetVel;
         double rightPowerVal = rightFF + rightPidOut;
 

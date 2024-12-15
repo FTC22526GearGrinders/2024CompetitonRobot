@@ -28,15 +28,15 @@ import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
     //units used are per unit motor setting since motor setVolts isn't available
-    public static double eks = 0.2;//1% motor power
-    public static double ekg = 0.25;
-    public static double ekv = .033;//1/35
-    public static double eka = 0.005;
+    public static double eks = 0.18;//1% motor power
+    public static double ekg = 0.1;
+    public static double ekv = .008;//1/35
+    public static double eka = 0.00;
 
 
-    public static double ekp = 0.35;
+    public static double ekp = 0.5;
     public static double eki = 0;
-    public static double ekd = 0.2;
+    public static double ekd = 0;
     public static boolean TUNE = false;
     public static double TARGET;
     public final double UPPER_POSITION_LIMIT = 28;
@@ -149,6 +149,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         holdTime = new ElapsedTime();
 
         levelBucket();
+
+        //setDefaultCommand(new PositionHoldElevator(this));
     }
 
     public static double round2dp(double number, int dp) {
@@ -158,7 +160,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getTargetInches() {
-        return TARGET;
+        return leftPidController.getGoal().position;
     }
 
     public void setTargetInches(double targetInches) {
@@ -351,7 +353,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftSetVel = leftSetpoint.velocity;
         leftSetPos = leftSetpoint.position;
         leftAccel = (leftSetVel - leftLastVel) * 50;
-        leftFf = elevatorFeedForward.calculate(leftSetVel, leftAccel);
+        leftFf = 0;//elevatorFeedForward.calculate(leftSetVel, leftAccel);
         leftLastVel = leftSetVel;
 
         double leftPowerVal = leftFf + leftPidOut;
@@ -366,7 +368,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightSetVel = rightSetpoint.velocity;
         rightSetPos = rightSetpoint.position;
         rightAccel = (rightSetVel - rightLastVel) * 50;
-        rightFf = elevatorFeedForward.calculate(rightSetVel, rightAccel);
+        rightFf = 0;//elevatorFeedForward.calculate(rightSetVel, rightAccel);
         rightLastVel = rightSetVel;
 
         double rightPowerVal = rightFf + rightPidOut;
@@ -450,6 +452,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void showCommonTelemetry() {
         telemetry.addData("ElevatorCommon", showSelect);
+        telemetry.addData("Goal", leftPidController.getGoal().position);
         telemetry.addData("LeftPositionInches", round2dp(getLeftPositionInches(), 2));
         telemetry.addData("RightPositionInches", round2dp(getRightPositionInches(), 2));
         telemetry.addData("LeftPower", round2dp(getLeftPower(), 2));

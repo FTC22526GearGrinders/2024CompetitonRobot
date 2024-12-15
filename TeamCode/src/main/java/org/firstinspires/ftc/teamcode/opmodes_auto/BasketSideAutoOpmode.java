@@ -261,29 +261,35 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         red = false;
         blue = false;
         //******select start pose*****
+
+        telemetry.addData("Initializing Autonomous for Team:",
+                TEAM_NAME, " ", TEAM_NUMBER);
+        telemetry.addData("---------------------------------------", "");
+        telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
+        telemetry.addData("    Red All Specimen   ", "(A / O)");
+
+        telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
+
+        telemetry.addData("Blue", blue);
+        telemetry.addData("Red", red);
+
+        red = false;
+        blue = false;
         while (!isStopRequested() && !blue && !red) {
-            telemetry.addData("Initializing Autonomous for Team:",
-                    TEAM_NAME, " ", TEAM_NUMBER);
-            telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
-            telemetry.addData("    Red All Specimen   ", "(A / O)");
 
-            telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
-            red = false;
-            blue = false;
-
-            if (currentGamepad1.a && !previousGamepad1.a) {
+            if (gamepad1.a) {
 
                 telemetry.clearAll();
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
+
 
                 blue = false;
 
                 red = true;
 
             }
-            if (currentGamepad1.x && !previousGamepad1.x) {
+            if (gamepad1.x) {
 
                 telemetry.clearAll();
                 telemetry.addData("BLUE ", "Chosen");
@@ -292,11 +298,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 red = false;
 
                 blue = true;
-
             }
-
+            telemetry.update();
         }
-        telemetry.update();
+
     }
 
 
