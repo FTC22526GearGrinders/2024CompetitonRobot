@@ -13,7 +13,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
@@ -27,11 +26,6 @@ import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
 
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
-    //units used are per unit motor setting since motor setVolts isn't available
-    public static double eks = 0.18;//1% motor power
-    public static double ekg = 0.1;
-    public static double ekv = .008;//1/35
-    public static double eka = 0.00;
 
 
     public static double ekp = 0.5;
@@ -60,7 +54,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ProfiledPIDController leftPidController;
     public TrapezoidProfile.State leftGoal = new TrapezoidProfile.State();
     public TrapezoidProfile.State leftSetpoint = new TrapezoidProfile.State();
-    public ElevatorFeedforward elevatorFeedForward;
     public Motor rightElevatorMotor;
     public Motor.Encoder rightElevatorEncoder;
     public ProfiledPIDController rightPidController;
@@ -73,27 +66,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     public int posrng;
     public double leftPower;
     public double rightPower;
-    public boolean openLoop;
+
     public boolean shutDownElevatorPositioning;
     public double leftTotalPower;
     public double rightTotalPower;
     CommandOpMode myOpmode;
     double leftSetVel;
     double leftSetPos;
-    double leftFf;
     double leftPidOut;
     double rightSetVel;
     double rightSetPos;
-    double rightFf;
+
     double rightPidOut;
-    private double lastKs;
-    private double lastKg;
-    private double lastKv;
-    private double lastKa;
-    private double leftAccel;
-    private double leftLastVel;
-    private double rightAccel;
-    private double rightLastVel;
+
     private int inPositionCtr;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
@@ -111,7 +96,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftElevatorEncoder.setDirection(Motor.Direction.FORWARD);
         leftElevatorEncoder.setDistancePerPulse(1 / Constants.ElevatorConstants.ENCODER_COUNTS_PER_INCH);
 
-        elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
         leftPidController = new ProfiledPIDController(ekp, eki, ekd, constraints);
         leftPidController.setTolerance(Constants.ElevatorConstants.POSITION_TOLERANCE_INCHES);
         leftPidController.reset();
@@ -329,7 +313,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (TARGET > UPPER_POSITION_LIMIT) TARGET = UPPER_POSITION_LIMIT;
             if (TARGET < LOWER_POSITION_LIMIT) TARGET = LOWER_POSITION_LIMIT;
             setTargetInches(TARGET);
-            setNewFFValues();
             setGains();
         }
     }
@@ -349,14 +332,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
         leftPidOut = leftPidController.calculate(getLeftPositionInches());
-        leftSetpoint = leftPidController.getSetpoint();
-        leftSetVel = leftSetpoint.velocity;
-        leftSetPos = leftSetpoint.position;
-        leftAccel = (leftSetVel - leftLastVel) * 50;
-        leftFf = 0;//elevatorFeedForward.calculate(leftSetVel, leftAccel);
-        leftLastVel = leftSetVel;
 
-        double leftPowerVal = leftFf + leftPidOut;
+
+        double leftPowerVal = leftPidOut;
 
         if (!shutDownElevatorPositioning && (leftPowerVal > 0 && !elevatorHigh || leftPowerVal < 0 && !elevatorLow))
             leftElevatorMotor.set(leftPowerVal);
@@ -364,28 +342,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
         rightPidOut = rightPidController.calculate(getRightPositionInches());
-        rightSetpoint = rightPidController.getSetpoint();
-        rightSetVel = rightSetpoint.velocity;
-        rightSetPos = rightSetpoint.position;
-        rightAccel = (rightSetVel - rightLastVel) * 50;
-        rightFf = 0;//elevatorFeedForward.calculate(rightSetVel, rightAccel);
-        rightLastVel = rightSetVel;
 
-        double rightPowerVal = rightFf + rightPidOut;
+        double rightPowerVal = rightPidOut;
 
         if (!shutDownElevatorPositioning && (rightPowerVal > 0 && !elevatorHigh || rightPowerVal < 0 && !elevatorLow))
             rightElevatorMotor.set(rightPowerVal);
         else rightElevatorMotor.set(0);
     }
 
-    public void setNewFFValues() {
-        if (eks != lastKs || ekg != lastKg || ekv != lastKv || eka != lastKa)
-            elevatorFeedForward = new ElevatorFeedforward(eks, ekg, ekv, eka);
-        lastKs = eks;
-        lastKg = ekg;
-        lastKv = ekv;
-        lastKa = eka;
-    }
 
     public void setGains() {
         if (ekp != leftPidController.getP()) {
@@ -476,11 +440,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("LeftPower", round2dp(getLeftPower(), 2));
         telemetry.addData("LeftVelErr", round2dp(leftPidController.getVelocityError(), 2));
         telemetry.addData("LeftPosErr", round2dp(leftPidController.getPositionError(), 2));
-        telemetry.addData("LeftFF", round2dp(leftFf, 2));
         telemetry.addData("LeftPIDOut", round2dp(leftPidOut, 2));
         telemetry.addData("LeftSetVel", round2dp(leftSetVel, 2));
         telemetry.addData("LeftSetPos", round2dp(leftSetPos, 2));
-        telemetry.addData("LeftAccel", round2dp(leftAccel, 2));
 
         telemetry.update();
 
@@ -496,11 +458,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         telemetry.addData("RightPower", getRightPower());
         telemetry.addData("RightVelErr", round2dp(rightPidController.getVelocityError(), 2));
         telemetry.addData("RightPosErr", rightPidController.getPositionError());
-        telemetry.addData("RightFF", rightFf);
         telemetry.addData("RightPIDOut", rightPidOut);
         telemetry.addData("RightSetVel", rightSetVel);
         telemetry.addData("RightSetPos", rightSetPos);
-        telemetry.addData("RightAccel", round2dp(rightAccel, 2));
 
         telemetry.update();
 

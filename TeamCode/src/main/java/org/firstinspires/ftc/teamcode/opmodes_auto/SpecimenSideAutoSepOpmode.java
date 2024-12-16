@@ -35,7 +35,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -54,7 +53,7 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 @Autonomous(name = "Specimen Fast", group = "Auto")
 //@Disabled
-public class SpecimenSideAutoOpmode extends CommandOpMode {
+public class SpecimenSideAutoSepOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
@@ -87,7 +86,6 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
     private RotateArmSubsystem rotate;
     private Elevator_Arm_RotateArm_Actions ears;
     private TelemetryPacket packet;
-    private SequentialAction doSpecimens;
 
     @Override
     public void initialize() {
@@ -158,40 +156,71 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
     }
 
-    private SequentialAction buildMotionSequence() {
+    private void runOps() {
 
-        return
-                new SequentialAction(
-                        new ParallelAction(
-                                firstSpecimenDeliverMove,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-                        new ParallelAction(
-                                firstSampleMoveToObservationZone,
-                                elevator.elevatorToHome()),
-                        secondSampleMoveToObservationZone,
-                        elevator.grabSpecimenAndClearWall(),
-                        new ParallelAction(
-                                secondSpecimenDeliverMove,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-                        new ParallelAction(
-                                thirdSpecimenPickupMove,
-                                elevator.elevatorToHome()),
-                        elevator.grabSpecimenAndClearWall(),
-                        new ParallelAction(
-                                thirdSpecimenDeliverMove,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-                        new ParallelAction(
-                                fourthSpecimenPickupMove,
-                                elevator.elevatorToHome()),
-                        elevator.grabSpecimenAndClearWall(),
-                        new ParallelAction(
-                                fourthSpecimenDeliverMove,
-                                elevator.elevatorToAboveUpperSubmersible()),
-                        ears.deliverSpecimenToUpperSubmersible(),
-                        park);
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        firstSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        firstSampleMoveToObservationZone,
+                        elevator.elevatorToHome()));
+
+        Actions.runBlocking(
+                secondSampleMoveToObservationZone);
+
+        Actions.runBlocking(
+                elevator.grabSpecimenAndClearWall());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        secondSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        thirdSpecimenPickupMove,
+                        elevator.elevatorToHome()));
+
+        Actions.runBlocking(
+                elevator.grabSpecimenAndClearWall());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        thirdSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        fourthSpecimenPickupMove,
+                        elevator.elevatorToHome()));
+
+        Actions.runBlocking(
+                elevator.grabSpecimenAndClearWall());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        fourthSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                park);
 
     }
 
@@ -204,7 +233,6 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
         createMotionActions(red);
 
-        doSpecimens = buildMotionSequence();
 
         waitForStart();
 
@@ -212,7 +240,7 @@ public class SpecimenSideAutoOpmode extends CommandOpMode {
 
             run();
 
-            Actions.runBlocking(doSpecimens);
+            runOps();
 
             telemetry.update();
 

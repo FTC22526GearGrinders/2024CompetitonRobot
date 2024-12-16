@@ -99,6 +99,17 @@ public class Elevator_Arm_RotateArm_Actions {
                         rotateArm.openIntakeClaw()));
     }
 
+    public Action pickupSampleDeliverToBucket() {
+
+        return new SequentialAction(
+
+                armOutTiltAboveSamplesOpenClaw(),
+                tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
+                tiltAndArmMoveThenDeliverToBucket());
+
+
+    }
+
 
 }
 
