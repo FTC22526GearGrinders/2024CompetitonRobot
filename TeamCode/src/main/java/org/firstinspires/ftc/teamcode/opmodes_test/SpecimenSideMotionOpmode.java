@@ -41,6 +41,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
@@ -53,7 +54,7 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
 @Autonomous(name = "Specimen Fast With Approach", group = "Auto")
-//@Disabled
+@Disabled
 public class SpecimenSideMotionOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name

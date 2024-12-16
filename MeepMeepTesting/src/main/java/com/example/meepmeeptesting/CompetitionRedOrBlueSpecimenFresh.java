@@ -41,7 +41,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 .setDriveTrainType((DriveTrainType.MECANUM))
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(80, 20, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.width, Constants.RobotConstants.length)
                 .setColorScheme(new ColorSchemeBlueLight())
                 .setStartPose(fcs.specimenSideStartPose)
@@ -62,19 +62,20 @@ public class CompetitionRedOrBlueSpecimenFresh {
                 //   .turn(Math.toRadians(90))
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, Math.toRadians(180))
-                .strafeToLinearHeading(fcs.thirdStagePushInnerVector, Math.toRadians(180))
-                .strafeToLinearHeading(fcs.sample1ObservationZoneDropPose.position, Math.toRadians(180));
+                .strafeToLinearHeading(fcs.thirdStagePushInnerVector, Math.toRadians(-90))
+                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle);
+        //  .strafeToLinearHeading(fcs.sample1ObservationZoneDropPose.position, Math.toRadians(180));
 
-        TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.secondStagePushMidVector, fcs.specimenPickupAngle)
-                .strafeToLinearHeading(fcs.thirdStagePushMidVector, fcs.specimenPickupAngle)
-                .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle);
-
-
-        Action secondSampleApproachCloseout = secondSampleMoveToObservationZoneApproach.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel).build();
-
+//        TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
+//                .strafeToLinearHeading(fcs.secondStagePushMidVector, fcs.specimenPickupAngle)
+//                .strafeToLinearHeading(fcs.thirdStagePushMidVector, fcs.specimenPickupAngle)
+//                .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle);
+//
+//
+//        Action secondSampleApproachCloseout = secondSampleMoveToObservationZoneApproach.endTrajectory().fresh()
+//                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle,
+//                        approachVel, approachAccel).build();
+//
 
         TrajectoryActionBuilder secondSpecimenDeliverMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle);
@@ -131,9 +132,9 @@ public class CompetitionRedOrBlueSpecimenFresh {
                         firstSampleMoveToObservationZone.build(),
                         elevatorMove),
 
-                secondSampleMoveToObservationZoneApproach.build(),
-
-                secondSampleApproachCloseout,
+//                secondSampleMoveToObservationZoneApproach.build(),
+//
+//                secondSampleApproachCloseout,
 
                 new SleepAction(1),
 
@@ -165,7 +166,7 @@ public class CompetitionRedOrBlueSpecimenFresh {
                         fourthSpecimenDeliverMove.build(),
                         elevatorMove),
                 fourthSpecimenDeliverCloseout,
-                new SleepAction(10),
+                new SleepAction(1),
 
                 park.build());
 

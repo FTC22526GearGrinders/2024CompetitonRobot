@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes_auto;
+package org.firstinspires.ftc.teamcode.opmodes_test;
 
 
 /* Copyright (c) 2017 FIRST. All rights reserved.
@@ -35,10 +35,11 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
@@ -52,8 +53,8 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
 @Autonomous(name = "Specimen Fast", group = "Auto")
-//@Disabled
-public class SpecimenSideAutoSepOpmode extends CommandOpMode {
+@Disabled
+public class SpecimenSideAutoOpmode extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public static int TEAM_NUMBER = 22526; //Enter team Number
@@ -76,8 +77,6 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
 
     Action park;
 
-    Gamepad currentGamepad1 = new Gamepad();
-    Gamepad previousGamepad1 = new Gamepad();
     boolean red = false;
     boolean blue = false;
     private MecanumDriveSubsystem drive;
@@ -86,6 +85,7 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
     private RotateArmSubsystem rotate;
     private Elevator_Arm_RotateArm_Actions ears;
     private TelemetryPacket packet;
+    private SequentialAction doSpecimens;
 
     @Override
     public void initialize() {
@@ -96,6 +96,8 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
         ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
         fcs = new FieldConstantsSelect();
         packet = new TelemetryPacket();
+
+        register(arm, elevator);
 
         arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
 
@@ -156,71 +158,40 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
 
     }
 
-    private void runOps() {
+    private SequentialAction buildMotionSequence() {
 
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        firstSpecimenDeliverMove,
-                        elevator.elevatorToAboveUpperSubmersible()));
-
-        Actions.runBlocking(
-                ears.deliverSpecimenToUpperSubmersible());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        firstSampleMoveToObservationZone,
-                        elevator.elevatorToHome()));
-
-        Actions.runBlocking(
-                secondSampleMoveToObservationZone);
-
-        Actions.runBlocking(
-                elevator.grabSpecimenAndClearWall());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        secondSpecimenDeliverMove,
-                        elevator.elevatorToAboveUpperSubmersible()));
-
-        Actions.runBlocking(
-                ears.deliverSpecimenToUpperSubmersible());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        thirdSpecimenPickupMove,
-                        elevator.elevatorToHome()));
-
-        Actions.runBlocking(
-                elevator.grabSpecimenAndClearWall());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        thirdSpecimenDeliverMove,
-                        elevator.elevatorToAboveUpperSubmersible()));
-
-
-        Actions.runBlocking(
-                ears.deliverSpecimenToUpperSubmersible());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        fourthSpecimenPickupMove,
-                        elevator.elevatorToHome()));
-
-        Actions.runBlocking(
-                elevator.grabSpecimenAndClearWall());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        fourthSpecimenDeliverMove,
-                        elevator.elevatorToAboveUpperSubmersible()));
-
-        Actions.runBlocking(
-                ears.deliverSpecimenToUpperSubmersible());
-
-        Actions.runBlocking(
-                park);
+        return
+                new SequentialAction(
+                        new ParallelAction(
+                                firstSpecimenDeliverMove,
+                                elevator.elevatorToAboveUpperSubmersible()),
+                        ears.deliverSpecimenToUpperSubmersible(),
+                        new ParallelAction(
+                                firstSampleMoveToObservationZone,
+                                elevator.elevatorToHome()),
+                        secondSampleMoveToObservationZone,
+                        elevator.grabSpecimenAndClearWall(),
+                        new ParallelAction(
+                                secondSpecimenDeliverMove,
+                                elevator.elevatorToAboveUpperSubmersible()),
+                        ears.deliverSpecimenToUpperSubmersible(),
+                        new ParallelAction(
+                                thirdSpecimenPickupMove,
+                                elevator.elevatorToHome()),
+                        elevator.grabSpecimenAndClearWall(),
+                        new ParallelAction(
+                                thirdSpecimenDeliverMove,
+                                elevator.elevatorToAboveUpperSubmersible()),
+                        ears.deliverSpecimenToUpperSubmersible(),
+                        new ParallelAction(
+                                fourthSpecimenPickupMove,
+                                elevator.elevatorToHome()),
+                        elevator.grabSpecimenAndClearWall(),
+                        new ParallelAction(
+                                fourthSpecimenDeliverMove,
+                                elevator.elevatorToAboveUpperSubmersible()),
+                        ears.deliverSpecimenToUpperSubmersible(),
+                        park);
 
     }
 
@@ -233,14 +204,17 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
 
         createMotionActions(red);
 
+        doSpecimens = buildMotionSequence();
 
         waitForStart();
+
+        elevator.closeSpecimenClaw();
 
         while (!isStopRequested() && opModeIsActive()) {
 
             run();
 
-            runOps();
+            Actions.runBlocking(doSpecimens);
 
             telemetry.update();
 
@@ -255,8 +229,6 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
     public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
-        previousGamepad1.copy(currentGamepad1);
-        currentGamepad1.copy(gamepad1);
         red = false;
         blue = false;
         //******select start pose*****
@@ -266,7 +238,6 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
         telemetry.addData("---------------------------------------", "");
         telemetry.addData("Select Alliance using XA on Logitech (or ▢ΔOX on Playstation) on gamepad 1:", "");
         telemetry.addData("    Red All Specimen   ", "(A / O)");
-
         telemetry.addData("    Blue All Specimen    ", "(X / ▢)");
 
         telemetry.addData("Blue", blue);
@@ -282,11 +253,8 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-
                 blue = false;
-
                 red = true;
-
             }
             if (gamepad1.x) {
 
@@ -295,7 +263,6 @@ public class SpecimenSideAutoSepOpmode extends CommandOpMode {
                 telemetry.addData("Restart OpMode ", "to Change");
 
                 red = false;
-
                 blue = true;
             }
             telemetry.update();

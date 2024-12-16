@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes_auto;
+package org.firstinspires.ftc.teamcode.opmodes_test;
 
 
 /* Copyright (c) 2017 FIRST. All rights reserved.
@@ -43,10 +43,13 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
+import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
+import org.firstinspires.ftc.teamcode.commands_actions.elevator.PositionHoldElevator;
 import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
@@ -55,7 +58,7 @@ import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
 @Autonomous(name = "Specimen Fast With Approach 2", group = "Auto")
-//@Disabled
+@Disabled
 public class SpecimenSideAutoOpmodeBlue2 extends CommandOpMode {
 
     public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
@@ -104,6 +107,12 @@ public class SpecimenSideAutoOpmodeBlue2 extends CommandOpMode {
         approachVel = new TranslationalVelConstraint(10.0);
         approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
         packet = new TelemetryPacket();
+
+        register(arm, elevator);
+
+        arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
+
+        elevator.setDefaultCommand(new PositionHoldElevator(elevator));
     }
 
     void createMotionActions(boolean redd) {
@@ -241,6 +250,8 @@ public class SpecimenSideAutoOpmodeBlue2 extends CommandOpMode {
         doSpecimens = buildMotionSequence();
 
         waitForStart();
+
+        elevator.closeSpecimenClaw();
 
         while (!isStopRequested() && opModeIsActive()) {
 

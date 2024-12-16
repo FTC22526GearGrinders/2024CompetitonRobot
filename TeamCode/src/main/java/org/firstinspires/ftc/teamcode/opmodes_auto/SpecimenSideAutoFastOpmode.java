@@ -38,6 +38,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
@@ -51,26 +52,33 @@ import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Basket", group = "Auto")
+@Autonomous(name = "Specimen Fast", group = "Auto")
 //@Disabled
-public class BasketSideAutoOpmode extends CommandOpMode {
+public class SpecimenSideAutoFastOpmode extends CommandOpMode {
 
-    public String TEAM_NAME = "Gear Grinders"; // Enter team Name
-    public int TEAM_NUMBER = 22526; //Enter team Number
+    public static String TEAM_NAME = "Gear Grinders"; // Enter team Name
+    public static int TEAM_NUMBER = 22526; //Enter team Number
 
-    public Action firstSampleDeliverMove;
 
-    Action secondSampleDeliverMove;
-    Action thirdSampleDeliverMove;
-    Action fourthSampleDeliverMove;
-    Action secondSamplePrePickupMove;
-    Action secondSamplePickupMove;
-    Action thirdSamplePrePickupMove;
-    Action thirdSamplePickupMove;
-    Action fourthSamplePrePickupMove;
-    Action fourthSamplePickupMove;
-    Action parkAction;
+    FieldConstantsSelect fcs;
+    Action firstSpecimenDeliverMove;
+    Action firstSampleMoveToObservationZone;
+    Action secondSampleMoveToObservationZone;
 
+    Action secondSpecimenDeliverMove;
+
+    Action thirdSpecimenPickupMove;
+
+    Action thirdSpecimenDeliverMove;
+
+    Action fourthSpecimenPickupMove;
+
+    Action fourthSpecimenDeliverMove;
+
+    Action park;
+
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad previousGamepad1 = new Gamepad();
     boolean red = false;
     boolean blue = false;
     private MecanumDriveSubsystem drive;
@@ -79,7 +87,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     private RotateArmSubsystem rotate;
     private Elevator_Arm_RotateArm_Actions ears;
     private TelemetryPacket packet;
-    private FieldConstantsSelect fcs;
+
+    private int showSelect = 0;
 
     @Override
     public void initialize() {
@@ -88,18 +97,19 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         arm = new ExtendArmSubsystem(this);
         rotate = new RotateArmSubsystem(this);
         ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
-        //   limelight = new LimelightSubsystem(this);
-        packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
+        packet = new TelemetryPacket();
 
         register(arm, elevator);
 
-        arm.setDefaultCommand(new PositionHoldArm(arm));
+        arm.setDefaultCommand(new PositionHoldArm(arm));//set in subsystem eventually since needed in auto and teleop
 
         elevator.setDefaultCommand(new PositionHoldElevator(elevator));
     }
 
+
     void createMotionActions(boolean red) {
+
         fcs.setBlue();
         PoseStorage.currentTeam = PoseStorage.Team.BLUE;
 
@@ -108,124 +118,109 @@ public class BasketSideAutoOpmode extends CommandOpMode {
             PoseStorage.currentTeam = PoseStorage.Team.RED;
         }
 
-        drive.pose = fcs.basketSideStartPose;
+        drive.pose = fcs.specimenSideStartPose;
+        drive.startRadians = drive.pose.heading.toDouble();
 
-        firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStartPose)
-                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
+        firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
+                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle)
+                .build();
 
-        secondSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
+        firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
+                .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
+                .strafeToLinearHeading(fcs.secondStagePushInnerVector, Math.toRadians(180))
+                .strafeToLinearHeading(fcs.thirdStagePushInnerVector, Math.toRadians(180))
+                .strafeToLinearHeading(fcs.sample1ObservationZoneDropPose.position, Math.toRadians(180)).build();
 
-        secondSamplePickupMove = drive.actionBuilder(fcs.innerYellowPrePickupPose)
-                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
+        secondSampleMoveToObservationZone = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
+                .strafeToLinearHeading(fcs.secondStagePushMidVector, fcs.specimenPickupAngle)
+                .strafeToLinearHeading(fcs.thirdStagePushMidVector, fcs.specimenPickupAngle)
+                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle).build();
 
-        secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
-                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
+        secondSpecimenDeliverMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose2, fcs.specimenPickupAngle).build();
 
+        thirdSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose2)
+                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle).build();
 
-        thirdSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading).build();
+        thirdSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose3, fcs.specimenPickupAngle).build();
 
-        thirdSamplePickupMove = drive.actionBuilder(fcs.midYellowPrePickupPose)
-                .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPrePickupPose.heading).build();
+        fourthSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose3)
+                .splineToLinearHeading(fcs.specimenPickupPose, fcs.specimenDropAngle).build();
 
-        thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
-                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
+        fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .splineToLinearHeading(fcs.specimenDeliverPose4, fcs.specimenPickupAngle).build();
 
-        fourthSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading).build();
-
-        fourthSamplePickupMove = drive.actionBuilder(fcs.outerYellowPrePose)
-                .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading).build();
-
-        fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPickupPose)
-                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
-
-        parkAction = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.ascentZoneParkPose.position, fcs.ascentZoneParkPose.heading).build();
-
+        park = drive.actionBuilder(fcs.specimenDeliverPose4)
+                .strafeToLinearHeading(fcs.specimenParkPose.position, fcs.specimenDropAngle).build();
     }
 
     private void runOps() {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        firstSampleDeliverMove,
-                        elevator.elevatorToUpperBasket()));
+                        firstSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
 
         Actions.runBlocking(
-                elevator.cycleBucket());
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        firstSampleMoveToObservationZone,
+                        elevator.elevatorToHome()));
+
+        Actions.runBlocking(
+                secondSampleMoveToObservationZone);
+
+        Actions.runBlocking(
+                elevator.grabSpecimenAndClearWall());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        secondSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        thirdSpecimenPickupMove,
+                        elevator.elevatorToHome()));
+
+        Actions.runBlocking(
+                elevator.grabSpecimenAndClearWall());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        thirdSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        fourthSpecimenPickupMove,
+                        elevator.elevatorToHome()));
+
+        Actions.runBlocking(
+                elevator.grabSpecimenAndClearWall());
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        fourthSpecimenDeliverMove,
+                        elevator.elevatorToAboveUpperSubmersible()));
+
+        Actions.runBlocking(
+                ears.deliverSpecimenToUpperSubmersible());
 
         Actions.runBlocking(
                 new ParallelAction(
                         elevator.elevatorToHome(),
-                        secondSamplePrePickupMove));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        secondSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()));
-
-        Actions.runBlocking(
-                ears.pickupSampleDeliverToBucket());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        secondSampleDeliverMove,
-                        elevator.elevatorToUpperBasket()));
-
-        Actions.runBlocking(
-                elevator.cycleBucket());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        elevator.elevatorToHome(),
-                        thirdSamplePrePickupMove));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        thirdSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()));
-
-        Actions.runBlocking(
-                ears.pickupSampleDeliverToBucket());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        thirdSampleDeliverMove,
-                        elevator.elevatorToUpperBasket()));
-
-        Actions.runBlocking(
-                elevator.cycleBucket());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        elevator.elevatorToHome(),
-                        fourthSamplePrePickupMove));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        fourthSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()));
-
-        Actions.runBlocking(
-                ears.pickupSampleDeliverToBucket());
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        fourthSampleDeliverMove,
-                        elevator.elevatorToUpperBasket()));
-
-        Actions.runBlocking(
-                elevator.cycleBucket());
-
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        elevator.elevatorToHome(),
-                        parkAction));
+                        park));
     }
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -238,6 +233,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         waitForStart();
 
+        elevator.closeSpecimenClaw();
+
         elevator.showSelect = Constants.ShowTelemetryConstants.showElevatorCommon;
 
         while (!isStopRequested() && opModeIsActive()) {
@@ -249,7 +246,6 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         PoseStorage.currentPose = drive.pose;
         PoseStorage.poseUpdatedTime = System.currentTimeMillis();
-
         reset();
     }
 
@@ -257,6 +253,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
+        previousGamepad1.copy(currentGamepad1);
+        currentGamepad1.copy(gamepad1);
         red = false;
         blue = false;
         //******select start pose*****
@@ -282,12 +280,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 telemetry.addData("RED ", "Chosen");
                 telemetry.addData("Restart OpMode ", "to Change");
 
-
                 blue = false;
-
                 red = true;
-
             }
+
             if (gamepad1.x) {
 
                 telemetry.clearAll();
@@ -295,15 +291,20 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 telemetry.addData("Restart OpMode ", "to Change");
 
                 red = false;
-
                 blue = true;
             }
+
+
             telemetry.update();
         }
 
     }
 
 
+    //    telemetry.clearAll();
+}
+
+//method to wait safely with stop button working if needed. Use this instead of sleep
 //        public void safeWaitSeconds ( double time){
 //            ElapsedTime timer = new ElapsedTime(SECONDS);
 //            timer.reset();
@@ -311,5 +312,3 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 //            }
 //        }
 
-
-}

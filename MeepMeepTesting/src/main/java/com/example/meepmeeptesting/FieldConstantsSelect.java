@@ -35,7 +35,10 @@ public final class FieldConstantsSelect {
     public double specimenPickupAngle;
     public Pose2d specimenSideStartPose;
     public Pose2d sample1ObservationZoneDropPose;
+    public Pose2d sample1ObservationZonePickupPose;
+
     public Pose2d sample3ObservationZoneDropPose;
+
     public Pose2d sample2ObservationZoneDropPose;
     public Pose2d sample2ObservationZonePickupPose;
 
@@ -89,13 +92,14 @@ public final class FieldConstantsSelect {
         specimenSideStartPose = new Pose2d(specStartX, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, specimenDropAngle);
 
         sample1ObservationZoneDropPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, Math.toRadians(180));
+        sample1ObservationZonePickupPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, Math.toRadians(180));
 
-        sample2ObservationZoneDropPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, specimenPickupAngle);
-        sample2ObservationZonePickupPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenPickupAngle);
+        sample2ObservationZoneDropPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, specimenPickupAngle);
+        sample2ObservationZonePickupPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - specimenClawAdder, specimenPickupAngle);
 
-        firstStagePushInnerPose = new Pose2d(-36, 42, Math.toRadians(180));
-        secondStagePushInnerVector = new Vector2d(-36, 10);
-        thirdStagePushInnerVector = new Vector2d(-48, 10);
+        firstStagePushInnerPose = new Pose2d(-34, 42, Math.toRadians(180));
+        secondStagePushInnerVector = new Vector2d(-34, 12);
+        thirdStagePushInnerVector = new Vector2d(-48, 12);
 
         firstStagePushMidPose = new Pose2d(-28, 42, Math.toRadians(180));
         secondStagePushMidVector = new Vector2d(-40, 10);//

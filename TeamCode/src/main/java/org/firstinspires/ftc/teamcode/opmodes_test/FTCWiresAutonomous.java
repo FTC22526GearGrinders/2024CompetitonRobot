@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes_auto;
+package org.firstinspires.ftc.teamcode.opmodes_test;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 

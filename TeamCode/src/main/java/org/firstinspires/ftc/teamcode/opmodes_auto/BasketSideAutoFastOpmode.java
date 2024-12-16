@@ -51,26 +51,22 @@ import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
 import org.firstinspires.ftc.teamcode.utils.PoseStorage;
 
 
-@Autonomous(name = "Basket", group = "Auto")
+@Autonomous(name = "Basket Fast", group = "Auto")
 //@Disabled
-public class BasketSideAutoOpmode extends CommandOpMode {
+public class BasketSideAutoFastOpmode extends CommandOpMode {
 
     public String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public int TEAM_NUMBER = 22526; //Enter team Number
-
     public Action firstSampleDeliverMove;
 
     Action secondSampleDeliverMove;
     Action thirdSampleDeliverMove;
     Action fourthSampleDeliverMove;
-    Action secondSamplePrePickupMove;
     Action secondSamplePickupMove;
-    Action thirdSamplePrePickupMove;
     Action thirdSamplePickupMove;
     Action fourthSamplePrePickupMove;
-    Action fourthSamplePickupMove;
+    Action fourthSamplePickupFinalMove;
     Action parkAction;
-
     boolean red = false;
     boolean blue = false;
     private MecanumDriveSubsystem drive;
@@ -113,20 +109,13 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-        secondSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
-
-        secondSamplePickupMove = drive.actionBuilder(fcs.innerYellowPrePickupPose)
+        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
 
         secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-
-        thirdSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading).build();
-
-        thirdSamplePickupMove = drive.actionBuilder(fcs.midYellowPrePickupPose)
+        thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPrePickupPose.heading).build();
 
         thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
@@ -135,7 +124,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         fourthSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading).build();
 
-        fourthSamplePickupMove = drive.actionBuilder(fcs.outerYellowPrePose)
+        fourthSamplePickupFinalMove = drive.actionBuilder(fcs.outerYellowPrePose)
                 .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading).build();
 
         fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPickupPose)
@@ -159,12 +148,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         elevator.elevatorToHome(),
-                        secondSamplePrePickupMove));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        secondSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()));
+                        secondSamplePickupMove));
 
         Actions.runBlocking(
                 ears.pickupSampleDeliverToBucket());
@@ -180,12 +164,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         elevator.elevatorToHome(),
-                        thirdSamplePrePickupMove));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        thirdSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()));
+                        thirdSamplePickupMove));
 
         Actions.runBlocking(
                 ears.pickupSampleDeliverToBucket());
@@ -204,9 +183,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         fourthSamplePrePickupMove));
 
         Actions.runBlocking(
-                new ParallelAction(
-                        fourthSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()));
+                fourthSamplePickupFinalMove
+        );
 
         Actions.runBlocking(
                 ears.pickupSampleDeliverToBucket());
