@@ -96,7 +96,7 @@ public class BasketSideMotionOpmode extends CommandOpMode {
     @Override
     public void initialize() {
         drive = new MecanumDriveSubsystem(this, new Pose2d(0, 0, 0));
-        ;
+
         packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
     }

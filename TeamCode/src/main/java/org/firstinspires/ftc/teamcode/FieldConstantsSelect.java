@@ -30,7 +30,7 @@ public final class FieldConstantsSelect {
     public double specimenPickupAngle;
     public Pose2d specimenSideStartPose;
     public Pose2d sample1ObservationZoneDropPose;
-    public Pose2d sample3ObservationZoneDropPose;
+    public Pose2d sample1ObservationZonePickupPose;
     public Pose2d sample2ObservationZoneDropPose;
     public Pose2d sample2ObservationZonePickupPose;
 
@@ -84,8 +84,9 @@ public final class FieldConstantsSelect {
         specimenSideStartPose = new Pose2d(specStartX, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, specimenDropAngle);
 
         sample1ObservationZoneDropPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, Math.toRadians(180));
+        sample1ObservationZonePickupPose = new Pose2d(-48, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, Math.toRadians(180));
 
-        sample2ObservationZoneDropPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - sampleDropOffZoneFromWall, specimenPickupAngle);
+        sample2ObservationZoneDropPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, specimenPickupAngle);
         sample2ObservationZonePickupPose = new Pose2d(-58, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, specimenPickupAngle);
 
         firstStagePushInnerPose = new Pose2d(-36, 42, Math.toRadians(180));
@@ -137,6 +138,7 @@ public final class FieldConstantsSelect {
         specimenSideStartPose = flipBlueToRedPose(specimenSideStartPose);
 
         sample1ObservationZoneDropPose = flipBlueToRedPose(sample1ObservationZoneDropPose);
+        sample1ObservationZonePickupPose = flipBlueToRedPose(sample1ObservationZonePickupPose);
         sample2ObservationZoneDropPose = flipBlueToRedPose(sample2ObservationZoneDropPose);
         sample2ObservationZonePickupPose = flipBlueToRedPose(sample2ObservationZonePickupPose);
 

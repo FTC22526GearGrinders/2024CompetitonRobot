@@ -6,7 +6,6 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueLight;
@@ -25,18 +24,46 @@ public class CompetitionRedOrBlueSpecimenFresh {
         Action sequenceOne;
 
 
-        TrajectoryActionBuilder sequenceThree;
-        TranslationalVelConstraint approachVel;
-        ProfileAccelConstraint approachAccel;
-
         FieldConstantsSelect fcs;
+        Action firstSpecimenPreDeliverMove;
+        Action firstSpecimenDeliverMove;
+        Action firstSampleMoveToObservationZone;
+
+        Action firstSampleMoveToObservationZonePickup;
+
+        Action secondSampleMoveToObservationZoneDrop;
+        Action secondSampleMoveToObservationZonePickup;
 
 
+        Action secondSpecimenPrePickupMove;
+        Action secondSpecimenPickupMove;
+
+
+        Action secondSpecimenPreDeliverMove;
+        Action secondSpecimenDeliverMove;
+
+        Action thirdSpecimenPrePickupMove;
+        Action thirdSpecimenPickupMove;
+
+        Action thirdSpecimenPreDeliverMove;
+        Action thirdSpecimenDeliverMove;
+
+        Action fourthSpecimenPrePickupMove;
+        Action fourthSpecimenPickupMove;
+
+        Action fourthSpecimenPreDeliverMove;
+        Action fourthSpecimenDeliverMove;
+
+
+        Action park;
+
+        TranslationalVelConstraint finalVel;
+        ProfileAccelConstraint finalAccel;
         MeepMeep meepMeep = new MeepMeep(800);
         fcs = new FieldConstantsSelect();
 
-        approachVel = new TranslationalVelConstraint(10.0);
-        approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
+        finalVel = new TranslationalVelConstraint(10.0);
+        finalAccel = new ProfileAccelConstraint(-20.0, 20.0);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 .setDriveTrainType((DriveTrainType.MECANUM))
@@ -52,123 +79,66 @@ public class CompetitionRedOrBlueSpecimenFresh {
 
         // fcs.setRed();
 
-        Action firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
+
+        firstSpecimenPreDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
                 .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)
-                .strafeTo(fcs.specimenDeliverPose1.position,
-                        approachVel, approachAccel
-                ).build();
+                .build();
 
-        TrajectoryActionBuilder firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
-                //   .turn(Math.toRadians(90))
-                .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
-                .strafeToLinearHeading(fcs.secondStagePushInnerVector, Math.toRadians(180))
-                .strafeToLinearHeading(fcs.thirdStagePushInnerVector, Math.toRadians(-90))
-                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle);
-        //  .strafeToLinearHeading(fcs.sample1ObservationZoneDropPose.position, Math.toRadians(180));
-
-//        TrajectoryActionBuilder secondSampleMoveToObservationZoneApproach = drive.actionBuilder(fcs.sample1ObservationZoneDropPose)
-//                .strafeToLinearHeading(fcs.secondStagePushMidVector, fcs.specimenPickupAngle)
-//                .strafeToLinearHeading(fcs.thirdStagePushMidVector, fcs.specimenPickupAngle)
-//                .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle);
-//
-//
-//        Action secondSampleApproachCloseout = secondSampleMoveToObservationZoneApproach.endTrajectory().fresh()
-//                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle,
-//                        approachVel, approachAccel).build();
-//
-
-        TrajectoryActionBuilder secondSpecimenDeliverMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle);
+        firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenDeliverApproachPose1)
+                .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle,
+                        finalVel, finalAccel).build();
 
 
-        Action secondSpecimenDeliverCloseOut = secondSpecimenDeliverMove.endTrajectory().fresh()
+        secondSpecimenPrePickupMove = drive.actionBuilder(fcs.specimenDeliverPose1)
+                .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle).build();
+
+        secondSpecimenPickupMove = drive.actionBuilder(fcs.specimenPickupApproachPose)
+                .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
+                        finalVel, finalAccel).build();
+
+
+        secondSpecimenPreDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
+                .strafeToLinearHeading(fcs.specimenDeliverApproachPose2.position, fcs.specimenDropAngle).build();
+
+        secondSpecimenDeliverMove = drive.actionBuilder(fcs.specimenDeliverApproachPose2)
                 .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle,
-                        approachVel, approachAccel).build();
+                        finalVel, finalAccel).build();
 
-
-        TrajectoryActionBuilder thirdSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose2)
-                .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle);
-
-
-        Action thirdSpecimenPickupCloseout = thirdSpecimenPickupMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel).build();
-
-
-        TrajectoryActionBuilder thirdSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverApproachPose3, fcs.specimenPickupAngle);
-
-        Action thirdSpecimenDeliverCloseout = thirdSpecimenDeliverMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle,
-                        approachVel, approachAccel).build();
-
-        TrajectoryActionBuilder fourthSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose3)
-                .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle);
-
-        Action fourthSpecimenPickupCloseout = fourthSpecimenPickupMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel
-                ).build();
-
-
-        TrajectoryActionBuilder fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
-                .splineToLinearHeading(fcs.specimenDeliverApproachPose4, fcs.specimenPickupAngle);
-
-        Action fourthSpecimenDeliverCloseout = fourthSpecimenDeliverMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.specimenDeliverPose4.position, fcs.specimenDropAngle,
-                        approachVel, approachAccel).build();
-
-        TrajectoryActionBuilder park = drive.actionBuilder(fcs.specimenDeliverPose4)
-                .strafeTo(fcs.specimenParkPose.position);
+        park = drive.actionBuilder(fcs.specimenDeliverPose2)
+                .strafeToLinearHeading(fcs.specimenParkPose.position, fcs.specimenDropAngle).build();
 
 
         sequenceOne = new SequentialAction(
 
                 new ParallelAction(
-                        firstSpecimenDeliverMove,
-                        elevatorMove),
+                        firstSpecimenPreDeliverMove, new SleepAction(1)),
+                // elevator.elevatorToAboveUpperSubmersible()),
 
-                new ParallelAction(
-                        firstSampleMoveToObservationZone.build(),
-                        elevatorMove),
+                firstSpecimenDeliverMove,
 
-//                secondSampleMoveToObservationZoneApproach.build(),
-//
-//                secondSampleApproachCloseout,
-
+                // elevator.deliverSpecimenToNearestChamber(),
                 new SleepAction(1),
 
-                new ParallelAction(
-                        secondSpecimenDeliverMove.build(),
+                new ParallelAction(new SleepAction(1),
+                        secondSpecimenPrePickupMove),
+                // elevator.elevatorToHome()),
 
-                        elevatorMove),
-                secondSpecimenDeliverCloseOut,
-                new SleepAction(1),
+                secondSpecimenPickupMove,
 
-                new ParallelAction(
-                        thirdSpecimenPickupMove.build(),
-                        elevatorMove),
-                new SleepAction(1),
-                thirdSpecimenPickupCloseout,
+                // elevator.grabSpecimenAndClearWall(),
 
-                new ParallelAction(
-                        thirdSpecimenDeliverMove.build(),
-                        elevatorMove),
                 new SleepAction(1),
-                thirdSpecimenDeliverCloseout,
                 new ParallelAction(
-                        fourthSpecimenPickupMove.build(),
-                        elevatorMove),
-                fourthSpecimenPickupCloseout,
-                new SleepAction(1),
+                        secondSpecimenPreDeliverMove, new SleepAction(1)),
+                // elevator.elevatorToAboveUpperSubmersible()),
 
-                new ParallelAction(
-                        fourthSpecimenDeliverMove.build(),
-                        elevatorMove),
-                fourthSpecimenDeliverCloseout,
+                secondSpecimenDeliverMove,
                 new SleepAction(1),
+                // elevator.deliverSpecimenToNearestChamber(),
 
-                park.build());
+                new ParallelAction(new SleepAction(1)),
+                //  elevator.elevatorToHome(),
+                park);
 
 
         myBot.runAction(sequenceOne);

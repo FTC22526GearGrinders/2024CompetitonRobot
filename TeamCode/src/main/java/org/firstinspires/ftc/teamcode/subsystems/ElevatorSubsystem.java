@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
@@ -80,6 +81,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     double rightPidOut;
 
     private int inPositionCtr;
+    public boolean positionElevator;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
 
@@ -88,7 +90,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         constraints = new TrapezoidProfile.Constraints(TRAJECTORY_VEL, TRAJECTORY_ACCEL);
 
 
-        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator", Motor.GoBILDA.RPM_1150);
+        leftElevatorMotor = new Motor(opMode.hardwareMap, "leftElevator", Motor.GoBILDA.RPM_435);
         leftElevatorMotor.setInverted(true);
         leftElevatorMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
@@ -134,7 +136,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         levelBucket();
 
-        //setDefaultCommand(new PositionHoldElevator(this));
+        //  setDefaultCommand(new PositionHoldElevator(this));
     }
 
     public static double round2dp(double number, int dp) {
@@ -211,7 +213,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
     public boolean atGoal() {
-        return atLeftGoal() && atRightGoal();
+        return leftPidController.atGoal() && rightPidController.atGoal();
+        //return atLeftGoal() && atRightGoal();
     }
 
     public boolean atLeftGoal() {
@@ -286,10 +289,15 @@ public class ElevatorSubsystem extends SubsystemBase {
                                 openSpecimenClaw()));
     }
 
+    public Command getDefComm() {
+        return getDefaultCommand();
+    }
+
 
     @Override
-
     public void periodic() {
+
+        if (inPositionCtr != 3) inPositionCtr++;
         if (showSelect == Constants.ShowTelemetryConstants.showElevatorCommon) {
             showCommonTelemetry();
         }
@@ -301,6 +309,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         holdCtr++;
+
+        if (positionElevator) position();
 
         if (holdCtr >= 50) {
             leftTotalPower += Math.abs(leftElevatorMotor.get());
@@ -325,7 +335,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void position() {
         posrng++;
 
-        if (inPositionCtr != 3) inPositionCtr++;
+
 
         boolean elevatorHigh = false;// getLeftPositionInches() >= UPPER_POSITION_LIMIT || getRightPositionInches() >= UPPER_POSITION_LIMIT;
         boolean elevatorLow = false;//getLeftPositionInches() <= LOWER_POSITION_LIMIT || getRightPositionInches() <= LOWER_POSITION_LIMIT;
@@ -416,6 +426,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void showCommonTelemetry() {
         telemetry.addData("ElevatorCommon", showSelect);
+        telemetry.addData("POSE", positionElevator);
+        telemetry.addData("PosRng", posrng);
+        telemetry.addData("HldRng", holdCtr);
+        telemetry.addData("AtGoal", atGoal());
+        telemetry.addData("CounterInPos", inPositionCtr);
         telemetry.addData("Goal", leftPidController.getGoal().position);
         telemetry.addData("LeftPositionInches", round2dp(getLeftPositionInches(), 2));
         telemetry.addData("RightPositionInches", round2dp(getRightPositionInches(), 2));

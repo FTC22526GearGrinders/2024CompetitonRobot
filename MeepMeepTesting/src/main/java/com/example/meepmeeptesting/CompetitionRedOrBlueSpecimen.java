@@ -45,8 +45,8 @@ public class CompetitionRedOrBlueSpecimen {
         // TrajectoryActionBuilder sequenceTwo;
         TrajectoryActionBuilder sequenceThree;
         TrajectoryActionBuilder sequenceFour;
-        TranslationalVelConstraint approachVel;
-        ProfileAccelConstraint approachAccel;
+        TranslationalVelConstraint finalVel;
+        ProfileAccelConstraint finalAccel;
 
         FieldConstantsSelect fcs;
 
@@ -54,8 +54,8 @@ public class CompetitionRedOrBlueSpecimen {
         MeepMeep meepMeep = new MeepMeep(800);
         fcs = new FieldConstantsSelect();
 
-        approachVel = new TranslationalVelConstraint(10.0);
-        approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
+        finalVel = new TranslationalVelConstraint(10.0);
+        finalAccel = new ProfileAccelConstraint(-20.0, 20.0);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 .setDriveTrainType((DriveTrainType.MECANUM))
@@ -74,7 +74,7 @@ public class CompetitionRedOrBlueSpecimen {
         firstSpecimenDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
                 .strafeToLinearHeading(fcs.specimenDeliverApproachPose1.position, fcs.specimenDropAngle)
                 .strafeTo(fcs.specimenDeliverPose1.position,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
         firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
@@ -91,38 +91,38 @@ public class CompetitionRedOrBlueSpecimen {
 
         secondSampleObservationZonePickup = drive.actionBuilder(fcs.sample2ObservationZoneDropPose)
                 .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
         secondSpecimenDeliverMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle)
                 .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
 
         thirdSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose2)
                 .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle)
                 .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
         thirdSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose3, fcs.specimenPickupAngle)
                 .strafeToLinearHeading(fcs.specimenDeliverPose3.position, fcs.specimenDropAngle,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
         fourthSpecimenPickupMove = drive.actionBuilder(fcs.specimenDeliverPose3)
                 .splineToLinearHeading(fcs.specimenPickupApproachPose, fcs.specimenDropAngle)
                 .strafeToLinearHeading(fcs.specimenPickupPose.position, fcs.specimenPickupAngle,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
         fourthSpecimenDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose4, fcs.specimenPickupAngle)
                 .strafeToLinearHeading(fcs.specimenDeliverPose4.position, fcs.specimenDropAngle,
-                        approachVel, approachAccel
+                        finalVel, finalAccel
                 );
 
         park = drive.actionBuilder(fcs.specimenDeliverPose4)
