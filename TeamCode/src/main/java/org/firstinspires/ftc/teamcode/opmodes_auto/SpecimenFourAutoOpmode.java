@@ -62,13 +62,12 @@ public class SpecimenFourAutoOpmode extends CommandOpMode {
 
 
     FieldConstantsSelect fcs;
+    public Action firstSampleDeliverMove;
+
     Action firstSpecimenPreDeliverMove;
     Action firstSpecimenDeliverMove;
     Action firstSampleMoveToObservationZone;
-
-    Action secondSampleMoveToObservationZoneDrop;
     Action secondSampleMoveToObservationZonePickup;
-
 
     Action secondSpecimenPreDeliverMove;
     Action secondSpecimenDeliverMove;
@@ -85,7 +84,6 @@ public class SpecimenFourAutoOpmode extends CommandOpMode {
     Action fourthSpecimenPreDeliverMove;
     Action fourthSpecimenDeliverMove;
 
-
     Action park;
 
     TranslationalVelConstraint finalVel;
@@ -101,6 +99,7 @@ public class SpecimenFourAutoOpmode extends CommandOpMode {
     private TelemetryPacket packet;
     private SequentialAction autoSequence;
     private int showSelect = 0;
+    private Action secondSampleMoveToObservationZoneDrop;
 
     @Override
     public void initialize() {
