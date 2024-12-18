@@ -137,14 +137,14 @@ public class SpecimenThreeAutoOpmode extends CommandOpMode {
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, Math.toRadians(180))
                 .strafeToLinearHeading(fcs.thirdStagePushInnerVector, fcs.specimenPickupAngle)
-                .strafeToLinearHeading(fcs.sample2ObservationZoneDropPose.position, fcs.specimenPickupAngle).build();
+                .strafeToLinearHeading(fcs.sample3ObservationZoneDropPose.position, fcs.specimenPickupAngle).build();
 
-        firstSampleMoveToObservationZonePickup = drive.actionBuilder(fcs.sample2ObservationZoneDropPose)
-                .strafeToLinearHeading(fcs.sample2ObservationZonePickupPose.position, fcs.specimenPickupAngle,
+        firstSampleMoveToObservationZonePickup = drive.actionBuilder(fcs.sample3ObservationZoneDropPose)
+                .strafeToLinearHeading(fcs.sample3ObservationZonePickupPose.position, fcs.specimenPickupAngle,
                         finalVel, finalAccel).build();
 
 
-        secondSpecimenPreDeliverMove = drive.actionBuilder(fcs.sample2ObservationZonePickupPose)
+        secondSpecimenPreDeliverMove = drive.actionBuilder(fcs.sample3ObservationZonePickupPose)
                 .splineToLinearHeading(fcs.specimenDeliverApproachPose2, fcs.specimenPickupAngle).build();
 
         secondSpecimenDeliverMove = drive.actionBuilder(fcs.specimenDeliverApproachPose2)
