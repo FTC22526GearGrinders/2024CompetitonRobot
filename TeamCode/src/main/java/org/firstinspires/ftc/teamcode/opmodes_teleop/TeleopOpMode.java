@@ -165,14 +165,14 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
             runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.firstExtendDistance)));
 
-        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
+        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_right)
             runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.secondExtendDistance)));
+
+        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
+            runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.pickupDistance)));
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
             runningActions.add(elevator.cycleBucket());
-
-        //  if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
-
 
     }
 
