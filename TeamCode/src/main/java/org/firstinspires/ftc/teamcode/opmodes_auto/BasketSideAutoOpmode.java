@@ -37,11 +37,11 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
@@ -60,6 +60,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     public String TEAM_NAME = "Gear Grinders"; // Enter team Name
     public int TEAM_NUMBER = 22526; //Enter team Number
 
+
+    public Action firstSampleStrafeMove;
     public Action firstSampleDeliverMove;
 
     Action secondSampleDeliverMove;
@@ -85,6 +87,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     private TelemetryPacket packet;
     private FieldConstantsSelect fcs;
     private SequentialAction autoSequence;
+    private SequentialAction autoSequence1;
+    private SequentialAction autoSequence2;
+    private SequentialAction autoSequenceAll;
+
 
     @Override
     public void initialize() {
@@ -96,8 +102,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         //   limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
-        finalAccel = new ProfileAccelConstraint(-10, 10);
-        finalVel = new TranslationalVelConstraint(10);
+        finalAccel = new ProfileAccelConstraint(-20, 20);
+        finalVel = new TranslationalVelConstraint(20);
         register(arm, elevator);
 
         arm.setDefaultCommand(new PositionHoldArm(arm));
@@ -116,38 +122,35 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         drive.pose = fcs.basketSideStartPose;
 
-        firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStartPose)
+        firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
+                .strafeToLinearHeading(fcs.basketStrafePose.position, fcs.basketStrafePose.heading).build();
+
+        firstSampleDeliverMove = drive.actionBuilder(fcs.basketStrafePose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-        secondSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPickupPose.heading).build();
+        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
 
-        secondSamplePickupMove = drive.actionBuilder(fcs.innerYellowPrePickupPose)
-                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading,
-                        finalVel, finalAccel).build();
 
         secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-        thirdSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading).build();
+        thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading).build();
 
-        thirdSamplePickupMove = drive.actionBuilder(fcs.midYellowPrePickupPose)
-                .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPrePickupPose.heading,
-                        finalVel, finalAccel).build();
 
         thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-        fourthSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading).build();
-
-        fourthSamplePickupMove = drive.actionBuilder(fcs.outerYellowPrePose)
-                .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading,
-                        finalVel, finalAccel).build();
-
-        fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPickupPose)
-                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
+//        fourthSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+//                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading).build();
+//
+//        fourthSamplePickupMove = drive.actionBuilder(fcs.outerYellowPrePose)
+//                .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading)
+//                .build();
+//
+//        fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPickupPose)
+//                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
         parkAction = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.ascentZoneParkPose.position, fcs.ascentZoneParkPose.heading).build();
@@ -159,21 +162,30 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         autoSequence = new SequentialAction(
 
+                firstSampleStrafeMove,
+                new SleepAction(1),
                 new ParallelAction(
+
                         firstSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
                 elevator.cycleBucket(),
 
                 new ParallelAction(
-                        elevator.elevatorToHome(),
-                        secondSamplePrePickupMove),
-
-                new ParallelAction(
                         secondSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()),
+                        elevator.elevatorToHome(),
+                        new SequentialAction(
+                                new SleepAction(1.5),
+                                arm.armToAutoPickupAction())),
 
-                ears.pickupSampleDeliverToBucket(),
+
+                //  secondSamplePickupMove,
+                // new ParallelAction(
+
+                ears.autoArmPickupBucketDrop(),
+
+                //   new InstantAction(() -> elevator.showSelect = Constants.ShowTelemetryConstants.showElevatorCommon),
+
 
                 new ParallelAction(
                         secondSampleDeliverMove,
@@ -184,44 +196,36 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
                 new ParallelAction(
                         elevator.elevatorToHome(),
-                        thirdSamplePrePickupMove),
+                        thirdSamplePickupMove),
 
-                new ParallelAction(
-                        thirdSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()),
-
-
-                ears.pickupSampleDeliverToBucket(),
+                ears.autoArmPickupBucketDrop(),
 
                 new ParallelAction(
                         thirdSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
-
                 elevator.cycleBucket(),
 
+//                new ParallelAction(
+//                        elevator.elevatorToHome(),
+//                        fourthSamplePrePickupMove),
+//
+//                new ParallelAction(
+//                        fourthSamplePickupMove,
+//                        ears.autoArmPickupBucketDrop()),
+//
+//                new ParallelAction(
+//                        fourthSampleDeliverMove,
+//                        elevator.elevatorToUpperBasket()),
+//
+//                elevator.cycleBucket(),
 
                 new ParallelAction(
                         elevator.elevatorToHome(),
-                        fourthSamplePrePickupMove),
-
-
-                new ParallelAction(
-                        fourthSamplePickupMove,
-                        ears.armOutTiltAboveSamplesOpenClaw()),
-
-
-                ears.pickupSampleDeliverToBucket(),
-
-                new ParallelAction(
-                        fourthSampleDeliverMove,
-                        elevator.elevatorToUpperBasket()),
-
-                elevator.cycleBucket(),
-
-                new ParallelAction(
-                        elevator.elevatorToHome(),
+                        rotate.tiltToTouchSubmersibleAction(),
                         parkAction));
+
+
     }
 
 
@@ -234,17 +238,21 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         createMotionActions(red);
 
+        buildSequence();
+
         waitForStart();
 
-        elevator.showSelect = Constants.ShowTelemetryConstants.showElevatorCommon;
+        // elevator.showSelect = Constants.ShowTelemetryConstants.showElevatorCommon;
 
-        elevator.levelBucket().run(packet);
+        elevator.travelBucket().run(packet);
 
         while (!isStopRequested() && opModeIsActive()) {
 
             run();
 
             autoSequence.run(packet);
+
+
         }
 
         PoseStorage.currentPose = drive.pose;

@@ -8,14 +8,16 @@ import com.acmerobotics.roadrunner.Vector2d;
 public final class FieldConstantsSelect {
 
     //basket
-    public double pickUpArmEX = 8;
-    public double driveTo = 6;
+    public double pickUpArmEX = 11;
+    public double driveTo = 0;
     public double sampleDropOffZoneFromWall = 8;
     public double specStartX = -9;
-    public double specDiffX = 3;
+    public double specDiffX = 6;
 
 
     public Pose2d basketSideStartPose;
+    public Pose2d basketStrafePose;
+
     public Pose2d basketDeliverPose;
     public Pose2d innerYellowPickupPose;
     public Pose2d innerYellowPrePickupPose;
@@ -63,14 +65,15 @@ public final class FieldConstantsSelect {
     public void setBlue() {
 
         basketSideStartPose = new Pose2d(36, 72 - Constants.RobotConstants.width / 2, Math.toRadians(180));
+        basketStrafePose = new Pose2d(36, 66 - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketDeliverPose = new Pose2d(57, 57, Math.toRadians(-135));
 
 
         innerYellowPickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
         innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
-        midYellowPickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        midYellowPrePickupPose = new Pose2d(58.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
+        midYellowPickupPose = new Pose2d(60, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
+        midYellowPrePickupPose = new Pose2d(60, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
         outerYellowPrePose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
         outerYellowPickupPose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
@@ -104,17 +107,17 @@ public final class FieldConstantsSelect {
         thirdStagePushMidVector = new Vector2d(-58, 10);
 
 
-        specimenDeliverPose1 = new Pose2d(specStartX, 24 + Constants.RobotConstants.length / 2, specimenDropAngle);
-        specimenDeliverPose2 = new Pose2d(specStartX + specDiffX, 24 + Constants.RobotConstants.length / 2, specimenDropAngle);
-        specimenDeliverPose3 = new Pose2d(specStartX + 2 * specDiffX, 24 + Constants.RobotConstants.length / 2, specimenDropAngle);
-        specimenDeliverPose4 = new Pose2d(specStartX + 3 * specDiffX, 24 + Constants.RobotConstants.length / 2, specimenDropAngle);
+        specimenDeliverPose1 = new Pose2d(specStartX, 25 + Constants.RobotConstants.length / 2, specimenDropAngle);
+        specimenDeliverPose2 = new Pose2d(specStartX + specDiffX, 25 + Constants.RobotConstants.length / 2, specimenDropAngle);
+        specimenDeliverPose3 = new Pose2d(specStartX + 2 * specDiffX, 25 + Constants.RobotConstants.length / 2, specimenDropAngle);
+        specimenDeliverPose4 = new Pose2d(specStartX + 3 * specDiffX, 25 + Constants.RobotConstants.length / 2, specimenDropAngle);
 
         specimenDeliverApproachPose1 = new Pose2d(specStartX, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
         specimenDeliverApproachPose2 = new Pose2d(specStartX + specDiffX, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
         specimenDeliverApproachPose3 = new Pose2d(specStartX + 2 * specDiffX, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
         specimenDeliverApproachPose4 = new Pose2d(specStartX + 3 * specDiffX, 24 + Constants.RobotConstants.length / 2 + driveTo, specimenDropAngle);
 
-        specimenPickupPose = new Pose2d(-36, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2, specimenPickupAngle);
+        specimenPickupPose = new Pose2d(-36, Constants.FieldConstants.length / 2 - Constants.RobotConstants.length / 2 - 1.5, specimenPickupAngle);
         specimenPickupApproachPose = new Pose2d(-36, specimenPickupPose.position.y - 9, specimenPickupAngle);
         specimenParkPose = new Pose2d(-48, 60 - Constants.RobotConstants.length / 2 + 8, Math.toRadians(180));
     }

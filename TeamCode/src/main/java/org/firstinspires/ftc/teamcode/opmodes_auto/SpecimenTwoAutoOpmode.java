@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.opmodes_auto;
  */
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -42,6 +43,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
@@ -97,8 +99,8 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
         ears = new Elevator_Arm_RotateArm_Actions(elevator, arm, rotate, this);
         fcs = new FieldConstantsSelect();
         packet = new TelemetryPacket();
-        finalAccel = new ProfileAccelConstraint(-10, 10);
-        finalVel = new TranslationalVelConstraint(10);
+        finalAccel = new ProfileAccelConstraint(-15, 15);
+        finalVel = new TranslationalVelConstraint(15);
 
         register(drive, arm, elevator, rotate);
 
@@ -210,6 +212,13 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
 
             autoSequence.run(packet);
 
+            showField();
+
+
+            if (gamepad2.start) incShowSelect();
+            if (gamepad2.back) decShowSelect();
+
+
         }
 
         PoseStorage.currentPose = drive.pose;
@@ -264,6 +273,38 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
             telemetry.update();
         }
 
+    }
+
+    void showField() {
+        drive.updatePoseEstimate();
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay().setStroke("#3F51B5");
+        Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
+    }
+
+    void incShowSelect() {
+        showSelect++;
+        if (showSelect > Constants.ShowTelemetryConstants.maxShowSelectCount)
+            showSelect = Constants.ShowTelemetryConstants.minShowSelectCount;
+        updateSubs();
+    }
+
+    void decShowSelect() {
+        showSelect--;
+        if (showSelect < Constants.ShowTelemetryConstants.minShowSelectCount)
+            showSelect = Constants.ShowTelemetryConstants.maxShowSelectCount;
+        updateSubs();
+    }
+
+    void updateSubs() {
+        telemetry.clearAll();
+        //   dashboard.clearTelemetry();
+        drive.showSelect = showSelect;
+        arm.showSelect = showSelect;
+        elevator.showSelect = showSelect;
+        //  rotateArm.showSelect = showSelect;
+        // limelight.showSelect = showSelect;
     }
 
 

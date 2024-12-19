@@ -20,21 +20,19 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class RotateArmSubsystem extends SubsystemBase {
+    private final double intakeClawTime = .5;
     public double intakeTiltHomeAngle = .1;
     public double intakeTiltClearAngle = 0.3;
     public double intakeTiltVerticalAngle = .5;
-    public double touchSubmersibleAngle = .6;
+    public double touchSubmersibleAngle = .55;
     public double intakeTiltAboveSubmersibleAngle = .87;
     public double intakeTiltAboveSampleAngle = .9;
     public double intakeTiltPickupAngle = .96;
     public double currentTilt;
     public double tiltChangeTime;
     public double tiltTimeMultiplier = 1.5;
-
     public double intakeClawOpenAngle = 0;
     public double intakeClawClosedAngle = 1;
-    private final double intakeClawTime = .5;
-
     public Servo intakeClawServo;
     public double currentClaw;
     public Servo leftTiltServo;
@@ -43,7 +41,6 @@ public class RotateArmSubsystem extends SubsystemBase {
     public int showSelect = 0;
 
     private Telemetry telemetry;
-
 
 
     public RotateArmSubsystem(CommandOpMode opMode) {
@@ -81,11 +78,8 @@ public class RotateArmSubsystem extends SubsystemBase {
     }
 
     public Action openIntakeClaw() {
-        return
-                new SequentialAction(
-                        new InstantAction(() -> intakeClawServo.setPosition(intakeClawOpenAngle)),
-                        new InstantAction(() -> currentClaw = intakeClawOpenAngle),
-                        new SleepAction(intakeClawTime));
+        return new InstantAction(() -> intakeClawServo.setPosition(intakeClawOpenAngle));
+
     }
 
     public Action closeIntakeClaw() {
@@ -93,16 +87,16 @@ public class RotateArmSubsystem extends SubsystemBase {
                 new SequentialAction(
                         new InstantAction(() -> intakeClawServo.setPosition(intakeClawClosedAngle)),
                         new InstantAction(() -> currentClaw = intakeClawClosedAngle),
-                        new SleepAction(intakeClawTime));
+                        new SleepAction(1));
     }
 
     public Action setTiltAngle(double angle) {
-        return new ParallelAction(
-                new InstantAction(() -> leftTiltServo.setPosition(angle)),
-                new InstantAction(() -> rightTiltServo.setPosition(angle)),
-                new InstantAction(() -> tiltChangeTime = Math.abs(angle - currentTilt) * tiltTimeMultiplier),//
-                new InstantAction(() -> currentTilt = angle),
-                new SleepAction(tiltChangeTime));
+        return
+                new ParallelAction(
+                        new InstantAction(() -> leftTiltServo.setPosition(angle)),
+                        new InstantAction(() -> rightTiltServo.setPosition(angle)));
+
+        //new SleepAction(1));
     }
 
 

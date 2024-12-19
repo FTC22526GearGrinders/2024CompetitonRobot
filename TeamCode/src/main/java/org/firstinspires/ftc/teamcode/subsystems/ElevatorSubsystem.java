@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -42,7 +44,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 5;
     private final double bucketCycleTime = .75;
-    public double releaseDelay = .5;
+    public double releaseDelay = 1;
     public double specimenClawOpenAngle = 0.0;
     public double specimenClawClosedAngle = .4;
     public double bucketUprightAngle = .5;
@@ -226,25 +228,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-    public Action setTarget(double targetInches) {
-        return new Action() {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    setTargetInches(targetInches);
-                    initialized = true;
-                }
-                packet.put("targetInches", getTargetInches());
-                packet.put("leftInches", getLeftPositionInches());
-                packet.put("rightInches", getRightPositionInches());
-
-                return atGoal();
-            }
-        };
-    }
-
 
     public Action tipBucket() {
         return new InstantAction(() -> bucketServo.setPosition(bucketTippedAngle));
@@ -344,7 +327,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftPidOut = leftPidController.calculate(getLeftPositionInches());
 
 
-        double leftPowerVal = leftPidOut;
+        double leftPowerVal = clamp(leftPidOut, -1, 1);
 
         if (!shutDownElevatorPositioning && (leftPowerVal > 0 && !elevatorHigh || leftPowerVal < 0 && !elevatorLow))
             leftElevatorMotor.set(leftPowerVal);
@@ -353,7 +336,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         rightPidOut = rightPidController.calculate(getRightPositionInches());
 
-        double rightPowerVal = rightPidOut;
+        double rightPowerVal = clamp(rightPidOut, -1, 1);
 
         if (!shutDownElevatorPositioning && (rightPowerVal > 0 && !elevatorHigh || rightPowerVal < 0 && !elevatorLow))
             rightElevatorMotor.set(rightPowerVal);

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -55,15 +57,13 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public TrapezoidProfile.Constraints constraints;
     public int holdCtr;
     public int showSelect = 0;
-
+    public boolean shutDownArmPositioning;
     double leftPidOut;
-
     double rightPidOut;
     private ElapsedTime et;
     private int inPositionCtr;
     private Telemetry telemetry;
     private double scanTime;
-    public boolean shutDownArmPositioning;
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
 
@@ -106,7 +106,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         et = new ElapsedTime();
 
 
-
     }
 
     public static double round2dp(double number, int dp) {
@@ -115,9 +114,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         return temp1 / temp;
     }
 
-    public double getTargetInches() {
-        return TARGET;
-    }
 
     public void setTargetInches(double targetInches) {
         leftArmController.reset(getLeftPositionInches());
@@ -200,15 +196,16 @@ public class ExtendArmSubsystem extends SubsystemBase {
         leftPidOut = leftArmController.calculate(getLeftPositionInches());
 
 
-        double leftPowerVal = leftPidOut;
+        double leftPowerVal = clamp(leftPidOut, -1, 1);
+
         if (!shutDownArmPositioning && (leftPowerVal > 0 && !armOutLimit || leftPowerVal < 0 && !armInLimit))
             leftArmMotor.set(leftPowerVal);
         else leftArmMotor.set(0);
 
-        //right
+
         rightPidOut = rightArmController.calculate(getRightPositionInches());
 
-        double rightPowerVal = rightPidOut;
+        double rightPowerVal = clamp(rightPidOut, -1, 1);
 
         if (!shutDownArmPositioning && (rightPowerVal > 0 && !armOutLimit || rightPowerVal < 0 && !armInLimit))
             rightArmMotor.set(rightPowerVal);
@@ -259,6 +256,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
     public Action armToPickupAction() {
         return positionArm(Constants.ExtendArmConstants.pickupDistance);
+    }
+
+    public Action armToAutoPickupAction() {
+        return positionArm(Constants.ExtendArmConstants.autoPickupDistance);
     }
 
     public Action armToBucketAction() {

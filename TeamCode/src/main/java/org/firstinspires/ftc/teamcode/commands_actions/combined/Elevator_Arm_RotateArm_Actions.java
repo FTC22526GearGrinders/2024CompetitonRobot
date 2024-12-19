@@ -85,8 +85,10 @@ public class Elevator_Arm_RotateArm_Actions {
     public Action tiltToPickupCloseClawRaiseTiltAboveSubmersible() {
         return new SequentialAction(
                 // arm.armToPickupAction(),
-                rotateArm.tiltToPickup(),
+                //  rotateArm.tiltToPickup(),
+                //  new SleepAction(.1),
                 rotateArm.closeIntakeClaw(),
+                new SleepAction(1),
                 rotateArm.tiltAboveSubmersible());
     }
 
@@ -99,11 +101,31 @@ public class Elevator_Arm_RotateArm_Actions {
                         rotateArm.openIntakeClaw()));
     }
 
+    public Action autoArmPickupBucketDrop() {
+        return new SequentialAction(
+                arm.armToAutoPickupAction(),
+                rotateArm.tiltToPickup(),
+                new SleepAction(1.5),
+                rotateArm.closeIntakeClaw(),
+                new SleepAction(0.2),
+                rotateArm.tiltToBucketDeliver(),
+                arm.armToBucketAction(),
+                new SleepAction(0.5),
+                rotateArm.openIntakeClaw(),
+                new SleepAction(.2),
+                elevator.travelBucket(),
+                rotateArm.tiltBothVertical(),
+
+                new SleepAction(.1));
+
+    }
+
+
     public Action pickupSampleDeliverToBucket() {
 
         return new SequentialAction(
 
-                armOutTiltAboveSamplesOpenClaw(),
+                // armOutTiltAboveSamplesOpenClaw(),
                 tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
                 tiltAndArmMoveThenDeliverToBucket());
 

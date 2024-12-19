@@ -107,8 +107,10 @@ public final class Constants {
         public static final double POSITION_TOLERANCE_INCHES = 2;
 
 
-        public static double bucketDistance = 1;
+        public static double bucketDistance = 0;
         public static double pickupDistance = 12;
+        public static double autoPickupDistance = 3.5;
+
         public static double firstExtendDistance = 14;
         public static double secondExtendDistance = 16;
 
