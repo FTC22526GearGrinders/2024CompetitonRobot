@@ -72,7 +72,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean shutDownElevatorPositioning;
     public double leftTotalPower;
     public double rightTotalPower;
-    public boolean positionElevator;
     CommandOpMode myOpmode;
     double leftSetVel;
     double leftSetPos;
@@ -81,6 +80,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     double rightSetPos;
     double rightPidOut;
     private int inPositionCtr;
+    private long startTime;
+    private long posTime;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
 
@@ -164,9 +165,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                 if (!initialized) {
                     inPositionCtr = 0;
                     setTargetInches(target);
+                    startTime = System.currentTimeMillis();
                     initialized = true;
                 }
                 packet.put("moving", atGoal());
+                posTime = (System.currentTimeMillis() - startTime) / 1000;
                 return !atGoal();
             }
         };
@@ -299,8 +302,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         holdCtr++;
 
-        if (positionElevator) position();
-
         if (holdCtr >= 50) {
             leftTotalPower += Math.abs(leftElevatorMotor.get());
             rightTotalPower += Math.abs(rightElevatorMotor.get());
@@ -413,7 +414,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void showCommonTelemetry() {
         telemetry.addData("ElevatorCommon", showSelect);
-        telemetry.addData("POSE", positionElevator);
+        telemetry.addData("PosTime", posTime);
         telemetry.addData("PosRng", posrng);
         telemetry.addData("HldRng", holdCtr);
         telemetry.addData("AtGoal", atGoal());
