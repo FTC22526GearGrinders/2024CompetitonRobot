@@ -16,7 +16,7 @@ public final class FieldConstantsSelect {
 
 
     public Pose2d basketSideStartPose;
-    public Pose2d basketStrafePose;
+    public Pose2d basketSideStrafePose;
 
     public Pose2d basketDeliverPose;
     public Pose2d innerYellowPickupPose;
@@ -65,15 +65,15 @@ public final class FieldConstantsSelect {
     public void setBlue() {
 
         basketSideStartPose = new Pose2d(36, 72 - Constants.RobotConstants.width / 2, Math.toRadians(180));
-        basketStrafePose = new Pose2d(36, 66 - Constants.RobotConstants.width / 2, Math.toRadians(180));
+        basketSideStrafePose = new Pose2d(36, 66 - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketDeliverPose = new Pose2d(57, 57, Math.toRadians(-135));
 
 
-        innerYellowPickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        innerYellowPrePickupPose = new Pose2d(48.7, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
+        innerYellowPickupPose = new Pose2d(48.5 + .75, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
+        innerYellowPrePickupPose = new Pose2d(48.5 + .75, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
-        midYellowPickupPose = new Pose2d(60, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        midYellowPrePickupPose = new Pose2d(60, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
+        midYellowPickupPose = new Pose2d(59.25, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
+        midYellowPrePickupPose = new Pose2d(59.25, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
         outerYellowPrePose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
         outerYellowPickupPose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
@@ -123,6 +123,7 @@ public final class FieldConstantsSelect {
     }
 
     public void setRed() {
+        basketSideStrafePose = flipBlueToRedPose(basketSideStrafePose);
         basketSideStartPose = flipBlueToRedPose(basketSideStartPose);
         basketDeliverPose = flipBlueToRedPose(basketDeliverPose);
 

@@ -123,9 +123,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         drive.pose = fcs.basketSideStartPose;
 
         firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
-                .strafeToLinearHeading(fcs.basketStrafePose.position, fcs.basketStrafePose.heading).build();
+                .strafeTo(fcs.basketSideStrafePose.position).build();
 
-        firstSampleDeliverMove = drive.actionBuilder(fcs.basketStrafePose)
+
+        firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStrafePose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
         secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
@@ -137,7 +138,6 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading).build();
-
 
         thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
@@ -163,9 +163,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         autoSequence = new SequentialAction(
 
                 firstSampleStrafeMove,
-                new SleepAction(1),
-                new ParallelAction(
 
+                new ParallelAction(
                         firstSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
@@ -175,28 +174,23 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         secondSamplePickupMove,
                         elevator.elevatorToHome(),
                         new SequentialAction(
-                                new SleepAction(1.5),
-                                arm.armToAutoPickupAction())),
-
-
-                //  secondSamplePickupMove,
-                // new ParallelAction(
+                                new SleepAction(1),
+                                ears.autoArmOutTiltToPickup())),
 
                 ears.autoArmPickupBucketDrop(),
-
-                //   new InstantAction(() -> elevator.showSelect = Constants.ShowTelemetryConstants.showElevatorCommon),
-
 
                 new ParallelAction(
                         secondSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
-
                 elevator.cycleBucket(),
 
                 new ParallelAction(
+                        thirdSamplePickupMove,
                         elevator.elevatorToHome(),
-                        thirdSamplePickupMove),
+                        new SequentialAction(
+                                new SleepAction(1),
+                                ears.autoArmOutTiltToPickup())),
 
                 ears.autoArmPickupBucketDrop(),
 

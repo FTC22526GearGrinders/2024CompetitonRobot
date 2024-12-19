@@ -249,7 +249,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Action closeSpecimenClaw() {
-        return new InstantAction(() -> specimenClawServo.setPosition(specimenClawClosedAngle));//.5
+        return new InstantAction(() -> specimenClawServo.setPosition(specimenClawClosedAngle));
     }
 
     public Action openSpecimenClaw() {

@@ -19,8 +19,8 @@ public class RedOrBlueSamplesFresh {
 
     public static void main(String[] args) {
 
+        Action firstSampleStrafeMove;
         Action firstSampleDeliverMove;
-
         TrajectoryActionBuilder secondSampleDeliverMove;
         Action secondSampleDeliverComplete;
         TrajectoryActionBuilder thirdSampleDeliverMove;
@@ -63,9 +63,13 @@ public class RedOrBlueSamplesFresh {
 
         DriveShim drive = myBot.getDrive();
 
-        // fcs.setRed();
+        fcs.setRed();
 
-        firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStartPose)
+        firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
+                .strafeTo(fcs.basketSideStrafePose.position).build();
+
+
+        firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStrafePose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
@@ -112,6 +116,8 @@ public class RedOrBlueSamplesFresh {
 
 
         deliverFourSamples = new SequentialAction(
+                new SleepAction(.5),
+                firstSampleStrafeMove,
 
                 firstSampleDeliverMove,
                 dropSampleAction,
@@ -140,9 +146,9 @@ public class RedOrBlueSamplesFresh {
 
                 parkAction);
 
-
-        myBot.runAction(deliverFourSamples);
         myBot.setPose(fcs.basketSideStartPose);
+        myBot.runAction(deliverFourSamples);
+
         ShowField.showIt(meepMeep, myBot);
         meepMeep.start();
     }

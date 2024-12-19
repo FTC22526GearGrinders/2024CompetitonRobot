@@ -6,8 +6,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -84,10 +82,9 @@ public class RotateArmSubsystem extends SubsystemBase {
 
     public Action closeIntakeClaw() {
         return
-                new SequentialAction(
+                new ParallelAction(
                         new InstantAction(() -> intakeClawServo.setPosition(intakeClawClosedAngle)),
-                        new InstantAction(() -> currentClaw = intakeClawClosedAngle),
-                        new SleepAction(1));
+                        new InstantAction(() -> currentClaw = intakeClawClosedAngle));
     }
 
     public Action setTiltAngle(double angle) {
@@ -95,8 +92,6 @@ public class RotateArmSubsystem extends SubsystemBase {
                 new ParallelAction(
                         new InstantAction(() -> leftTiltServo.setPosition(angle)),
                         new InstantAction(() -> rightTiltServo.setPosition(angle)));
-
-        //new SleepAction(1));
     }
 
 
