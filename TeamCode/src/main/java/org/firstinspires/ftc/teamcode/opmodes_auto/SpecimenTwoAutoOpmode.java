@@ -212,7 +212,6 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
 
             autoSequence.run(packet);
 
-            showField();
 
 
             if (gamepad2.start) incShowSelect();

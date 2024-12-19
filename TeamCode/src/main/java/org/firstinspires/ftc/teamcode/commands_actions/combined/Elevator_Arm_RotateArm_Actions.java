@@ -101,31 +101,47 @@ public class Elevator_Arm_RotateArm_Actions {
                         rotateArm.openIntakeClaw()));
     }
 
-    public Action autoArmPickupBucketDrop() {
-
-        return new SequentialAction(
-                rotateArm.closeIntakeClaw(),
-                new SleepAction(.75),
-                rotateArm.tiltToBucketDeliver(),
-                arm.armToBucketAction(),
-                new SleepAction(1.5),
-                rotateArm.openIntakeClaw(),
-                new SleepAction(.75),
-                elevator.travelBucket(),
-                rotateArm.tiltBothVertical(),
-                new SleepAction(.1));
-
+    public Action autoArmPickupThenBucketDrop() {
+        return
+                new SequentialAction(
+                        rotateArm.closeIntakeClaw(),
+                        elevator.levelBucket(),
+                        new SleepAction(.5),//claw close wait
+                        rotateArm.tiltToBucketDeliver(),
+                        arm.armToBucketAction(),//arm tolerance is 2" so will finish early
+                        new SleepAction(1.5),//wait for arm and tilt
+                        rotateArm.openIntakeClaw(),
+                        new SleepAction(1),//claw open wait for sample to drop
+                        elevator.travelBucket(),
+                        rotateArm.tiltBothVertical());
     }
 
     public Action autoArmOutTiltToPickup() {
-        return new ParallelAction(
-                arm.armToAutoPickupAction(),
-                new SequentialAction(
-                        new SleepAction(.5),
-                        rotateArm.tiltToPickup()));
+        return
+                new ParallelAction(
+                        arm.armToAutoPickupAction(),// 2" in position means ends early but continues to position
+                        new SequentialAction(
+                                new SleepAction(.5),//wait before tilt out
+                                rotateArm.tiltToPickup()));
     }
 
+    public Action testDeliver() {
+        return new SequentialAction(
+                elevator.elevatorToUpperBasket(),
+                elevator.cycleBucketToVertical());//keep clear of rotate for now
+    }
 
+    public Action testPickup() {
+        return new SequentialAction(
+                new ParallelAction(
+                        elevator.elevatorToHome(),//start elevator down
+                        new SequentialAction(
+                                new SleepAction(1),//wait before arm extend
+                                autoArmOutTiltToPickup())),// extend arm and rotate to pickup
+
+                elevator.levelBucket(),
+                autoArmPickupThenBucketDrop());//close claw, raise tilt, arm to bucket open claw
+    }
 
 
 }

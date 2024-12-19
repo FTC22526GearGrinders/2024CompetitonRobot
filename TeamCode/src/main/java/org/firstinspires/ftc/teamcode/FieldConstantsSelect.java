@@ -8,12 +8,14 @@ import com.acmerobotics.roadrunner.Vector2d;
 public final class FieldConstantsSelect {
 
     //basket
-    public double pickUpArmEX = 11;
+    public double pickUpArmEX = 10.5;//11;
     public double driveTo = 0;
     public double sampleDropOffZoneFromWall = 8;
     public double specStartX = -9;
     public double specDiffX = 6;
-
+    public double tileToothDepth = .75;
+    public double sampleLength = 3.5;
+    public double sampleWidth = 1.5;
 
     public Pose2d basketSideStartPose;
     public Pose2d basketSideStrafePose;
@@ -68,12 +70,12 @@ public final class FieldConstantsSelect {
         basketSideStrafePose = new Pose2d(36, 66 - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketDeliverPose = new Pose2d(57, 57, Math.toRadians(-135));
 
+        innerYellowPickupPose = new Pose2d(48 + tileToothDepth / 2 + sampleWidth / 2,
+                24 + tileToothDepth / 2 + sampleLength / 2 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
 
-        innerYellowPickupPose = new Pose2d(48.5 + .75, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        innerYellowPrePickupPose = new Pose2d(48.5 + .75, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
 
-        midYellowPickupPose = new Pose2d(59.25, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
-        midYellowPrePickupPose = new Pose2d(59.25, 25.5 + Constants.RobotConstants.length / 2 + pickUpArmEX + driveTo, Math.toRadians(-90));
+        midYellowPickupPose = new Pose2d(58 + tileToothDepth / 2 + sampleWidth / 2,
+                24 + tileToothDepth / 2 + sampleLength / 2 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
 
         outerYellowPrePose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
         outerYellowPickupPose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
@@ -129,9 +131,9 @@ public final class FieldConstantsSelect {
 
 
         innerYellowPickupPose = flipBlueToRedPose(innerYellowPickupPose);
-        innerYellowPrePickupPose = flipBlueToRedPose(innerYellowPrePickupPose);
+
         midYellowPickupPose = flipBlueToRedPose(midYellowPickupPose);
-        midYellowPrePickupPose = flipBlueToRedPose(midYellowPrePickupPose);
+
 
         outerYellowPrePose = flipBlueToRedPose(outerYellowPrePose);
         outerYellowPickupPose = flipBlueToRedPose(outerYellowPickupPose);

@@ -125,7 +125,6 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeTo(fcs.basketSideStrafePose.position).build();
 
-
         firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStrafePose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
@@ -168,7 +167,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         firstSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
-                elevator.cycleBucket(),
+                elevator.cycleBucketToVertical(),
 
                 new ParallelAction(
                         secondSamplePickupMove,
@@ -177,13 +176,15 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                                 new SleepAction(1),
                                 ears.autoArmOutTiltToPickup())),
 
-                ears.autoArmPickupBucketDrop(),
+                elevator.levelBucket(),
+
+                ears.autoArmPickupThenBucketDrop(),
 
                 new ParallelAction(
                         secondSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
-                elevator.cycleBucket(),
+                elevator.cycleBucketToVertical(),
 
                 new ParallelAction(
                         thirdSamplePickupMove,
@@ -192,7 +193,9 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                                 new SleepAction(1),
                                 ears.autoArmOutTiltToPickup())),
 
-                ears.autoArmPickupBucketDrop(),
+                elevator.levelBucket(),
+
+                ears.autoArmPickupThenBucketDrop(),
 
                 new ParallelAction(
                         thirdSampleDeliverMove,

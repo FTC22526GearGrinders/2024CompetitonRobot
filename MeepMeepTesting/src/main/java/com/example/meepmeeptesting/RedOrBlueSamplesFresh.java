@@ -63,7 +63,7 @@ public class RedOrBlueSamplesFresh {
 
         DriveShim drive = myBot.getDrive();
 
-        fcs.setRed();
+        // fcs.setRed();
 
         firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeTo(fcs.basketSideStrafePose.position).build();
@@ -74,24 +74,20 @@ public class RedOrBlueSamplesFresh {
                 .build();//move to place first specimen
 
 
-        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading);
+        firstSampleDeliverMove = drive.actionBuilder(fcs.altBasketStartPose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
+                .build();//move to place first specimen
 
-        secondSamplePickupComplete = secondSamplePickupMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading,
-                        approachVel, approachAccel).build();
+        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading);
+
 
         secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading);
 
 
         thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading);
-
-
-        thirdSamplePickupComplete = thirdSamplePickupMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading,
-                        approachVel, approachAccel).build();
+                .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading);
 
 
         thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
@@ -116,14 +112,13 @@ public class RedOrBlueSamplesFresh {
 
 
         deliverFourSamples = new SequentialAction(
-                new SleepAction(.5),
-                firstSampleStrafeMove,
+                // new SleepAction(10),
+                //  firstSampleStrafeMove,
 
                 firstSampleDeliverMove,
                 dropSampleAction,
 
                 secondSamplePickupMove.build(),
-                secondSamplePickupComplete,
                 pickupSampleAction,
 
                 secondSampleDeliverMove.build(),
@@ -131,7 +126,6 @@ public class RedOrBlueSamplesFresh {
 
 
                 thirdSamplePickupMove.build(),
-                thirdSamplePickupComplete,
                 pickupSampleAction,
 
                 thirdSampleDeliverMove.build(),

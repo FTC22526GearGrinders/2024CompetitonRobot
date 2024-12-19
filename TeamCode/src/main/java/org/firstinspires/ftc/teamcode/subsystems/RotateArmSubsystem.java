@@ -27,8 +27,6 @@ public class RotateArmSubsystem extends SubsystemBase {
     public double intakeTiltAboveSampleAngle = .9;
     public double intakeTiltPickupAngle = .96;
     public double currentTilt;
-    public double tiltChangeTime;
-    public double tiltTimeMultiplier = 1.5;
     public double intakeClawOpenAngle = 0;
     public double intakeClawClosedAngle = 1;
     public Servo intakeClawServo;
@@ -94,19 +92,16 @@ public class RotateArmSubsystem extends SubsystemBase {
                         new InstantAction(() -> rightTiltServo.setPosition(angle)));
     }
 
-
     public Action tiltToPickup() {
         return setTiltAngle(intakeTiltPickupAngle);
     }
 
     public Action tiltAboveSamples() {
         return setTiltAngle(intakeTiltAboveSampleAngle);
-
     }
 
     public Action tiltAboveSubmersible() {
         return setTiltAngle(intakeTiltAboveSubmersibleAngle);
-
     }
 
     public Action tiltToBucketDeliver() {
@@ -120,7 +115,6 @@ public class RotateArmSubsystem extends SubsystemBase {
     public Action tiltBothHome(double timeout) {
         return setTiltAngle(intakeTiltHomeAngle);
     }
-
 
     public Action tiltToTouchSubmersibleAction() {
         return setTiltAngle(touchSubmersibleAngle);

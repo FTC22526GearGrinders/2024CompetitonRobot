@@ -205,14 +205,16 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad2.a && !previousGamepad2.a)
             runningActions.add(elevator.deliverSpecimenToNearestChamber());
 
-//        if (currentGamepad2.b && !previousGamepad2.b)
+        //  if (currentGamepad2.b && !previousGamepad2.b)
 
 
-//        if (currentGamepad2.dpad_up && !previousGamepad1.dpad_up)
-//
-//        if (currentGamepad2.dpad_down && !previousGamepad1.dpad_down)
-//
-//
+        if (currentGamepad2.dpad_up && !previousGamepad1.dpad_up)
+            runningActions.add(eara.testDeliver());
+
+        if (currentGamepad2.dpad_down && !previousGamepad1.dpad_down)
+            runningActions.add(eara.testPickup());
+
+
 //        if (currentGamepad2.dpad_right && !previousGamepad1.dpad_right)
 //
 //

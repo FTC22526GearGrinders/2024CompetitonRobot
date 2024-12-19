@@ -34,34 +34,33 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double ekp = 0.5;
     public static double eki = 0;
     public static double ekd = 0;
+    public static double powerDownLimit = .5;
+    public static double powerUpLimit = .8;
+
     public static boolean TUNE = false;
     public static double TARGET;
-    public final double UPPER_POSITION_LIMIT = 28;
+    public static double TRAJECTORY_VEL = 15;
+    public static double TRAJECTORY_ACCEL = 10;
+    public final double UPPER_POSITION_LIMIT = 30;
     public final double LOWER_POSITION_LIMIT = 0;
-    public final double TRAJECTORY_VEL = 15;
-    public final double TRAJECTORY_ACCEL = 10;
-    public final double minimumHoldHeight = 0;//1.2;
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 5;
-    private final double bucketCycleTime = .75;
+    private final double bucketCycleTime = .5;
     public double releaseDelay = 1;
     public double specimenClawOpenAngle = 0.0;
     public double specimenClawClosedAngle = .4;
     public double bucketUprightAngle = .5;
     public double bucketTravelAngle = .4;
+    public double bucketVerticalAngle = .1;
     public double bucketTippedAngle = 0;
     public ElapsedTime holdTime;
     public TrapezoidProfile.Constraints constraints;
     public Motor leftElevatorMotor;
     public Motor.Encoder leftElevatorEncoder;
     public ProfiledPIDController leftPidController;
-    public TrapezoidProfile.State leftGoal = new TrapezoidProfile.State();
-    public TrapezoidProfile.State leftSetpoint = new TrapezoidProfile.State();
     public Motor rightElevatorMotor;
     public Motor.Encoder rightElevatorEncoder;
     public ProfiledPIDController rightPidController;
-    public TrapezoidProfile.State rightGoal = new TrapezoidProfile.State();
-    public TrapezoidProfile.State rightSetpoint = new TrapezoidProfile.State();
     public Servo bucketServo;
     public Servo specimenClawServo;
     public int holdCtr;
@@ -73,17 +72,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean shutDownElevatorPositioning;
     public double leftTotalPower;
     public double rightTotalPower;
+    public boolean positionElevator;
     CommandOpMode myOpmode;
     double leftSetVel;
     double leftSetPos;
     double leftPidOut;
     double rightSetVel;
     double rightSetPos;
-
     double rightPidOut;
-
     private int inPositionCtr;
-    public boolean positionElevator;
 
     public ElevatorSubsystem(CommandOpMode opMode) {
 
@@ -183,7 +180,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         return positionElevator(Constants.ElevatorConstants.elevatorClearOfWall);
     }
 
-
     public Action elevatorToAboveLowerSubmersible() {
         return positionElevator(Constants.ElevatorConstants.elevatorSpecimenAboveLowPlaceHeight);
     }
@@ -228,7 +224,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-
     public Action tipBucket() {
         return new InstantAction(() -> bucketServo.setPosition(bucketTippedAngle));
     }
@@ -241,11 +236,22 @@ public class ElevatorSubsystem extends SubsystemBase {
         return new InstantAction(() -> bucketServo.setPosition(bucketUprightAngle));
     }
 
+    public Action verticalBucket() {
+        return new InstantAction(() -> bucketServo.setPosition(bucketVerticalAngle));
+    }
+
     public Action cycleBucket() {
         return new SequentialAction(
                 tipBucket(),
                 new SleepAction(bucketCycleTime),
                 levelBucket());
+    }
+
+    public Action cycleBucketToVertical() {
+        return new SequentialAction(
+                tipBucket(),
+                new SleepAction(.25),
+                verticalBucket());
     }
 
     public Action closeSpecimenClaw() {
@@ -307,6 +313,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (TARGET < LOWER_POSITION_LIMIT) TARGET = LOWER_POSITION_LIMIT;
             setTargetInches(TARGET);
             setGains();
+            if (constraints.maxVelocity != TRAJECTORY_VEL || constraints.maxAcceleration != TRAJECTORY_ACCEL)
+                constraints = new TrapezoidProfile.Constraints(TRAJECTORY_VEL, TRAJECTORY_ACCEL);
         }
     }
 
@@ -316,18 +324,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void position() {
+
         posrng++;
 
-
-
-        boolean elevatorHigh = false;// getLeftPositionInches() >= UPPER_POSITION_LIMIT || getRightPositionInches() >= UPPER_POSITION_LIMIT;
-        boolean elevatorLow = false;//getLeftPositionInches() <= LOWER_POSITION_LIMIT || getRightPositionInches() <= LOWER_POSITION_LIMIT;
-
+        boolean elevatorHigh = getLeftPositionInches() >= UPPER_POSITION_LIMIT || getRightPositionInches() >= UPPER_POSITION_LIMIT;
+        boolean elevatorLow = getLeftPositionInches() <= LOWER_POSITION_LIMIT || getRightPositionInches() <= LOWER_POSITION_LIMIT;
 
         leftPidOut = leftPidController.calculate(getLeftPositionInches());
 
-
-        double leftPowerVal = clamp(leftPidOut, -1, 1);
+        double leftPowerVal = clamp(leftPidOut, -powerDownLimit, powerUpLimit);
 
         if (!shutDownElevatorPositioning && (leftPowerVal > 0 && !elevatorHigh || leftPowerVal < 0 && !elevatorLow))
             leftElevatorMotor.set(leftPowerVal);
@@ -336,13 +341,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         rightPidOut = rightPidController.calculate(getRightPositionInches());
 
-        double rightPowerVal = clamp(rightPidOut, -1, 1);
+        double rightPowerVal = clamp(rightPidOut, -powerDownLimit, powerUpLimit);
 
         if (!shutDownElevatorPositioning && (rightPowerVal > 0 && !elevatorHigh || rightPowerVal < 0 && !elevatorLow))
             rightElevatorMotor.set(rightPowerVal);
         else rightElevatorMotor.set(0);
     }
-
 
     public void setGains() {
         if (ekp != leftPidController.getP()) {
