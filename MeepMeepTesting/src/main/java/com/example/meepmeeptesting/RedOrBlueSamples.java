@@ -2,6 +2,7 @@ package com.example.meepmeeptesting;
 
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -14,13 +15,16 @@ import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 
-public class RedOrBlueSamplesFresh {
+public class RedOrBlueSamples {
 
 
     public static void main(String[] args) {
 
         Action firstSampleStrafeMove;
         Action firstSampleDeliverMove;
+
+        Action firstTurn;
+        Action secondTurn;
         TrajectoryActionBuilder secondSampleDeliverMove;
         Action secondSampleDeliverComplete;
         TrajectoryActionBuilder thirdSampleDeliverMove;
@@ -55,7 +59,7 @@ public class RedOrBlueSamplesFresh {
         approachAccel = new ProfileAccelConstraint(-20.0, 20.0);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(20, 20, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(Constants.RobotConstants.length, Constants.RobotConstants.length)
                 .setColorScheme(new ColorSchemeBlueLight())
                 .setStartPose(fcs.basketSideStartPose)
@@ -63,7 +67,7 @@ public class RedOrBlueSamplesFresh {
 
         DriveShim drive = myBot.getDrive();
 
-        // fcs.setRed();
+        //  fcs.setRed();
 
         firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeTo(fcs.basketSideStrafePose.position).build();
@@ -73,20 +77,21 @@ public class RedOrBlueSamplesFresh {
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
                 .build();//move to place first specimen
 
+        firstTurn = drive.actionBuilder(fcs.basketDeliverPose)
+                .turn(Math.toRadians(5)).build();
 
-        firstSampleDeliverMove = drive.actionBuilder(fcs.altBasketStartPose)
-                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading)
-                .build();//move to place first specimen
-
-        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPoseTurned)
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading);
 
 
         secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading);
 
+        secondTurn = drive.actionBuilder(fcs.basketDeliverPose)
+                .turn(Math.toRadians(10)).build();
 
-        thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+
+        thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPoseTurned1)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading);
 
 
@@ -95,11 +100,6 @@ public class RedOrBlueSamplesFresh {
 
         fourthSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading);
-
-
-        fourthSamplePickupComplete = fourthSamplePickupMove.endTrajectory().fresh()
-                .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading,
-                        approachVel, approachAccel).build();
 
 
         fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPickupPose)
@@ -112,31 +112,35 @@ public class RedOrBlueSamplesFresh {
 
 
         deliverFourSamples = new SequentialAction(
-                // new SleepAction(10),
-                //  firstSampleStrafeMove,
+                new SleepAction(1),
 
-                firstSampleDeliverMove,
+                new ParallelAction(
+                        new SequentialAction(
+                                firstSampleStrafeMove,
+                                firstSampleDeliverMove),
+                        new SleepAction(2)),
+
                 dropSampleAction,
-
+                firstTurn,
                 secondSamplePickupMove.build(),
                 pickupSampleAction,
 
                 secondSampleDeliverMove.build(),
                 dropSampleAction,
 
-
+                secondTurn,
                 thirdSamplePickupMove.build(),
                 pickupSampleAction,
 
                 thirdSampleDeliverMove.build(),
                 dropSampleAction,
 
-                fourthSamplePickupMove.build(),
-                fourthSamplePickupComplete,
-                pickupSampleAction,
-
-                fourthSampleDeliverMove.build(),
-                dropSampleAction,
+//                fourthSamplePickupMove.build(),
+//                fourthSamplePickupComplete,
+//                pickupSampleAction,
+//
+//                fourthSampleDeliverMove.build(),
+//                dropSampleAction,
 
                 parkAction);
 

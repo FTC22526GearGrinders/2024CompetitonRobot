@@ -77,7 +77,7 @@ public class CompetitionTwoRedOrBlueSpecimen {
         DriveShim drive = myBot.getDrive();
 
 
-        // fcs.setRed();
+        fcs.setRed();
 
 
         firstSpecimenPreDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)

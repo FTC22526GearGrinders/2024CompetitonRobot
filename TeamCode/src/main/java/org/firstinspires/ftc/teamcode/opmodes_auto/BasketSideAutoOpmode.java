@@ -61,8 +61,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     public int TEAM_NUMBER = 22526; //Enter team Number
 
 
-    public Action firstSampleStrafeMove;
-    public Action firstSampleDeliverMove;
+    Action firstSampleStrafeMove;
+    Action firstSampleDeliverMove;
 
     Action secondSampleDeliverMove;
     Action thirdSampleDeliverMove;
@@ -87,9 +87,6 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     private TelemetryPacket packet;
     private FieldConstantsSelect fcs;
     private SequentialAction autoSequence;
-    private SequentialAction autoSequence1;
-    private SequentialAction autoSequence2;
-    private SequentialAction autoSequenceAll;
 
 
     @Override
@@ -131,9 +128,9 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
 
-
         secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
+
 
         thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading).build();
@@ -158,13 +155,12 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
     private void buildSequence() {
 
-
         autoSequence = new SequentialAction(
 
-                firstSampleStrafeMove,
-
                 new ParallelAction(
-                        firstSampleDeliverMove,
+                        new SequentialAction(
+                                firstSampleStrafeMove,
+                                firstSampleDeliverMove),
                         elevator.elevatorToUpperBasket()),
 
                 elevator.cycleBucketToVertical(),
@@ -201,28 +197,32 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         thirdSampleDeliverMove,
                         elevator.elevatorToUpperBasket()),
 
-                elevator.cycleBucket(),
+                elevator.cycleBucketToVertical(),
 
 //                new ParallelAction(
-//                        elevator.elevatorToHome(),
-//                        fourthSamplePrePickupMove),
-//
-//                new ParallelAction(
+//                        fourthSamplePrePickupMove,
+//                        elevator.elevatorToHome()),
+
+//                new SequentialAction(
 //                        fourthSamplePickupMove,
-//                        ears.autoArmPickupBucketDrop()),
+//                        ears.autoArmOutTiltToPickup()),
+//
+//                elevator.levelBucket(),
+//
+//                ears.autoArmPickupThenBucketDrop(),
 //
 //                new ParallelAction(
 //                        fourthSampleDeliverMove,
 //                        elevator.elevatorToUpperBasket()),
-//
-//                elevator.cycleBucket(),
-
-                new ParallelAction(
-                        elevator.elevatorToHome(),
-                        rotate.tiltToTouchSubmersibleAction(),
-                        parkAction));
 
 
+                new SequentialAction(
+                        new ParallelAction(
+                                rotate.tiltBothHome(),
+                                elevator.elevatorToHome(),
+                                parkAction),
+                        elevator.levelBucket(),
+                        arm.raiseParkArm()));
     }
 
 
@@ -248,8 +248,6 @@ public class BasketSideAutoOpmode extends CommandOpMode {
             run();
 
             autoSequence.run(packet);
-
-
         }
 
         PoseStorage.currentPose = drive.pose;

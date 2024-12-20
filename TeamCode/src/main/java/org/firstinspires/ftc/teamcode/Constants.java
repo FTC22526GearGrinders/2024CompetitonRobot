@@ -107,7 +107,7 @@ public final class Constants {
         public static final double POSITION_TOLERANCE_INCHES = 2;
 
 
-        public static double bucketDistance = 0;
+        public static double home = 0;
         public static double pickupDistance = 12;
         public static double autoPickupDistance = 3.5;
 

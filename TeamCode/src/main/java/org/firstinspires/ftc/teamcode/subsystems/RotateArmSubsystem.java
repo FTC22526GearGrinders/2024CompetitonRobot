@@ -22,7 +22,6 @@ public class RotateArmSubsystem extends SubsystemBase {
     public double intakeTiltHomeAngle = .1;
     public double intakeTiltClearAngle = 0.3;
     public double intakeTiltVerticalAngle = .5;
-    public double touchSubmersibleAngle = .55;
     public double intakeTiltAboveSubmersibleAngle = .87;
     public double intakeTiltAboveSampleAngle = .9;
     public double intakeTiltPickupAngle = .96;
@@ -61,6 +60,8 @@ public class RotateArmSubsystem extends SubsystemBase {
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
         telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
+
+        tiltBothHome();
 
     }
 
@@ -112,12 +113,8 @@ public class RotateArmSubsystem extends SubsystemBase {
         return setTiltAngle(intakeTiltVerticalAngle);
     }
 
-    public Action tiltBothHome(double timeout) {
+    public Action tiltBothHome() {
         return setTiltAngle(intakeTiltHomeAngle);
-    }
-
-    public Action tiltToTouchSubmersibleAction() {
-        return setTiltAngle(touchSubmersibleAngle);
     }
 
 

@@ -27,12 +27,19 @@ public final class FieldConstantsSelect {
     public Pose2d basketSideStartPose;
     public Pose2d altBasketStartPose;
     public Pose2d basketDeliverPose;
+    public Pose2d basketDeliverPoseTurned;
+    public Pose2d basketDeliverPoseTurned1;
+
+
     public Pose2d innerYellowPickupPose;
     public Pose2d innerYellowPrePickupPose;
     public Pose2d midYellowPickupPose;
     public Pose2d midYellowPrePickupPose;
     public Pose2d outerYellowPrePose;
     public Pose2d outerYellowPickupPose;
+    public Pose2d outerYellowPickupPoseDirect;
+
+
     public Pose2d ascentZoneParkPose;
     public Pose2d ascentZonePickupPose;
     public double specimenDropAngle;
@@ -79,6 +86,8 @@ public final class FieldConstantsSelect {
         basketSideStrafePose = new Pose2d(36, 72 - strafeDistance - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketSideStartPose = new Pose2d(36, 72 - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketDeliverPose = new Pose2d(57, 57, Math.toRadians(-135));
+        basketDeliverPoseTurned = new Pose2d(57, 57, Math.toRadians(-130));
+        basketDeliverPoseTurned1 = new Pose2d(57, 57, Math.toRadians(-125));
 
 
         innerYellowPickupPose = new Pose2d(48 + tileToothDepth / 2 + sampleWidth / 2,
@@ -90,6 +99,9 @@ public final class FieldConstantsSelect {
 
         outerYellowPrePose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
         outerYellowPickupPose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX, 25.5, Math.toRadians(0));
+
+        outerYellowPickupPoseDirect = new Pose2d(68 + tileToothDepth / 2 + sampleWidth / 2,
+                24 + tileToothDepth / 2 + sampleLength / 2 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
 
         ascentZoneParkPose = new Pose2d(24, -12, Math.toRadians(180));
         ascentZonePickupPose = new Pose2d(24, -12, Math.toRadians(180));
@@ -139,12 +151,15 @@ public final class FieldConstantsSelect {
         basketSideStrafePose = flipBlueToRedPose(basketSideStrafePose);
         basketSideStartPose = flipBlueToRedPose(basketSideStartPose);
         basketDeliverPose = flipBlueToRedPose(basketDeliverPose);
+        basketDeliverPoseTurned = flipBlueToRedPose(basketDeliverPoseTurned);
+        basketDeliverPoseTurned1 = flipBlueToRedPose(basketDeliverPoseTurned1);
+
         altBasketStartPose = flipBlueToRedPose(altBasketStartPose);
 
         innerYellowPickupPose = flipBlueToRedPose(innerYellowPickupPose);
-        innerYellowPrePickupPose = flipBlueToRedPose(innerYellowPrePickupPose);
+
         midYellowPickupPose = flipBlueToRedPose(midYellowPickupPose);
-        midYellowPrePickupPose = flipBlueToRedPose(midYellowPrePickupPose);
+
 
         outerYellowPrePose = flipBlueToRedPose(outerYellowPrePose);
         outerYellowPickupPose = flipBlueToRedPose(outerYellowPickupPose);

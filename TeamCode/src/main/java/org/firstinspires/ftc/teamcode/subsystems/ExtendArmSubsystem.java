@@ -9,11 +9,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -28,6 +30,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public static double kp = 0.8;
     public static double ki = 0;
     public static double kd = 0;
+
+    public static double parkArmDown = .25;
+    public static double parkArmUp = .0;
+
 
     public static boolean TUNE = false;
 
@@ -58,6 +64,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
     public int holdCtr;
     public int showSelect = 0;
     public boolean shutDownArmPositioning;
+    public Servo parkArmServo;
     double leftPidOut;
     double rightPidOut;
     private ElapsedTime et;
@@ -66,6 +73,10 @@ public class ExtendArmSubsystem extends SubsystemBase {
     private double scanTime;
 
     public ExtendArmSubsystem(CommandOpMode opMode) {
+
+        parkArmServo = opMode.hardwareMap.get(Servo.class, "parkArm");
+
+        parkArmServo.setDirection(Servo.Direction.FORWARD);
 
         constraints = new TrapezoidProfile.Constraints(TRAJECTORY_VEL, TRAJECTORY_ACCEL);
 
@@ -105,7 +116,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
 
         et = new ElapsedTime();
 
-
+        dropParkArm();
     }
 
     public static double round2dp(double number, int dp) {
@@ -218,6 +229,14 @@ public class ExtendArmSubsystem extends SubsystemBase {
         setTargetInches(0);
     }
 
+    public Action dropParkArm() {
+        return new InstantAction(() -> parkArmServo.setPosition(parkArmDown));
+    }
+
+    public Action raiseParkArm() {
+        return new InstantAction(() -> parkArmServo.setPosition(parkArmUp));
+    }
+
     public double getLeftPositionInches() {
         return leftArmEncoder.getDistance();
     }
@@ -262,10 +281,9 @@ public class ExtendArmSubsystem extends SubsystemBase {
         return positionArm(Constants.ExtendArmConstants.autoPickupDistance);
     }
 
-    public Action armToBucketAction() {
-        return positionArm(Constants.ExtendArmConstants.bucketDistance);
+    public Action armToHome() {
+        return positionArm(Constants.ExtendArmConstants.home);
     }
-
 
     public void showTelemetryCommon() {
         telemetry.addData("ArmCommon", showSelect);
@@ -275,8 +293,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmRightInches", round2dp(getRightPositionInches(), 2));
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
         telemetry.addData("ArmShutdownPositioning", shutDownArmPositioning);
-
-
         telemetry.update();
     }
 
@@ -292,10 +308,7 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmLeftVel", round2dp(getLeftInchesPerSec(), 2));
         telemetry.addData("ArmLeftPID", round2dp(leftPidOut, 2));
         telemetry.addData("ArmLeftPower", round2dp(leftArmMotor.get(), 2));
-
-
         telemetry.update();
-
     }
 
     public void showTelemetryRight() {
@@ -311,7 +324,6 @@ public class ExtendArmSubsystem extends SubsystemBase {
         telemetry.addData("ArmRightPID", round2dp(rightPidOut, 2));
         telemetry.addData("ArmRightPower", round2dp(rightArmMotor.get(), 2));
         telemetry.update();
-
     }
 
 

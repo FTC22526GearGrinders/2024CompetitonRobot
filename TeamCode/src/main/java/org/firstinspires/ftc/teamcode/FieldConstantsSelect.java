@@ -70,6 +70,7 @@ public final class FieldConstantsSelect {
         basketSideStrafePose = new Pose2d(36, 66 - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketDeliverPose = new Pose2d(57, 57, Math.toRadians(-135));
 
+
         innerYellowPickupPose = new Pose2d(48 + tileToothDepth / 2 + sampleWidth / 2,
                 24 + tileToothDepth / 2 + sampleLength / 2 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
 

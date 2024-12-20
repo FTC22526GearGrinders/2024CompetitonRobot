@@ -142,6 +142,7 @@ public class SpecimenFourAutoOpmode extends CommandOpMode {
                 .strafeToLinearHeading(fcs.specimenDeliverPose1.position, fcs.specimenDropAngle,
                         finalVel, finalAccel).build();
 
+
         firstSampleMoveToObservationZone = drive.actionBuilder(fcs.specimenDeliverPose1)
                 .strafeToLinearHeading(fcs.firstStagePushInnerPose.position, Math.toRadians(180))
                 .strafeToLinearHeading(fcs.secondStagePushInnerVector, Math.toRadians(180))

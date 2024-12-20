@@ -65,7 +65,7 @@ public class Elevator_Arm_RotateArm_Actions {
         return
                 new SequentialAction(
                         rotateArm.tiltToBucketDeliver(),
-                        arm.armToBucketAction(),
+                        arm.armToHome(),
                         rotateArm.openIntakeClaw(),
                         new SleepAction(.5),
                         elevator.travelBucket(),
@@ -77,7 +77,7 @@ public class Elevator_Arm_RotateArm_Actions {
         return
                 new SequentialAction(
                         rotateArm.tiltToBucketDeliver(),
-                        arm.armToBucketAction());
+                        arm.armToHome());
     }
 
 
@@ -108,7 +108,7 @@ public class Elevator_Arm_RotateArm_Actions {
                         elevator.levelBucket(),
                         new SleepAction(.5),//claw close wait
                         rotateArm.tiltToBucketDeliver(),
-                        arm.armToBucketAction(),//arm tolerance is 2" so will finish early
+                        arm.armToHome(),//arm tolerance is 2" so will finish early
                         new SleepAction(1.5),//wait for arm and tilt
                         rotateArm.openIntakeClaw(),
                         new SleepAction(1),//claw open wait for sample to drop
@@ -124,6 +124,17 @@ public class Elevator_Arm_RotateArm_Actions {
                                 new SleepAction(.5),//wait before tilt out
                                 rotateArm.tiltToPickup()));
     }
+
+    public Action autoArmOutTiltToVertical() {
+        return
+                new ParallelAction(
+                        arm.armToAutoPickupAction(),// 2" in position means ends early but continues to position
+                        new SequentialAction(
+                                new SleepAction(.5),//wait before tilt out
+                                rotateArm.tiltBothVertical()));
+    }
+
+
 
     public Action testDeliver() {
         return new SequentialAction(
