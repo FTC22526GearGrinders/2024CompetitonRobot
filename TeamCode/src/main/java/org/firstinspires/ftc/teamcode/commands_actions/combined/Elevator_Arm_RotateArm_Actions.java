@@ -101,6 +101,14 @@ public class Elevator_Arm_RotateArm_Actions {
                         rotateArm.openIntakeClaw()));
     }
 
+    public Action armShortOutTiltAboveSamplesOpenClaw() {
+        return new SequentialAction(
+                arm.armToAutoPickupAction(),
+                new ParallelAction(
+                        rotateArm.tiltAboveSamples(),
+                        rotateArm.openIntakeClaw()));
+    }
+
     public Action autoArmPickupThenBucketDrop() {
         return
                 new SequentialAction(

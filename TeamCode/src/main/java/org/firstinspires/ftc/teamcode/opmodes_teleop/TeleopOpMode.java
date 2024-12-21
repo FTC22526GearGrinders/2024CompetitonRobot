@@ -126,7 +126,8 @@ public class TeleopOpMode extends CommandOpMode {
             runningActions.add(
                     new ConditionalAction(
                             eara.armOutTiltAboveSamplesOpenClaw(),
-                            eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
+                            eara.armShortOutTiltAboveSamplesOpenClaw(),
+                            //  eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
                             rotateArm.currentTilt != rotateArm.intakeTiltAboveSampleAngle));
 
         if (currentGamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
