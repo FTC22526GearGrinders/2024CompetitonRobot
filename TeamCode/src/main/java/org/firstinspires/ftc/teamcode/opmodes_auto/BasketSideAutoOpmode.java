@@ -75,6 +75,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     Action fourthSamplePickupMove;
     Action parkAction;
 
+
     boolean red = false;
     boolean blue = false;
     TranslationalVelConstraint finalVel;
@@ -99,8 +100,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         //   limelight = new LimelightSubsystem(this);
         packet = new TelemetryPacket();
         fcs = new FieldConstantsSelect();
-        finalAccel = new ProfileAccelConstraint(-20, 20);
-        finalVel = new TranslationalVelConstraint(20);
+        finalAccel = new ProfileAccelConstraint(-30, 30);
+        finalVel = new TranslationalVelConstraint(30);
         register(arm, elevator);
 
         arm.setDefaultCommand(new PositionHoldArm(arm));
@@ -121,6 +122,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
         firstSampleStrafeMove = drive.actionBuilder(fcs.basketSideStartPose)
                 .strafeTo(fcs.basketSideStrafePose.position).build();
+        // .lineToX(fcs.basketSideStrafePose.position.x).build();
 
         firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStrafePose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();

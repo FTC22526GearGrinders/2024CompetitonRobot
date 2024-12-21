@@ -84,9 +84,9 @@ public class Elevator_Arm_RotateArm_Actions {
     //this may result in a sample or not - need to check
     public Action tiltToPickupCloseClawRaiseTiltAboveSubmersible() {
         return new SequentialAction(
-                // arm.armToPickupAction(),
-                //  rotateArm.tiltToPickup(),
-                //  new SleepAction(.1),
+                arm.armToPickupAction(),
+                rotateArm.tiltToPickup(),
+                new SleepAction(.1),
                 rotateArm.closeIntakeClaw(),
                 new SleepAction(1),
                 rotateArm.tiltAboveSubmersible());
@@ -105,11 +105,12 @@ public class Elevator_Arm_RotateArm_Actions {
         return
                 new SequentialAction(
                         rotateArm.closeIntakeClaw(),
+                        new SleepAction(0.5),
                         elevator.levelBucket(),
-                        new SleepAction(.5),//claw close wait
+                        // new SleepAction(.5),//claw close wait
                         rotateArm.tiltToBucketDeliver(),
                         arm.armToHome(),//arm tolerance is 2" so will finish early
-                        new SleepAction(1.5),//wait for arm and tilt
+                        new SleepAction(.5),//wait for arm and tilt
                         rotateArm.openIntakeClaw(),
                         new SleepAction(1),//claw open wait for sample to drop
                         elevator.travelBucket(),

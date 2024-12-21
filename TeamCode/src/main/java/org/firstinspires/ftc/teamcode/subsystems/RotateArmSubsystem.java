@@ -90,7 +90,8 @@ public class RotateArmSubsystem extends SubsystemBase {
         return
                 new ParallelAction(
                         new InstantAction(() -> leftTiltServo.setPosition(angle)),
-                        new InstantAction(() -> rightTiltServo.setPosition(angle)));
+                        new InstantAction(() -> rightTiltServo.setPosition(angle)),
+                        new InstantAction(() -> currentTilt = angle));
     }
 
     public Action tiltToPickup() {
