@@ -34,13 +34,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static double ekp = 0.5;
     public static double eki = 0;
     public static double ekd = 0;
-    public static double powerDownLimit = .5;
-    public static double powerUpLimit = .8;
+    public static double powerDownLimit = .9;
+    public static double powerUpLimit = .9;
 
     public static boolean TUNE = false;
     public static double TARGET;
-    public static double TRAJECTORY_VEL = 15;
-    public static double TRAJECTORY_ACCEL = 10;
+    public static double TRAJECTORY_VEL = 20;
+    public static double TRAJECTORY_ACCEL = 20;
     public final double UPPER_POSITION_LIMIT = 30;
     public final double LOWER_POSITION_LIMIT = 0;
     private final Telemetry telemetry;

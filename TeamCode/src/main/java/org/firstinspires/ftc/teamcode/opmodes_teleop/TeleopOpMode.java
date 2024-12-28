@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
-import org.firstinspires.ftc.teamcode.utils.ConditionalAction;
+import org.firstinspires.ftc.teamcode.utils.MultiConditionalAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +47,7 @@ public class TeleopOpMode extends CommandOpMode {
 
     private Elevator_Arm_RotateArm_Actions eara;
     private List<Action> runningActions = new ArrayList<>();
+    private int pickupStep;
 
     // @Override
     public void initialize() {
@@ -121,14 +122,23 @@ public class TeleopOpMode extends CommandOpMode {
 
 
     private void doDriverButtons() {
+//
+//        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
+//            runningActions.add(
+//                    new ConditionalAction(
+//                            eara.armOutTiltAboveSamplesOpenClaw(),
+//                            eara.armShortOutTiltAboveSamplesOpenClaw(),
+//                            //  eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
+//                            rotateArm.currentTilt != rotateArm.intakeTiltAboveSampleAngle));
 
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
             runningActions.add(
-                    new ConditionalAction(
-                            eara.armOutTiltAboveSamplesOpenClaw(),
+                    new MultiConditionalAction(
                             eara.armShortOutTiltAboveSamplesOpenClaw(),
-                            //  eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
-                            rotateArm.currentTilt != rotateArm.intakeTiltAboveSampleAngle));
+                            eara.armOutTiltAboveSamplesOpenClaw(),
+                            eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
+                            pickupStep
+                    ));
 
         if (currentGamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
             runningActions.add(eara.tiltAndArmMoveThenDeliverToBucket());
