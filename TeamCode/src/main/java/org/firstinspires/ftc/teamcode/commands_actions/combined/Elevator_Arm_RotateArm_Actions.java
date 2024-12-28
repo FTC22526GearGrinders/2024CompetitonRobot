@@ -112,6 +112,7 @@ public class Elevator_Arm_RotateArm_Actions {
     public Action autoArmPickupThenBucketDrop() {
         return
                 new SequentialAction(
+                        new SleepAction(1),
                         rotateArm.closeIntakeClaw(),
                         new SleepAction(0.5),
                         elevator.levelBucket(),

@@ -312,16 +312,16 @@ public final class MecanumDriveSubsystem extends SubsystemBase {
 
         telemetry.addData("MecanumDrive 1", showSelect);
 
-        telemetry.addData("TMPY", tempy);
-        telemetry.addData("FrontLeftTicks P0", leftFront.getCurrentPosition());
-        telemetry.addData("FrontRightTicks P1", rightFront.getCurrentPosition());
+//        telemetry.addData("TMPY", tempy);
+//        telemetry.addData("FrontLeftTicks P0", leftFront.getCurrentPosition());
+//        telemetry.addData("FrontRightTicks P1", rightFront.getCurrentPosition());
         //  telemetry.addData("BackLeftTicks P1", leftBack.getCurrentPosition());
-        telemetry.addData("BackRightTicks Perp", rightBack.getCurrentPosition());
+       // telemetry.addData("BackRightTicks Perp", rightBack.getCurrentPosition());
         telemetry.addData("X", pose.position.x);
         telemetry.addData("Y", pose.position.y);
         telemetry.addData("H", pose.heading.toDouble());
-        telemetry.addData("IMUYawDeg", getYawDegs());
-        telemetry.addData("FieldCentric", fieldCentric);
+//        telemetry.addData("IMUYawDeg", getYawDegs());
+//        telemetry.addData("FieldCentric", fieldCentric);
         telemetry.update();
     }
 

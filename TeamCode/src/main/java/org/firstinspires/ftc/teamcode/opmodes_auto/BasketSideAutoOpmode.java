@@ -42,6 +42,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FieldConstantsSelect;
 import org.firstinspires.ftc.teamcode.commands_actions.arm.PositionHoldArm;
 import org.firstinspires.ftc.teamcode.commands_actions.combined.Elevator_Arm_RotateArm_Actions;
@@ -107,6 +108,8 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         arm.setDefaultCommand(new PositionHoldArm(arm));
 
         elevator.setDefaultCommand(new PositionHoldElevator(elevator));
+
+        drive.showSelect = Constants.ShowTelemetryConstants.showDrive1;
     }
 
     void createMotionActions(boolean red) {
@@ -127,14 +130,20 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         firstSampleDeliverMove = drive.actionBuilder(fcs.basketSideStrafePose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-        secondSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+        secondSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.innerYellowPrePickupPose.position, fcs.innerYellowPrePickupPose.heading).build();
+
+
+        secondSamplePickupMove = drive.actionBuilder(fcs.innerYellowPrePickupPose)
                 .strafeToLinearHeading(fcs.innerYellowPickupPose.position, fcs.innerYellowPickupPose.heading).build();
 
         secondSampleDeliverMove = drive.actionBuilder(fcs.innerYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
+        thirdSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.midYellowPrePickupPose.position, fcs.midYellowPrePickupPose.heading).build();
 
-        thirdSamplePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+        thirdSamplePickupMove = drive.actionBuilder(fcs.midYellowPrePickupPose)
                 .strafeToLinearHeading(fcs.midYellowPickupPose.position, fcs.midYellowPickupPose.heading).build();
 
         thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
@@ -168,7 +177,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 elevator.cycleBucketToVertical(),
 
                 new ParallelAction(
-                        secondSamplePickupMove,
+                        new SequentialAction(
+                                secondSamplePrePickupMove,
+                                secondSamplePickupMove),
+
                         elevator.elevatorToHome(),
                         new SequentialAction(
                                 new SleepAction(1),
@@ -185,7 +197,10 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 elevator.cycleBucketToVertical(),
 
                 new ParallelAction(
-                        thirdSamplePickupMove,
+                        new SequentialAction(
+                                thirdSamplePrePickupMove,
+                                thirdSamplePickupMove),
+
                         elevator.elevatorToHome(),
                         new SequentialAction(
                                 new SleepAction(1),

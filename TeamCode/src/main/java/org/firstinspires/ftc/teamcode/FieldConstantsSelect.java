@@ -10,6 +10,7 @@ public final class FieldConstantsSelect {
     //basket
     public double pickUpArmEX = 10.5;//11;
     public double driveTo = 0;
+    public double basketPreY=6;
     public double sampleDropOffZoneFromWall = 8;
     public double specStartX = -9;
     public double specDiffX = 12;
@@ -68,14 +69,19 @@ public final class FieldConstantsSelect {
 
         basketSideStartPose = new Pose2d(36, 72 - Constants.RobotConstants.width / 2, Math.toRadians(180));
         basketSideStrafePose = new Pose2d(41, 66 - Constants.RobotConstants.width / 2, Math.toRadians(180));
-        basketDeliverPose = new Pose2d(58, 58, Math.toRadians(-135));//57,57
+        basketDeliverPose = new Pose2d(57, 57, Math.toRadians(-135));//57,57
 
+
+        innerYellowPrePickupPose = new Pose2d(48 + tileToothDepth / 2 + sampleWidth / 2,
+                24 + tileToothDepth / 2 + sampleLength / 2 + basketPreY + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-100));
 
         innerYellowPickupPose = new Pose2d(48 + tileToothDepth / 2 + sampleWidth / 2,
                 24 + tileToothDepth / 2 + sampleLength / 2 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
 
+        midYellowPrePickupPose = new Pose2d(58 + tileToothDepth / 2 + sampleWidth / 2,
+                24 + tileToothDepth / 2 + sampleLength / 2 + basketPreY + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-100));
 
-        midYellowPickupPose = new Pose2d(58 + 3.5 + tileToothDepth / 2 + sampleWidth / 2,
+        midYellowPickupPose = new Pose2d(58 + tileToothDepth / 2 + sampleWidth / 2,
                 24 + tileToothDepth / 2 + sampleLength / 2 + Constants.RobotConstants.length / 2 + pickUpArmEX, Math.toRadians(-90));
 
         outerYellowPrePose = new Pose2d(Constants.FieldConstants.width / 2 - 1 - Constants.RobotConstants.length / 2 - pickUpArmEX - driveTo, 25.5, Math.toRadians(0));
@@ -130,6 +136,10 @@ public final class FieldConstantsSelect {
         basketSideStartPose = flipBlueToRedPose(basketSideStartPose);
         basketDeliverPose = flipBlueToRedPose(basketDeliverPose);
 
+
+        innerYellowPrePickupPose = flipBlueToRedPose(innerYellowPrePickupPose);
+
+        midYellowPrePickupPose = flipBlueToRedPose(midYellowPrePickupPose);
 
         innerYellowPickupPose = flipBlueToRedPose(innerYellowPickupPose);
 
