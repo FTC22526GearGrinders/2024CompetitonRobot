@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode.opmodes_teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -23,7 +22,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ExtendArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RotateArmSubsystem;
-import org.firstinspires.ftc.teamcode.utils.MultiConditionalAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,26 +120,33 @@ public class TeleopOpMode extends CommandOpMode {
 
 
     private void doDriverButtons() {
-//
-//        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
-//            runningActions.add(
-//                    new ConditionalAction(
-//                            eara.armOutTiltAboveSamplesOpenClaw(),
-//                            eara.armShortOutTiltAboveSamplesOpenClaw(),
-//                            //  eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
-//                            rotateArm.currentTilt != rotateArm.intakeTiltAboveSampleAngle));
+
+        /*
+         *
+         * Use dpad ri
+         *
+         *
+         *
+         * */
+
+        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
+            runningActions.add(eara.armOutTiltAboveSubmersible());
+
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
+            runningActions.add(rotateArm.toggleTiltPickupAboveSamples());
 
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
-            runningActions.add(
-                    new MultiConditionalAction(
-                            eara.armShortOutTiltAboveSamplesOpenClaw(),
-                            eara.armOutTiltAboveSamplesOpenClaw(),
-                            eara.tiltToPickupCloseClawRaiseTiltAboveSubmersible(),
-                            pickupStep
-                    ));
+            runningActions.add(rotateArm.toggleIntakeClaw());
+
+        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
+            runningActions.add(eara.armOutTiltAboveSamples());
+
+        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
+            runningActions.add(eara.armOutShortTiltAboveSubmersibleWithSample());
 
         if (currentGamepad1.left_trigger > .75 && !(previousGamepad1.left_trigger > .75))
             runningActions.add(eara.tiltAndArmMoveThenDeliverToBucket());
+
 
         if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)
             runningActions.add(elevator.grabSpecimenAndClearWall());
@@ -149,11 +154,11 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad1.right_trigger > .75 && !(previousGamepad1.right_trigger > .75))
             runningActions.add(elevator.deliverSpecimenToNearestChamber());
 
-        if (currentGamepad1.y && !previousGamepad1.y)
-            runningActions.add(rotateArm.openIntakeClaw());
+//        if (currentGamepad1.y && !previousGamepad1.y)
+//            runningActions.add(
 
-        if (currentGamepad1.x && !previousGamepad1.x)
-            runningActions.add(rotateArm.closeIntakeClaw());
+//        if (currentGamepad1.x && !previousGamepad1.x)
+//            runningActions.add(
 
         if (currentGamepad1.a && !previousGamepad1.a)
             runningActions.add(elevator.openSpecimenClaw());
@@ -161,17 +166,6 @@ public class TeleopOpMode extends CommandOpMode {
         if (currentGamepad1.b && !previousGamepad1.b)
             runningActions.add(elevator.closeSpecimenClaw());
 
-        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up)
-            runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.firstExtendDistance)));
-
-        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_right)
-            runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.secondExtendDistance)));
-
-        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
-            runningActions.add(new InstantAction(() -> arm.setTargetInches(Constants.ExtendArmConstants.pickupDistance)));
-
-        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
-            runningActions.add(elevator.cycleBucket());
 
     }
 

@@ -8,20 +8,20 @@ import com.acmerobotics.roadrunner.Action;
 public class ConditionalAction implements Action {
     private final Action firstAction;
     private final Action secondAction;
-    private boolean select = false;
+    private boolean selectFirstAction = false;
     private boolean initialized = false;
     private boolean latchCondition = false;
 
-    public ConditionalAction(Action firstAction, Action secondAction, boolean select) {
+    public ConditionalAction(Action firstAction, Action secondAction, boolean selectFirstAction) {
         this.firstAction = firstAction;
         this.secondAction = secondAction;
-        this.select = select;
+        this.selectFirstAction = selectFirstAction;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         if (!initialized) {
-            latchCondition = select;
+            latchCondition = selectFirstAction;
             initialized = true;
         }
 

@@ -178,47 +178,45 @@ public class SpecimenThreeAutoOpmode extends CommandOpMode {
         autoSequence = new SequentialAction(
 
                 new ParallelAction(
-                        firstSpecimenPreDeliverMove,
+                        new SequentialAction(
+                                firstSpecimenPreDeliverMove,
+                                firstSpecimenDeliverMove),
                         elevator.elevatorToAboveUpperSubmersible()),
-
-                firstSpecimenDeliverMove,
 
                 elevator.deliverSpecimenToNearestChamber(),
 
-
                 new ParallelAction(
-                        firstSampleMoveToObservationZone,
+                        new SequentialAction(
+                                firstSampleMoveToObservationZone,
+                                firstSampleMoveToObservationZonePickup),
                         elevator.elevatorToHome()),
-
-                firstSampleMoveToObservationZonePickup,
 
                 elevator.grabSpecimenAndClearWall(),
 
 
                 new ParallelAction(
-                        secondSpecimenPreDeliverMove,
+                        new SequentialAction(
+                                secondSpecimenPreDeliverMove,
+                                secondSpecimenDeliverMove),
                         elevator.elevatorToAboveUpperSubmersible()),
-
-                secondSpecimenDeliverMove,
 
                 elevator.deliverSpecimenToNearestChamber(),
 
                 new ParallelAction(
-                        thirdSpecimenPrePickupMove,
+                        new SequentialAction(
+                                thirdSpecimenPrePickupMove,
+                                thirdSpecimenPickupMove),
                         elevator.elevatorToHome()),
-
-                thirdSpecimenPickupMove,
 
                 elevator.grabSpecimenAndClearWall(),
 
                 new ParallelAction(
-                        thirdSpecimenPreDeliverMove,
+                        new SequentialAction(
+                                thirdSpecimenPreDeliverMove,
+                                thirdSpecimenDeliverMove),
                         elevator.elevatorToAboveUpperSubmersible()),
 
-                thirdSpecimenDeliverMove,
-
                 elevator.deliverSpecimenToNearestChamber(),
-
 
                 new ParallelAction(
                         elevator.elevatorToHome(),

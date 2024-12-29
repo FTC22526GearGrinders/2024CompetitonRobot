@@ -154,37 +154,37 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
 
     private void buildSequence() {
 
-        autoSequence = new SequentialAction(
+        autoSequence =
 
-                new ParallelAction(
-                        firstSpecimenPreDeliverMove,
-                        elevator.elevatorToAboveUpperSubmersible()),
+                new SequentialAction(
 
-                firstSpecimenDeliverMove,
+                        new ParallelAction(
+                                new SequentialAction(
+                                        firstSpecimenPreDeliverMove,
+                                        firstSpecimenDeliverMove),
+                                elevator.elevatorToAboveUpperSubmersible()),
 
-                elevator.deliverSpecimenToNearestChamber(),
+                        elevator.deliverSpecimenToNearestChamber(),
 
+                        new ParallelAction(
+                                new SequentialAction(
+                                        secondSpecimenPrePickupMove,
+                                        secondSpecimenPickupMove),
+                                elevator.elevatorToHome()),
 
-                new ParallelAction(
-                        secondSpecimenPrePickupMove,
-                        elevator.elevatorToHome()),
+                        elevator.grabSpecimenAndClearWall(),
 
-                secondSpecimenPickupMove,
+                        new ParallelAction(
+                                new SequentialAction(
+                                        secondSpecimenPreDeliverMove,
+                                        secondSpecimenDeliverMove),
+                                elevator.elevatorToAboveUpperSubmersible()),
 
-                elevator.grabSpecimenAndClearWall(),
+                        elevator.deliverSpecimenToNearestChamber(),
 
-
-                new ParallelAction(
-                        secondSpecimenPreDeliverMove,
-                        elevator.elevatorToAboveUpperSubmersible()),
-
-                secondSpecimenDeliverMove,
-
-                elevator.deliverSpecimenToNearestChamber(),
-
-                new ParallelAction(
-                        elevator.elevatorToHome(),
-                        park));
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                park));
     }
 
     @Override
@@ -211,7 +211,6 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
             run();
 
             autoSequence.run(packet);
-
 
 
             if (gamepad2.start) incShowSelect();

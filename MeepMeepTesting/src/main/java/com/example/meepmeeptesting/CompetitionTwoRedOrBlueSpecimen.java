@@ -77,7 +77,7 @@ public class CompetitionTwoRedOrBlueSpecimen {
         DriveShim drive = myBot.getDrive();
 
 
-        fcs.setRed();
+        //  fcs.setRed();
 
 
         firstSpecimenPreDeliverMove = drive.actionBuilder(fcs.specimenSideStartPose)
@@ -98,7 +98,7 @@ public class CompetitionTwoRedOrBlueSpecimen {
 
 
         secondSpecimenPreDeliverMove = drive.actionBuilder(fcs.specimenPickupPose)
-                .strafeToLinearHeading(fcs.specimenDeliverApproachPose2.position, fcs.specimenDropAngle).build();
+                .strafeToLinearHeading(fcs.specimenDeliverApproachPose2.position, fcs.specimenDropApproachAngle).build();
 
         secondSpecimenDeliverMove = drive.actionBuilder(fcs.specimenDeliverApproachPose2)
                 .strafeToLinearHeading(fcs.specimenDeliverPose2.position, fcs.specimenDropAngle,

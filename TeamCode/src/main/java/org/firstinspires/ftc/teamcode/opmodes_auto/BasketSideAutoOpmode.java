@@ -177,18 +177,19 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                 elevator.cycleBucketToVertical(),
 
                 new ParallelAction(
+
                         new SequentialAction(
                                 secondSamplePrePickupMove,
                                 secondSamplePickupMove),
+                        new ParallelAction(
+                                elevator.elevatorToHome(),
+                                new SequentialAction(
+                                        new SleepAction(1.5),
+                                        ears.autoArmOutTiltToPickup()))),
 
-                        elevator.elevatorToHome(),
-                        new SequentialAction(
-                                new SleepAction(1),
-                                ears.autoArmOutTiltToPickup())),
-
-                elevator.levelBucket(),
-
-                ears.autoArmPickupThenBucketDrop(),
+                new ParallelAction(
+                        elevator.levelBucket(),
+                        ears.autoArmPickupThenBucketDrop()),
 
                 new ParallelAction(
                         secondSampleDeliverMove,
@@ -200,15 +201,14 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new SequentialAction(
                                 thirdSamplePrePickupMove,
                                 thirdSamplePickupMove),
-
                         elevator.elevatorToHome(),
                         new SequentialAction(
-                                new SleepAction(1),
+                                new SleepAction(1.5),
                                 ears.autoArmOutTiltToPickup())),
 
-                elevator.levelBucket(),
-
-                ears.autoArmPickupThenBucketDrop(),
+                new ParallelAction(
+                        elevator.levelBucket(),
+                        ears.autoArmPickupThenBucketDrop()),
 
                 new ParallelAction(
                         thirdSampleDeliverMove,
@@ -216,22 +216,24 @@ public class BasketSideAutoOpmode extends CommandOpMode {
 
                 elevator.cycleBucketToVertical(),
 
-//                new ParallelAction(
-//                        fourthSamplePrePickupMove,
-//                        elevator.elevatorToHome()),
+                new ParallelAction(
+                        new SequentialAction(
+                                fourthSamplePrePickupMove,
+                                fourthSamplePickupMove),
+                        elevator.elevatorToHome(),
+                        new SequentialAction(
+                                new SleepAction(1.5),
+                                ears.autoArmOutTiltToPickup())),
 
-//                new SequentialAction(
-//                        fourthSamplePickupMove,
-//                        ears.autoArmOutTiltToPickup()),
-//
-//                elevator.levelBucket(),
-//
-//                ears.autoArmPickupThenBucketDrop(),
-//
-//                new ParallelAction(
-//                        fourthSampleDeliverMove,
-//                        elevator.elevatorToUpperBasket()),
+                new ParallelAction(
+                        elevator.levelBucket(),
+                        ears.autoArmPickupThenBucketDrop()),
 
+                new ParallelAction(
+                        fourthSampleDeliverMove,
+                        elevator.elevatorToUpperBasket()),
+
+                elevator.cycleBucketToVertical(),
 
                 new SequentialAction(
                         new ParallelAction(

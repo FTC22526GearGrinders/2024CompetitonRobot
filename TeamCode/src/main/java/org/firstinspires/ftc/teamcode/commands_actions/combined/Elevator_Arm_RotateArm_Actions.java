@@ -93,7 +93,7 @@ public class Elevator_Arm_RotateArm_Actions {
     }
 
 
-    public Action armOutTiltAboveSamplesOpenClaw() {
+    public Action armOutTiltAboveSamples() {
         return new SequentialAction(
                 arm.armToPickupAction(),
                 new ParallelAction(
@@ -101,13 +101,22 @@ public class Elevator_Arm_RotateArm_Actions {
                         rotateArm.openIntakeClaw()));
     }
 
-    public Action armShortOutTiltAboveSamplesOpenClaw() {
+    public Action armOutTiltAboveSubmersible() {
+        return new SequentialAction(
+                arm.armToPickupAction(),
+                new ParallelAction(
+                        rotateArm.tiltAboveSubmersible(),
+                        rotateArm.openIntakeClaw()));
+    }
+
+    public Action armOutShortTiltAboveSubmersibleWithSample() {
         return new SequentialAction(
                 arm.armToAutoPickupAction(),
                 new ParallelAction(
-                        rotateArm.tiltAboveSamples(),
+                        rotateArm.tiltAboveSubmersibleWithSample(),
                         rotateArm.openIntakeClaw()));
     }
+
 
     public Action autoArmPickupThenBucketDrop() {
         return
@@ -143,7 +152,6 @@ public class Elevator_Arm_RotateArm_Actions {
                                 new SleepAction(.5),//wait before tilt out
                                 rotateArm.tiltBothVertical()));
     }
-
 
 
     public Action testDeliver() {
