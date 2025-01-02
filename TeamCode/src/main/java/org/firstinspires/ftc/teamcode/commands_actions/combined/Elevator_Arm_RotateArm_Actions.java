@@ -123,14 +123,14 @@ public class Elevator_Arm_RotateArm_Actions {
                 new SequentialAction(
                         new SleepAction(1),
                         rotateArm.closeIntakeClaw(),
-                        new SleepAction(0.5),
+                        new SleepAction(1),
                         elevator.levelBucket(),
                         // new SleepAction(.5),//claw close wait
                         rotateArm.tiltToBucketDeliver(),
                         arm.armToHome(),//arm tolerance is 2" so will finish early
                         new SleepAction(.5),//wait for arm and tilt
                         rotateArm.openIntakeClaw(),
-                        new SleepAction(1),//claw open wait for sample to drop
+                        new SleepAction(0.75),//claw open wait for sample to drop
                         elevator.travelBucket(),
                         rotateArm.tiltBothVertical());
     }

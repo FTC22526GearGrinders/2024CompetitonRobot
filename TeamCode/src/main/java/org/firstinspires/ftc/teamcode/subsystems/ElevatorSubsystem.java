@@ -46,9 +46,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final double lrDiffMaxInches = 5;
     private final double bucketCycleTime = .5;
-    public double releaseDelay = 1;
-    public double specimenClawOpenAngle = 0.0;
-    public double specimenClawClosedAngle = .4;
+    public double releaseDelay = 0.8;
+    public double specimenClawOpenAngle = 0.3;
+    public double specimenClawClosedAngle = .6;
     public double bucketUprightAngle = .5;
     public double bucketTravelAngle = .4;
     public double bucketVerticalAngle = .1;

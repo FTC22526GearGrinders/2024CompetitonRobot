@@ -159,27 +159,21 @@ public class SpecimenTwoAutoOpmode extends CommandOpMode {
                 new SequentialAction(
 
                         new ParallelAction(
-                                new SequentialAction(
-                                        firstSpecimenPreDeliverMove,
-                                        firstSpecimenDeliverMove),
+                                firstSpecimenPreDeliverMove,
                                 elevator.elevatorToAboveUpperSubmersible()),
-
+                        firstSpecimenDeliverMove,
                         elevator.deliverSpecimenToNearestChamber(),
 
                         new ParallelAction(
-                                new SequentialAction(
-                                        secondSpecimenPrePickupMove,
-                                        secondSpecimenPickupMove),
+                                secondSpecimenPrePickupMove,
                                 elevator.elevatorToHome()),
-
+                        secondSpecimenPickupMove,
                         elevator.grabSpecimenAndClearWall(),
 
                         new ParallelAction(
-                                new SequentialAction(
-                                        secondSpecimenPreDeliverMove,
-                                        secondSpecimenDeliverMove),
+                                secondSpecimenPreDeliverMove,
                                 elevator.elevatorToAboveUpperSubmersible()),
-
+                        secondSpecimenDeliverMove,
                         elevator.deliverSpecimenToNearestChamber(),
 
                         new ParallelAction(

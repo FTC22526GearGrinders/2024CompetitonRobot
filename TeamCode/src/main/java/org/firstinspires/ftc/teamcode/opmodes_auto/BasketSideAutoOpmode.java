@@ -74,6 +74,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
     Action thirdSamplePickupMove;
     Action fourthSamplePrePickupMove;
     Action fourthSamplePickupMove;
+    Action fourthSampleRetractMove;
     Action parkAction;
 
 
@@ -149,15 +150,19 @@ public class BasketSideAutoOpmode extends CommandOpMode {
         thirdSampleDeliverMove = drive.actionBuilder(fcs.midYellowPickupPose)
                 .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
-//        fourthSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
-//                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading).build();
+        fourthSamplePrePickupMove = drive.actionBuilder(fcs.basketDeliverPose)
+                .strafeToLinearHeading(fcs.outerYellowPrePose.position, fcs.outerYellowPrePose.heading).build();
+
+        fourthSamplePickupMove = drive.actionBuilder(fcs.outerYellowPrePose)
+                .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading)
+                .build();
+
+        fourthSampleRetractMove = drive.actionBuilder(fcs.outerYellowPickupPose)
+                .strafeToLinearHeading(fcs.outerYellowPrePose.position, Math.toRadians(-10))
+                .build();
 //
-//        fourthSamplePickupMove = drive.actionBuilder(fcs.outerYellowPrePose)
-//                .strafeToLinearHeading(fcs.outerYellowPickupPose.position, fcs.outerYellowPickupPose.heading)
-//                .build();
-//
-//        fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPickupPose)
-//                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
+        fourthSampleDeliverMove = drive.actionBuilder(fcs.outerYellowPrePose)
+                .strafeToLinearHeading(fcs.basketDeliverPose.position, fcs.basketDeliverPose.heading).build();
 
         parkAction = drive.actionBuilder(fcs.basketDeliverPose)
                 .strafeToLinearHeading(fcs.ascentZoneParkPose.position, fcs.ascentZoneParkPose.heading).build();
@@ -184,7 +189,7 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                         new ParallelAction(
                                 elevator.elevatorToHome(),
                                 new SequentialAction(
-                                        new SleepAction(1.5),
+                                        new SleepAction(.75),
                                         ears.autoArmOutTiltToPickup()))),
 
                 new ParallelAction(
@@ -225,6 +230,14 @@ public class BasketSideAutoOpmode extends CommandOpMode {
                                 new SleepAction(1.5),
                                 ears.autoArmOutTiltToPickup())),
 
+
+                new SequentialAction(
+                        rotate.closeIntakeClaw(),
+                        new SleepAction(1),
+                        fourthSampleRetractMove),
+
+
+//
                 new ParallelAction(
                         elevator.levelBucket(),
                         ears.autoArmPickupThenBucketDrop()),
